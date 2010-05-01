@@ -1,0 +1,21 @@
+include ../makeinc
+
+all: driver_sine.o driver_sine_inplace.o driver_rand.o driver_spec.o 
+	$(FF) -o test_sine.x driver_sine.o -L$(P3DFFT_LOC) -l$(P3DFFT_LIB) $(LDFFLAGS)
+	$(FF) -o test_sine_inplace.x driver_sine_inplace.o -L$(P3DFFT_LOC) -l$(P3DFFT_LIB) $(LDFFLAGS)
+	$(FF) -o test_rand.x driver_rand.o -L$(P3DFFT_LOC) -l$(P3DFFT_LIB) $(LDFFLAGS)
+	$(FF) -o test_spec.x driver_spec.o -L$(P3DFFT_LOC) -l$(P3DFFT_LIB) $(LDFFLAGS)
+#	$(FF) -o test_ghost.x driver_ghost.o -L$(P3DFFT_LOC) -l$(P3DFFT_LIB) $(LDFFLAGS)
+
+driver_sine.o: driver_sine.f
+driver_sine_inplace.o: driver_sine_inplace.f
+driver_rand.o: driver_rand.f
+driver_spec.o: driver_spec.f
+#driver_ghost.o: driver_ghost.f
+
+.f.o: 
+		$(FF) -c $(FFLAGS) -I$(P3DFFT_INC) $(INC_FFT) $<
+
+clean:
+	-rm -f driver*.o 
+	-rm -f test_*.x

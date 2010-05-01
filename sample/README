@@ -1,0 +1,81 @@
+P3DFFT - Highly scalable parallel 3D Fast Fourier Transforms library
+
+Example programs directory
+
+Version 2.3
+
+Copyright (C) 2006-2008 Dmitry Pekurovsky
+San Diego Supercomputer Center/UC SanDiego
+
+Copyright (C) 2008 Jens Henrik Goebbert (ghost cell support)
+RWTH-Aachen, Germany
+
+------------
+Notice
+------------
+
+    P3DFFT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+------------
+Acknowledgements
+------------
+
+Prof. P.K.Yeung
+Dr. Diego Donzis
+Dr. Giri Chukkapalli
+Dr. Geert Brethouwer
+
+---------------------
+
+This directory contains example programs for using P3DFFT, both 
+in FORTRAN and C (in separate subdirectories). To compile the 
+examples, edit makeinc (see P3DFFT installation guide for details). 
+
+FORTRAN/ directory contains:
+
+driver_sine.f - program initializes a 3D array of real numbers as 
+  a sine wave. It calls forward real-to-complex FFT and then backward
+  complex-to-real FFT, checking to see if the original results were
+  reproduced (a maximum deviation is printed). This program expects
+  an ASCII file 'stdin' in the running directory, containing five numbers
+  in a single line:
+
+  Nx,Ny,Nz,Ndim,Nrep
+ 
+  The first three numbers are box dimensions. Ndim is the number of 
+  dimensions for processor decomposition, currently 1 or 2 (2 recommended). 
+  Nrep is the number of repititions (for timing runs). In addition the 
+  working directory may optionally contain a file 'dims', with two 
+  numbers in a line, specifying the desired dimensions of the processor 
+  grid. The product of these numbers should be equal to the total numer 
+  of tasks. If this file is absent, a default grid geometry is used. 
+
+driver_sine_inplace.f - this program is the same as driver_sine, except 
+  the input and output arrays are the same. When allocating this space
+  the size of the output array is used as it is usually a little larger 
+  due to the middle Fourier mode being present in full. 
+
+driver_rand.f - this program is the same as driver_sine, except the 
+  input array is initialized with random numbers. 
+
+driver_spec.f - this program initializes a 3D real array, calls 
+  forward real-to-complex FFT, and computes power spectrum based on the 
+  complex Fourier coefficients. 
+
+driver_ghost.f - this program illustrates the use of ghost cell features.
+  please note that ghost cell support is off by default
+
+C/ directory contains analogous programs written in C rather than Fortran. 
+

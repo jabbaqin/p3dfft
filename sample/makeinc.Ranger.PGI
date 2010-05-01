@@ -1,0 +1,11 @@
+FF = mpif90 
+FFLAGS = -fastsse -tp barcelona-64 -Mextend -byteswapio
+  # run "module load fftw3" before make
+FFT_LIB = -L$(TACC_FFTW3_LIB) -lfftw3 -lfftw3f
+
+INC_FFT = $(TACC_FFTW3_INC)
+LDFFLAGS= $(FFT_LIB)
+CC = mpicc
+
+CFLAGS = -fastsse -tp barcelona-64 -DPGI -DSINGLE_PREC
+LDCFLAGS= $(LDFFLAGS) -lm

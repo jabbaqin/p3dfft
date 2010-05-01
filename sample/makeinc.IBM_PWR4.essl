@@ -1,0 +1,10 @@
+FF = mpxlf95_r
+FFLAGS = -O3 -qfixed=132 -qarch=pwr4 -qstrict -qtune=pwr4 -q64 -d 
+LDFFLAGS= -O3 -q64  -lessl -L/usr/local/apps/mass -lmass 
+
+INC_FFT = 
+
+CC = mpcc_r 
+CFLAGS = -O3 -q64 -qarch=pwr4 -qtune=pwr4 -DIBM -DSINGLE_PREC
+LDCFLAGS= $(LDFFLAGS) -lxlf90_r
+

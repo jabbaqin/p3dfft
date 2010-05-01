@@ -1,0 +1,34 @@
+# P3DFFT build Options
+#
+# -DSINGLE_PREC : for single precision (default is double precision)
+#
+# -DONED : for 1D decomposition (default is 2D but it can be made 1D through
+#    setting up grid 1 x n when running the code) 
+#
+# -DFFTW or -DESSL for using FFTW3 library or ESSL (on IBM) in 1D FFTs.
+#   One of these has to be set.
+#
+# -DDIMS_C to assign processor rows and columns according to C convention, 
+# rather than "Fortran", which is default.
+#
+# -DUSE_EVEN for using MPI_Alltoall instead of MPI_Alltoallv. This method
+#   pads the send buffers with zeros to make them equal size. This options
+#   is not needed on most architectures.
+#
+# -DSTRIDE1 [-DNBL_X=... -DNBL_Y=...] to enable stride-1 data structure on 
+#  output (this may in some cases give some advantage in performance). 
+#  You can define loop blocking factors NBL_X and NBL_Y to experiment, 
+#  otherwise they are set to default values. NBL_Y=1 is recommended. 
+
+DFLAGS = -WF,"-P","-DESSL"
+
+CC = xlc
+FF = mpxlf90
+
+FFLAGS = -O3 -qfixed=132 -qarch=440 -qstrict -qsave -qtune=440 -qcache=auto -d
+AR = ar
+ARFLAGS = -v -r -u
+LDFLAGS= -O3 -L/opt/ibmmath/essl/4.2/lib -lesslbg -L/usr/local/apps/lib -lmass 
+
+
+

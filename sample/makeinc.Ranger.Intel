@@ -1,0 +1,10 @@
+FF = mpif90 
+FFLAGS = -O3 -xW -132 -fpp
+  # run "module load fftw3" before make
+FFT_LIB = -L$(TACC_FFTW3_LIB) -lfftw3 -lfftw3f
+
+INC_FFT = $(TACC_FFTW3_INC)
+LDFFLAGS= -O3 $(FFT_LIB)
+CC = mpicc
+CFLAGS = -O3 -xW -DSINGLE_PREC
+LDCFLAGS= $(LDFFLAGS)  -lm

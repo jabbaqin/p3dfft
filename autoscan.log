@@ -1,0 +1,56 @@
+autoscan: warning: missing AC_CHECK_FUNCS([sqrt]) wanted by: 
+	sample/C/driver_spec.c:154
+	sample/C/driver_spec.c:243
+autoscan: warning: missing AC_CHECK_HEADERS([stdlib.h]) wanted by: 
+	sample/C/driver_rand.c:30
+	sample/C/driver_sine.c:30
+	sample/C/driver_sine_inplace.c:30
+	sample/C/driver_spec.c:26
+	include/p3dfft.h:25
+autoscan: warning: missing AC_FUNC_MALLOC wanted by: 
+	sample/C/driver_rand.c:113
+	sample/C/driver_rand.c:114
+	sample/C/driver_rand.c:115
+	sample/C/driver_rand.c:125
+	sample/C/driver_rand.c:126
+	sample/C/driver_rand.c:127
+	sample/C/driver_sine.c:113
+	sample/C/driver_sine.c:114
+	sample/C/driver_sine.c:115
+	sample/C/driver_sine.c:125
+	sample/C/driver_sine.c:126
+	sample/C/driver_sine.c:127
+	sample/C/driver_sine_inplace.c:112
+	sample/C/driver_sine_inplace.c:113
+	sample/C/driver_sine_inplace.c:114
+	sample/C/driver_sine_inplace.c:127
+	sample/C/driver_spec.c:109
+	sample/C/driver_spec.c:110
+	sample/C/driver_spec.c:111
+	sample/C/driver_spec.c:122
+	sample/C/driver_spec.c:123
+	sample/C/driver_spec.c:155
+	sample/C/driver_spec.c:219
+autoscan: warning: missing AC_HEADER_STDC wanted by: 
+	sample/C/driver_rand.c:30
+	sample/C/driver_sine.c:30
+	sample/C/driver_sine_inplace.c:30
+	sample/C/driver_spec.c:26
+	include/p3dfft.h:25
+autoscan: warning: missing AC_PREREQ wanted by: 
+	autoscan
+autoscan: warning: missing AC_PROG_CC wanted by: 
+	sample/C/driver_rand.c
+	sample/C/driver_sine.c
+	sample/C/driver_sine_inplace.c
+	sample/C/driver_spec.c
+	include/p3dfft.h
+autoscan: warning: missing AC_PROG_INSTALL wanted by: 
+	build/makefile:56
+autoscan: warning: missing AC_PROG_MAKE_SET wanted by: 
+	sample/makefile:13
+	sample/makefile:14
+	sample/makefile:16
+	sample/makefile:18
+	sample/makefile:20
+	sample/makefile:21

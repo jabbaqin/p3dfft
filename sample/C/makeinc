@@ -1,0 +1,16 @@
+FF = mpif90 
+FFTW3_INC = /opt/pgi/fftw_pgi/include/ 
+FFTW3_LIB = /opt/pgi/fftw_pgi/lib/
+FFTW3F_LIB = /home/d4park/local/lib/
+
+
+FFLAGS = -fastsse -tp barcelona-64 -Mextend -byteswapio
+  # run "module load fftw3" before make
+FFT_LIB = -L$(FFTW3_LIB) -lfftw3 -L$(FFTW3F_LIB) -lfftw3f
+
+INC_FFT = -I$(FFTW3_INC)
+LDFFLAGS= $(FFT_LIB) -lmpi_f90 -lmpi_f77 -lmyriexpress
+CC = mpicc
+
+CFLAGS = -fastsse -tp barcelona-64 -DPGI
+LDCFLAGS= $(LDFFLAGS) -lm -pgf90libs -lmyriexpress

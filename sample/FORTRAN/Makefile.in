@@ -49,22 +49,22 @@ PROGRAMS = $(noinst_PROGRAMS)
 am_test_rand_x_OBJECTS = driver_rand.$(OBJEXT)
 test_rand_x_OBJECTS = $(am_test_rand_x_OBJECTS)
 test_rand_x_LDADD = $(LDADD)
-test_rand_x_DEPENDENCIES = $(prefix)/build/libp3dfft.a \
+test_rand_x_DEPENDENCIES = $(top_builddir)/build/libp3dfft.a \
 	$(FFTW3_LIB)/libfftw3.a
 am_test_sine_x_OBJECTS = driver_sine.$(OBJEXT)
 test_sine_x_OBJECTS = $(am_test_sine_x_OBJECTS)
 test_sine_x_LDADD = $(LDADD)
-test_sine_x_DEPENDENCIES = $(prefix)/build/libp3dfft.a \
+test_sine_x_DEPENDENCIES = $(top_builddir)/build/libp3dfft.a \
 	$(FFTW3_LIB)/libfftw3.a
 am_test_sine_inplace_x_OBJECTS = driver_sine_inplace.$(OBJEXT)
 test_sine_inplace_x_OBJECTS = $(am_test_sine_inplace_x_OBJECTS)
 test_sine_inplace_x_LDADD = $(LDADD)
-test_sine_inplace_x_DEPENDENCIES = $(prefix)/build/libp3dfft.a \
+test_sine_inplace_x_DEPENDENCIES = $(top_builddir)/build/libp3dfft.a \
 	$(FFTW3_LIB)/libfftw3.a
 am_test_spec_x_OBJECTS = driver_spec.$(OBJEXT)
 test_spec_x_OBJECTS = $(am_test_spec_x_OBJECTS)
 test_spec_x_LDADD = $(LDADD)
-test_spec_x_DEPENDENCIES = $(prefix)/build/libp3dfft.a \
+test_spec_x_DEPENDENCIES = $(top_builddir)/build/libp3dfft.a \
 	$(FFTW3_LIB)/libfftw3.a
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp =
@@ -156,7 +156,7 @@ F77 = $(FC)
 AM_FFLAGS = $(FCFLAGS) $(DFLAGS) $(INCLUDES) #-fastsse -tp barcelona-64 -Mextend -byteswapio
 #AM_LDFLAGS = -lmyriexpress
 INCLUDES = -I$(top_builddir)/include/
-LDADD = $(prefix)/build/libp3dfft.a $(FFTW3_LIB)/libfftw3.a
+LDADD = $(top_builddir)/build/libp3dfft.a $(FFTW3_LIB)/libfftw3.a
 test_sine_x_SOURCES = driver_sine.f
 test_sine_inplace_x_SOURCES = driver_sine_inplace.f
 test_rand_x_SOURCES = driver_rand.f

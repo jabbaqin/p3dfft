@@ -43,7 +43,15 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
-LIBRARIES = $(noinst_LIBRARIES)
+am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
+am__vpath_adj = case $$p in \
+    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
+    *) f=$$p;; \
+  esac;
+am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
+am__installdirs = "$(DESTDIR)$(libdir)"
+libLIBRARIES_INSTALL = $(INSTALL_DATA)
+LIBRARIES = $(lib_LIBRARIES)
 AR = ar
 ARFLAGS = cru
 libp3dfft_a_AR = $(AR) $(ARFLAGS)
@@ -65,11 +73,11 @@ DIST_SOURCES = $(libp3dfft_a_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} /home/d4park/auto/p/p3dfft/missing --run aclocal-1.9
-AMTAR = ${SHELL} /home/d4park/auto/p/p3dfft/missing --run tar
-AUTOCONF = ${SHELL} /home/d4park/auto/p/p3dfft/missing --run autoconf
-AUTOHEADER = ${SHELL} /home/d4park/auto/p/p3dfft/missing --run autoheader
-AUTOMAKE = ${SHELL} /home/d4park/auto/p/p3dfft/missing --run automake-1.9
+ACLOCAL = ${SHELL} /home/d4park/svn/branches/p3dfft-config/missing --run aclocal-1.9
+AMTAR = ${SHELL} /home/d4park/svn/branches/p3dfft-config/missing --run tar
+AUTOCONF = ${SHELL} /home/d4park/svn/branches/p3dfft-config/missing --run autoconf
+AUTOHEADER = ${SHELL} /home/d4park/svn/branches/p3dfft-config/missing --run autoheader
+AUTOMAKE = ${SHELL} /home/d4park/svn/branches/p3dfft-config/missing --run automake-1.9
 AWK = gawk
 CC = mpicc
 CFLAGS = -fastsse -tp barcelona-64 -DPGI
@@ -95,7 +103,7 @@ LDFLAGS = -lmpi_f90 -lmpi_f77 -pgf90libs -lmyriexpress
 LIBOBJS = 
 LIBS = 
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /home/d4park/auto/p/p3dfft/missing --run makeinfo
+MAKEINFO = ${SHELL} /home/d4park/svn/branches/p3dfft-config/missing --run makeinfo
 OBJEXT = o
 PACKAGE = p3dfft
 PACKAGE_BUGREPORT = dmitry@sdsc.edu
@@ -124,14 +132,14 @@ exec_prefix = ${prefix}
 host_alias = 
 includedir = ${prefix}/include
 infodir = ${prefix}/info
-install_sh = /home/d4park/auto/p/p3dfft/install-sh
+install_sh = /home/d4park/svn/branches/p3dfft-config/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localstatedir = ${prefix}/var
 mandir = ${prefix}/man
 mkdir_p = mkdir -p --
 oldincludedir = /usr/include
-prefix = /usr/local
+prefix = /home/d4park/local/lib/
 program_transform_name = s,x,x,
 sbindir = ${exec_prefix}/sbin
 sharedstatedir = ${prefix}/com
@@ -140,7 +148,7 @@ target_alias =
 F77 = $(FC)
 AM_FFLAGS = $(FCFLAGS) $(DFLAGS) #-fastsse -tp barcelona-64 -Mextend -byteswapio
 INCLUDES = -I$(FFTW3_INC)
-noinst_LIBRARIES = libp3dfft.a
+lib_LIBRARIES = libp3dfft.a
 libp3dfft_a_SOURCES = fft_spec.F module.F fft_init.F fft_exec.F wrap.f
 all: all-am
 
@@ -175,9 +183,35 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+install-libLIBRARIES: $(lib_LIBRARIES)
+	@$(NORMAL_INSTALL)
+	test -z "$(libdir)" || $(mkdir_p) "$(DESTDIR)$(libdir)"
+	@list='$(lib_LIBRARIES)'; for p in $$list; do \
+	  if test -f $$p; then \
+	    f=$(am__strip_dir) \
+	    echo " $(libLIBRARIES_INSTALL) '$$p' '$(DESTDIR)$(libdir)/$$f'"; \
+	    $(libLIBRARIES_INSTALL) "$$p" "$(DESTDIR)$(libdir)/$$f"; \
+	  else :; fi; \
+	done
+	@$(POST_INSTALL)
+	@list='$(lib_LIBRARIES)'; for p in $$list; do \
+	  if test -f $$p; then \
+	    p=$(am__strip_dir) \
+	    echo " $(RANLIB) '$(DESTDIR)$(libdir)/$$p'"; \
+	    $(RANLIB) "$(DESTDIR)$(libdir)/$$p"; \
+	  else :; fi; \
+	done
 
-clean-noinstLIBRARIES:
-	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
+uninstall-libLIBRARIES:
+	@$(NORMAL_UNINSTALL)
+	@list='$(lib_LIBRARIES)'; for p in $$list; do \
+	  p=$(am__strip_dir) \
+	  echo " rm -f '$(DESTDIR)$(libdir)/$$p'"; \
+	  rm -f "$(DESTDIR)$(libdir)/$$p"; \
+	done
+
+clean-libLIBRARIES:
+	-test -z "$(lib_LIBRARIES)" || rm -f $(lib_LIBRARIES)
 libp3dfft.a: $(libp3dfft_a_OBJECTS) $(libp3dfft_a_DEPENDENCIES) 
 	-rm -f libp3dfft.a
 	$(libp3dfft_a_AR) libp3dfft.a $(libp3dfft_a_OBJECTS) $(libp3dfft_a_LIBADD)
@@ -281,8 +315,11 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LIBRARIES) all-local
+all-am: Makefile $(LIBRARIES)
 installdirs:
+	for dir in "$(DESTDIR)$(libdir)"; do \
+	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
+	done
 install: install-am
 install-exec: install-exec-am
 install-data: install-data-am
@@ -309,8 +346,7 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-generic clean-local clean-noinstLIBRARIES \
-	mostlyclean-am
+clean-am: clean-generic clean-libLIBRARIES clean-local mostlyclean-am
 
 distclean: distclean-am
 	-rm -f Makefile
@@ -329,7 +365,7 @@ info-am:
 
 install-data-am:
 
-install-exec-am:
+install-exec-am: install-libLIBRARIES
 
 install-info: install-info-am
 
@@ -353,23 +389,24 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-info-am
+uninstall-am: uninstall-info-am uninstall-libLIBRARIES
 
-.PHONY: CTAGS GTAGS all all-am all-local check check-am clean \
-	clean-generic clean-local clean-noinstLIBRARIES ctags \
-	distclean distclean-compile distclean-generic distclean-tags \
-	distdir dvi dvi-am html html-am info info-am install \
-	install-am install-data install-data-am install-exec \
-	install-exec-am install-info install-info-am install-man \
+.PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
+	clean-libLIBRARIES clean-local ctags distclean \
+	distclean-compile distclean-generic distclean-tags distdir dvi \
+	dvi-am html html-am info info-am install install-am \
+	install-data install-data-am install-exec install-exec-am \
+	install-info install-info-am install-libLIBRARIES install-man \
 	install-strip installcheck installcheck-am installdirs \
 	maintainer-clean maintainer-clean-generic mostlyclean \
 	mostlyclean-compile mostlyclean-generic pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-info-am
+	tags uninstall uninstall-am uninstall-info-am \
+	uninstall-libLIBRARIES
 
 
-all-local:
-	-mv libp3dfft.a $(top_builddir)/lib/
-	-mv p3dfft.mod $(top_builddir)/include/
+# all-local:
+#	-mv libp3dfft.a $(top_builddir)/lib/
+#	-mv p3dfft.mod $(top_builddir)/include/
 
 clean-local:
 	-test -z "*.mod" || rm -f *.mod

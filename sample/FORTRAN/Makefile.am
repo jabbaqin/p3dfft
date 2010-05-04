@@ -1,7 +1,6 @@
 F77 = $(FC)
 FC = mpif90
-AM_FFLAGS = $(FCFLAGS) $(DFLAGS) $(INCLUDES) #-fastsse -tp barcelona-64 -Mextend -byteswapio
-#AM_LDFLAGS = -lmyriexpress
+AM_FFLAGS = $(FCFLAGS) $(DFLAGS) $(INCLUDES) 
 INCLUDES = -I$(top_builddir)/include/
 LDADD = $(top_builddir)/build/libp3dfft.a $(FFTW3_LIB)/libfftw3.a
 

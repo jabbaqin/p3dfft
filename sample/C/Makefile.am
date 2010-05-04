@@ -1,6 +1,5 @@
 CC = mpicc
-AM_CPPFLAGS = $(DFLAGS) #-fastsse -tp barcelona-64 -DPGI 
-#AM_LDFLAGS = -lmpi_f90 -lmpi_f77 -pgf90libs -lmyriexpress 
+AM_CPPFLAGS = $(DFLAGS) 
 INCLUDES = -I$(top_builddir)/include/ 
 LDADD = $(top_builddir)/build/libp3dfft.a $(FFTW3_LIB)/libfftw3.a
 

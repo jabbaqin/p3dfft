@@ -89,11 +89,11 @@ if test "$ok" = "yes"; then
 fi
 
 #check for fftw3
-AC_ARG_WITH(fftw3, [AC_HELP_STRING([--with-fftw3], [path to location of FFTW3 library])], loc=$withval, loc="")
-if test "$loc" != ""; then
+AC_ARG_WITH(fftw, [AC_HELP_STRING([--with-fftw], [path to location of FFTW3 library])], withfftw=$withval, withfftw="")
+if test "$withfftw" != ""; then
         AC_SUBST(DFLAGS, "$DFLAGS -DFFTW")
-	AC_SUBST(FFTW3_INC, "$loc/include")
-	AC_SUBST(FFTW3_LIB, "$loc/lib")
+	AC_SUBST(FFTW3_INC, "$withfftw/include")
+	AC_SUBST(FFTW3_LIB, "$withfftw/lib")
 	
 fi
 

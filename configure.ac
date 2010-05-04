@@ -26,9 +26,9 @@ fi
 
 # check whether to use ESSL
 AC_MSG_CHECKING([whether to use ESSL library])
-AC_ARG_ENABLE(essl, [AC_HELP_STRING([--enable-essl], [for using ESSL (on IBM) in 1D FFTs.])], ok=$enableval, ok=no)
-AC_MSG_RESULT([$ok])
-if test "$ok" = "yes"; then
+AC_ARG_ENABLE(essl, [AC_HELP_STRING([--enable-essl], [for using ESSL (on IBM) in 1D FFTs.])], esslval=$enableval, esslval=no)
+AC_MSG_RESULT([$esslval])
+if test "$esslval" = "yes"; then
         AC_SUBST(DFLAGS, "DFLAGS -DESSL")
 fi
 
@@ -88,15 +88,27 @@ if test "$ok" = "yes"; then
         AC_SUBST(DFLAGS, "$DFLAGS -DSTRIDE1")
 fi
 
-#check for fftw3
+# check for fftw3
+AC_MSG_CHECKING([whether to use FFTW library])
 AC_ARG_WITH(fftw, [AC_HELP_STRING([--with-fftw], [path to location of FFTW3 library])], withfftw=$withval, withfftw="")
 if test "$withfftw" != ""; then
+	AC_MSG_RESULT([yes])
         AC_SUBST(DFLAGS, "$DFLAGS -DFFTW")
 	AC_SUBST(FFTW3_INC, "$withfftw/include")
 	AC_SUBST(FFTW3_LIB, "$withfftw/lib")
-	
+else
+	AC_MSG_RESULT([no])
 fi
 
+# check to see if FFTW or ESSL has been selected
+if test "$withfftw" == "" && test "$esslval" == "no"; then
+	AC_MSG_ERROR([You must choose to use either ESSL or FFTW!])
+fi
+
+# check to see if FFTW and ESSL have both been selected
+if test "$withfftw" != "" && test "$esslval" == "yes"; then
+	AC_MSG_ERROR([You must only choose either ESSL or FFTW!])
+fi
 
 # Checks for programs.
 AC_PROG_FC(mpif90)

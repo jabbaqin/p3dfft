@@ -25,15 +25,6 @@ if test "$ok" = "yes"; then
         AC_DEFINE(ONED, 1, [Define if you want 1D decomposition])
 fi
 
-# check whether to use ESSL
-AC_MSG_CHECKING([whether to use ESSL library])
-AC_ARG_ENABLE(essl, [AC_HELP_STRING([--enable-essl], [for using ESSL (on IBM) in 1D FFTs.])], esslval=$enableval, esslval=no)
-AC_MSG_RESULT([$esslval])
-if test "$esslval" = "yes"; then
-        AC_SUBST(DFLAGS, "DFLAGS -DESSL")
-        AC_DEFINE(ESSL, 1, [Define if you want to use the ESSL libray instead of FFTW])
-fi
-
 # check whether to enable estimation
 AC_MSG_CHECKING([whether to enable estimation])
 AC_ARG_ENABLE(estimate, [AC_HELP_STRING([--enable-estimate], [for initialization thoroughness in setting up FFTW calls (this option only goes with --enable-fftw) .])], ok=$enableval, ok=no)
@@ -97,12 +88,43 @@ if test "$ok" = "yes"; then
         AC_DEFINE(STRIDE1, 1, [Define if you want to enable stride-1 data structures])
 fi
 
+# check whether to override default value of the NBL_X
+AC_MSG_CHECKING([whether to override default value of NBL_X])
+AC_ARG_ENABLE(nblx, [AC_HELP_STRING([--enable-nblx], [to define loop blocking factor NBL_X])], nblval=$enableval, nblval="")
+if test "$nblval" != ""; then
+        AC_MSG_RESULT([yes])
+        AC_SUBST(DFLAGS, "$DFLAGS -DNBL_X=$nblval")
+        AC_DEFINE(NBL_X, $nblval, [Define if you want to override the default value of NBL_X]) 
+else
+        AC_MSG_RESULT([no])
+fi
+
+# check whether to override default value of NBL_Y
+AC_MSG_CHECKING([whether to override the default value of NBL_Y])
+AC_ARG_ENABLE(nbly, [AC_HELP_STRING([--enable-nbly], [to define loop blocking factor NBL_Y])], nblval=$enableval, nblval="")
+if test "$nblval" != ""; then
+        AC_MSG_RESULT([yes])
+        AC_SUBST(DFLAGS, "$DFLAGS -DNBL_Y=$nblval")
+        AC_DEFINE(NBL_Y, $nblval, [Define if you want to override the default value of NBL_Y])
+else
+        AC_MSG_RESULT([no])
+fi
+
+# check whether to use ESSL
+AC_MSG_CHECKING([whether to use ESSL library])
+AC_ARG_ENABLE(essl, [AC_HELP_STRING([--enable-essl], [for using ESSL (on IBM) in 1D FFTs.])], esslval=$enableval, esslval=no)
+AC_MSG_RESULT([$esslval])
+if test "$esslval" = "yes"; then
+        AC_SUBST(DFLAGS, "DFLAGS -DESSL")
+        AC_DEFINE(ESSL, 1, [Define if you want to use the ESSL libray instead of FFTW])
+fi
+
 # check for fftw3
 AC_MSG_CHECKING([whether to use FFTW library])
 AC_ARG_WITH(fftw, [AC_HELP_STRING([--with-fftw], [path to location of FFTW3 library])], withfftw=$withval, withfftw="")
 if test "$withfftw" != ""; then
 	AC_MSG_RESULT([yes])
-    AC_SUBST(DFLAGS, "$DFLAGS -DFFTW")
+	AC_SUBST(DFLAGS, "$DFLAGS -DFFTW")
 	AC_SUBST(FFTW3_INC, "$withfftw/include")
 	AC_SUBST(FFTW3_LIB, "$withfftw/lib")
 	AC_DEFINE(FFTW, 1, [Define if you want to use FFTW library])

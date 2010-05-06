@@ -106,156 +106,172 @@ m4trace:configure.ac:30: -1- _m4_warn([obsolete], [The macro `AC_HELP_STRING' is
 You should run autoupdate.], [autoconf/general.m4:219: AC_HELP_STRING is expanded from...
 autoconf/general.m4:1303: AC_ARG_ENABLE is expanded from...
 configure.ac:30: the top level])
-m4trace:configure.ac:33: -1- AC_SUBST([DFLAGS], ["DFLAGS -DESSL"])
-m4trace:configure.ac:34: -1- AC_DEFINE_TRACE_LITERAL([ESSL])
-m4trace:configure.ac:34: -1- AH_OUTPUT([ESSL], [/* Define if you want to use the ESSL libray instead of FFTW */
-#undef ESSL])
+m4trace:configure.ac:33: -1- AC_SUBST([DFLAGS], ["$DFLAGS -DESTIMATE"])
+m4trace:configure.ac:34: -1- AC_DEFINE_TRACE_LITERAL([ESTIMATE])
+m4trace:configure.ac:34: -1- AH_OUTPUT([ESTIMATE], [/* Define whether you want to enable estimation */
+#undef ESTIMATE])
 m4trace:configure.ac:39: -1- _m4_warn([obsolete], [The macro `AC_HELP_STRING' is obsolete.
 You should run autoupdate.], [autoconf/general.m4:219: AC_HELP_STRING is expanded from...
 autoconf/general.m4:1303: AC_ARG_ENABLE is expanded from...
 configure.ac:39: the top level])
-m4trace:configure.ac:42: -1- AC_SUBST([DFLAGS], ["$DFLAGS -DESTIMATE"])
-m4trace:configure.ac:43: -1- AC_DEFINE_TRACE_LITERAL([ESTIMATE])
-m4trace:configure.ac:43: -1- AH_OUTPUT([ESTIMATE], [/* Define whether you want to enable estimation */
-#undef ESTIMATE])
+m4trace:configure.ac:42: -1- AC_SUBST([DFLAGS], ["$DFLAGS -DMEASURE"])
+m4trace:configure.ac:43: -1- AC_DEFINE_TRACE_LITERAL([MEASURE])
+m4trace:configure.ac:43: -1- AH_OUTPUT([MEASURE], [/* Define if you want to enable the measure algorithm */
+#undef MEASURE])
 m4trace:configure.ac:48: -1- _m4_warn([obsolete], [The macro `AC_HELP_STRING' is obsolete.
 You should run autoupdate.], [autoconf/general.m4:219: AC_HELP_STRING is expanded from...
 autoconf/general.m4:1303: AC_ARG_ENABLE is expanded from...
 configure.ac:48: the top level])
-m4trace:configure.ac:51: -1- AC_SUBST([DFLAGS], ["$DFLAGS -DMEASURE"])
-m4trace:configure.ac:52: -1- AC_DEFINE_TRACE_LITERAL([MEASURE])
-m4trace:configure.ac:52: -1- AH_OUTPUT([MEASURE], [/* Define if you want to enable the measure algorithm */
-#undef MEASURE])
+m4trace:configure.ac:51: -1- AC_SUBST([DFLAGS], ["$DFLAGS -DPATIENT"])
+m4trace:configure.ac:52: -1- AC_DEFINE_TRACE_LITERAL([PATIENT])
+m4trace:configure.ac:52: -1- AH_OUTPUT([PATIENT], [/* Define if you want to enable the patient algorithm */
+#undef PATIENT])
 m4trace:configure.ac:57: -1- _m4_warn([obsolete], [The macro `AC_HELP_STRING' is obsolete.
 You should run autoupdate.], [autoconf/general.m4:219: AC_HELP_STRING is expanded from...
 autoconf/general.m4:1303: AC_ARG_ENABLE is expanded from...
 configure.ac:57: the top level])
-m4trace:configure.ac:60: -1- AC_SUBST([DFLAGS], ["$DFLAGS -DPATIENT"])
-m4trace:configure.ac:61: -1- AC_DEFINE_TRACE_LITERAL([PATIENT])
-m4trace:configure.ac:61: -1- AH_OUTPUT([PATIENT], [/* Define if you want to enable the patient algorithm */
-#undef PATIENT])
+m4trace:configure.ac:60: -1- AC_SUBST([DFLAGS], ["$DFLAGS -DDIMS_C"])
+m4trace:configure.ac:61: -1- AC_DEFINE_TRACE_LITERAL([DIMS_C])
+m4trace:configure.ac:61: -1- AH_OUTPUT([DIMS_C], [/* Define if you want to enable C convention for processor dimensions */
+#undef DIMS_C])
 m4trace:configure.ac:66: -1- _m4_warn([obsolete], [The macro `AC_HELP_STRING' is obsolete.
 You should run autoupdate.], [autoconf/general.m4:219: AC_HELP_STRING is expanded from...
 autoconf/general.m4:1303: AC_ARG_ENABLE is expanded from...
 configure.ac:66: the top level])
-m4trace:configure.ac:69: -1- AC_SUBST([DFLAGS], ["$DFLAGS -DDIMS_C"])
-m4trace:configure.ac:70: -1- AC_DEFINE_TRACE_LITERAL([DIMS_C])
-m4trace:configure.ac:70: -1- AH_OUTPUT([DIMS_C], [/* Define if you want to enable C convention for processor dimensions */
-#undef DIMS_C])
+m4trace:configure.ac:69: -1- AC_SUBST([DFLAGS], ["$DFLAGS -DREVERSE_DIMS"])
+m4trace:configure.ac:70: -1- AC_DEFINE_TRACE_LITERAL([REVERSE])
+m4trace:configure.ac:70: -1- AH_OUTPUT([REVERSE], [/* Define if you want to reverse processor dimensions */
+#undef REVERSE])
 m4trace:configure.ac:75: -1- _m4_warn([obsolete], [The macro `AC_HELP_STRING' is obsolete.
 You should run autoupdate.], [autoconf/general.m4:219: AC_HELP_STRING is expanded from...
 autoconf/general.m4:1303: AC_ARG_ENABLE is expanded from...
 configure.ac:75: the top level])
-m4trace:configure.ac:78: -1- AC_SUBST([DFLAGS], ["$DFLAGS -DREVERSE_DIMS"])
-m4trace:configure.ac:79: -1- AC_DEFINE_TRACE_LITERAL([REVERSE])
-m4trace:configure.ac:79: -1- AH_OUTPUT([REVERSE], [/* Define if you want to reverse processor dimensions */
-#undef REVERSE])
+m4trace:configure.ac:78: -1- AC_SUBST([DFLAGS], ["$DFLAGS -DUSE_EVEN"])
+m4trace:configure.ac:79: -1- AC_DEFINE_TRACE_LITERAL([USE_EVEN])
+m4trace:configure.ac:79: -1- AH_OUTPUT([USE_EVEN], [/* Define if you want to MPI_Alltoall instead of MPI_Alltotallv */
+#undef USE_EVEN])
 m4trace:configure.ac:84: -1- _m4_warn([obsolete], [The macro `AC_HELP_STRING' is obsolete.
 You should run autoupdate.], [autoconf/general.m4:219: AC_HELP_STRING is expanded from...
 autoconf/general.m4:1303: AC_ARG_ENABLE is expanded from...
 configure.ac:84: the top level])
-m4trace:configure.ac:87: -1- AC_SUBST([DFLAGS], ["$DFLAGS -DUSE_EVEN"])
-m4trace:configure.ac:88: -1- AC_DEFINE_TRACE_LITERAL([USE_EVEN])
-m4trace:configure.ac:88: -1- AH_OUTPUT([USE_EVEN], [/* Define if you want to MPI_Alltoall instead of MPI_Alltotallv */
-#undef USE_EVEN])
+m4trace:configure.ac:87: -1- AC_SUBST([DFLAGS], ["$DFLAGS -DSTRIDE1"])
+m4trace:configure.ac:88: -1- AC_DEFINE_TRACE_LITERAL([STRIDE1])
+m4trace:configure.ac:88: -1- AH_OUTPUT([STRIDE1], [/* Define if you want to enable stride-1 data structures */
+#undef STRIDE1])
 m4trace:configure.ac:93: -1- _m4_warn([obsolete], [The macro `AC_HELP_STRING' is obsolete.
 You should run autoupdate.], [autoconf/general.m4:219: AC_HELP_STRING is expanded from...
 autoconf/general.m4:1303: AC_ARG_ENABLE is expanded from...
 configure.ac:93: the top level])
-m4trace:configure.ac:96: -1- AC_SUBST([DFLAGS], ["$DFLAGS -DSTRIDE1"])
-m4trace:configure.ac:97: -1- AC_DEFINE_TRACE_LITERAL([STRIDE1])
-m4trace:configure.ac:97: -1- AH_OUTPUT([STRIDE1], [/* Define if you want to enable stride-1 data structures */
-#undef STRIDE1])
-m4trace:configure.ac:102: -1- _m4_warn([obsolete], [The macro `AC_HELP_STRING' is obsolete.
+m4trace:configure.ac:96: -1- AC_SUBST([DFLAGS], ["$DFLAGS -DNBL_X=$nblval"])
+m4trace:configure.ac:97: -1- AC_DEFINE_TRACE_LITERAL([NBL_X])
+m4trace:configure.ac:97: -1- AH_OUTPUT([NBL_X], [/* Define if you want to override the default value of NBL_X */
+#undef NBL_X])
+m4trace:configure.ac:104: -1- _m4_warn([obsolete], [The macro `AC_HELP_STRING' is obsolete.
+You should run autoupdate.], [autoconf/general.m4:219: AC_HELP_STRING is expanded from...
+autoconf/general.m4:1303: AC_ARG_ENABLE is expanded from...
+configure.ac:104: the top level])
+m4trace:configure.ac:107: -1- AC_SUBST([DFLAGS], ["$DFLAGS -DNBL_Y=$nblval"])
+m4trace:configure.ac:108: -1- AC_DEFINE_TRACE_LITERAL([NBL_Y])
+m4trace:configure.ac:108: -1- AH_OUTPUT([NBL_Y], [/* Define if you want to override the default value of NBL_Y */
+#undef NBL_Y])
+m4trace:configure.ac:115: -1- _m4_warn([obsolete], [The macro `AC_HELP_STRING' is obsolete.
+You should run autoupdate.], [autoconf/general.m4:219: AC_HELP_STRING is expanded from...
+autoconf/general.m4:1303: AC_ARG_ENABLE is expanded from...
+configure.ac:115: the top level])
+m4trace:configure.ac:118: -1- AC_SUBST([DFLAGS], ["DFLAGS -DESSL"])
+m4trace:configure.ac:119: -1- AC_DEFINE_TRACE_LITERAL([ESSL])
+m4trace:configure.ac:119: -1- AH_OUTPUT([ESSL], [/* Define if you want to use the ESSL libray instead of FFTW */
+#undef ESSL])
+m4trace:configure.ac:124: -1- _m4_warn([obsolete], [The macro `AC_HELP_STRING' is obsolete.
 You should run autoupdate.], [autoconf/general.m4:219: AC_HELP_STRING is expanded from...
 autoconf/general.m4:1331: AC_ARG_WITH is expanded from...
-configure.ac:102: the top level])
-m4trace:configure.ac:105: -1- AC_SUBST([DFLAGS], ["$DFLAGS -DFFTW"])
-m4trace:configure.ac:106: -1- AC_SUBST([FFTW3_INC], ["$withfftw/include"])
-m4trace:configure.ac:107: -1- AC_SUBST([FFTW3_LIB], ["$withfftw/lib"])
-m4trace:configure.ac:108: -1- AC_DEFINE_TRACE_LITERAL([FFTW])
-m4trace:configure.ac:108: -1- AH_OUTPUT([FFTW], [/* Define if you want to use FFTW library */
+configure.ac:124: the top level])
+m4trace:configure.ac:127: -1- AC_SUBST([DFLAGS], ["$DFLAGS -DFFTW"])
+m4trace:configure.ac:128: -1- AC_SUBST([FFTW3_INC], ["$withfftw/include"])
+m4trace:configure.ac:129: -1- AC_SUBST([FFTW3_LIB], ["$withfftw/lib"])
+m4trace:configure.ac:130: -1- AC_DEFINE_TRACE_LITERAL([FFTW])
+m4trace:configure.ac:130: -1- AH_OUTPUT([FFTW], [/* Define if you want to use FFTW library */
 #undef FFTW])
-m4trace:configure.ac:124: -1- AC_SUBST([FC])
-m4trace:configure.ac:124: -1- AC_SUBST([FCFLAGS])
-m4trace:configure.ac:124: -1- AC_SUBST([LDFLAGS])
-m4trace:configure.ac:124: -1- AC_SUBST([FC])
-m4trace:configure.ac:124: -1- AC_SUBST([ac_ct_FC])
-m4trace:configure.ac:124: -1- AC_SUBST([EXEEXT], [$ac_cv_exeext])
-m4trace:configure.ac:124: -1- AC_SUBST([OBJEXT], [$ac_cv_objext])
-m4trace:configure.ac:125: -1- AC_SUBST([CC])
-m4trace:configure.ac:126: -1- AC_PROG_RANLIB
-m4trace:configure.ac:126: -1- AC_SUBST([RANLIB])
-m4trace:configure.ac:126: -1- AC_SUBST([ac_ct_RANLIB])
-m4trace:configure.ac:127: -1- AC_PROG_INSTALL
-m4trace:configure.ac:127: -1- AC_SUBST([INSTALL_PROGRAM])
-m4trace:configure.ac:127: -1- AC_SUBST([INSTALL_SCRIPT])
-m4trace:configure.ac:127: -1- AC_SUBST([INSTALL_DATA])
-m4trace:configure.ac:128: -1- AC_PROG_MAKE_SET
-m4trace:configure.ac:128: -1- AC_SUBST([SET_MAKE])
-m4trace:configure.ac:133: -1- AC_HEADER_STDC
-m4trace:configure.ac:133: -1- AC_PROG_CC
-m4trace:configure.ac:133: -1- AC_SUBST([CC])
-m4trace:configure.ac:133: -1- AC_SUBST([CFLAGS])
-m4trace:configure.ac:133: -1- AC_SUBST([LDFLAGS])
-m4trace:configure.ac:133: -1- AC_SUBST([CPPFLAGS])
-m4trace:configure.ac:133: -1- AC_SUBST([CC])
-m4trace:configure.ac:133: -1- AC_SUBST([ac_ct_CC])
-m4trace:configure.ac:133: -1- AC_SUBST([CC])
-m4trace:configure.ac:133: -1- AC_SUBST([ac_ct_CC])
-m4trace:configure.ac:133: -1- AC_SUBST([CC])
-m4trace:configure.ac:133: -1- AC_SUBST([CC])
-m4trace:configure.ac:133: -1- AC_SUBST([ac_ct_CC])
-m4trace:configure.ac:133: -1- AC_PROG_CPP
-m4trace:configure.ac:133: -1- AC_SUBST([CPP])
-m4trace:configure.ac:133: -1- AC_SUBST([CPPFLAGS])
-m4trace:configure.ac:133: -1- AC_SUBST([CPP])
-m4trace:configure.ac:133: -1- AC_SUBST([EGREP])
-m4trace:configure.ac:133: -1- AC_DEFINE_TRACE_LITERAL([STDC_HEADERS])
-m4trace:configure.ac:133: -1- AH_OUTPUT([STDC_HEADERS], [/* Define to 1 if you have the ANSI C header files. */
+m4trace:configure.ac:146: -1- AC_SUBST([FC])
+m4trace:configure.ac:146: -1- AC_SUBST([FCFLAGS])
+m4trace:configure.ac:146: -1- AC_SUBST([LDFLAGS])
+m4trace:configure.ac:146: -1- AC_SUBST([FC])
+m4trace:configure.ac:146: -1- AC_SUBST([ac_ct_FC])
+m4trace:configure.ac:146: -1- AC_SUBST([EXEEXT], [$ac_cv_exeext])
+m4trace:configure.ac:146: -1- AC_SUBST([OBJEXT], [$ac_cv_objext])
+m4trace:configure.ac:147: -1- AC_SUBST([CC])
+m4trace:configure.ac:148: -1- AC_PROG_RANLIB
+m4trace:configure.ac:148: -1- AC_SUBST([RANLIB])
+m4trace:configure.ac:148: -1- AC_SUBST([ac_ct_RANLIB])
+m4trace:configure.ac:149: -1- AC_PROG_INSTALL
+m4trace:configure.ac:149: -1- AC_SUBST([INSTALL_PROGRAM])
+m4trace:configure.ac:149: -1- AC_SUBST([INSTALL_SCRIPT])
+m4trace:configure.ac:149: -1- AC_SUBST([INSTALL_DATA])
+m4trace:configure.ac:150: -1- AC_PROG_MAKE_SET
+m4trace:configure.ac:150: -1- AC_SUBST([SET_MAKE])
+m4trace:configure.ac:155: -1- AC_HEADER_STDC
+m4trace:configure.ac:155: -1- AC_PROG_CC
+m4trace:configure.ac:155: -1- AC_SUBST([CC])
+m4trace:configure.ac:155: -1- AC_SUBST([CFLAGS])
+m4trace:configure.ac:155: -1- AC_SUBST([LDFLAGS])
+m4trace:configure.ac:155: -1- AC_SUBST([CPPFLAGS])
+m4trace:configure.ac:155: -1- AC_SUBST([CC])
+m4trace:configure.ac:155: -1- AC_SUBST([ac_ct_CC])
+m4trace:configure.ac:155: -1- AC_SUBST([CC])
+m4trace:configure.ac:155: -1- AC_SUBST([ac_ct_CC])
+m4trace:configure.ac:155: -1- AC_SUBST([CC])
+m4trace:configure.ac:155: -1- AC_SUBST([CC])
+m4trace:configure.ac:155: -1- AC_SUBST([ac_ct_CC])
+m4trace:configure.ac:155: -1- AC_PROG_CPP
+m4trace:configure.ac:155: -1- AC_SUBST([CPP])
+m4trace:configure.ac:155: -1- AC_SUBST([CPPFLAGS])
+m4trace:configure.ac:155: -1- AC_SUBST([CPP])
+m4trace:configure.ac:155: -1- AC_SUBST([EGREP])
+m4trace:configure.ac:155: -1- AC_DEFINE_TRACE_LITERAL([STDC_HEADERS])
+m4trace:configure.ac:155: -1- AH_OUTPUT([STDC_HEADERS], [/* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS])
-m4trace:configure.ac:134: -1- AC_CHECK_HEADERS([stdlib.h])
-m4trace:configure.ac:134: -1- AH_OUTPUT([HAVE_STDLIB_H], [/* Define to 1 if you have the <stdlib.h> header file. */
+m4trace:configure.ac:156: -1- AC_CHECK_HEADERS([stdlib.h])
+m4trace:configure.ac:156: -1- AH_OUTPUT([HAVE_STDLIB_H], [/* Define to 1 if you have the <stdlib.h> header file. */
 #undef HAVE_STDLIB_H])
-m4trace:configure.ac:134: -1- AC_CHECK_HEADERS([sys/types.h sys/stat.h stdlib.h string.h memory.h strings.h \
+m4trace:configure.ac:156: -1- AC_CHECK_HEADERS([sys/types.h sys/stat.h stdlib.h string.h memory.h strings.h \
 		  inttypes.h stdint.h unistd.h], [], [], [$ac_includes_default])
-m4trace:configure.ac:134: -1- AH_OUTPUT([HAVE_SYS_TYPES_H], [/* Define to 1 if you have the <sys/types.h> header file. */
+m4trace:configure.ac:156: -1- AH_OUTPUT([HAVE_SYS_TYPES_H], [/* Define to 1 if you have the <sys/types.h> header file. */
 #undef HAVE_SYS_TYPES_H])
-m4trace:configure.ac:134: -1- AH_OUTPUT([HAVE_SYS_STAT_H], [/* Define to 1 if you have the <sys/stat.h> header file. */
+m4trace:configure.ac:156: -1- AH_OUTPUT([HAVE_SYS_STAT_H], [/* Define to 1 if you have the <sys/stat.h> header file. */
 #undef HAVE_SYS_STAT_H])
-m4trace:configure.ac:134: -1- AH_OUTPUT([HAVE_STDLIB_H], [/* Define to 1 if you have the <stdlib.h> header file. */
+m4trace:configure.ac:156: -1- AH_OUTPUT([HAVE_STDLIB_H], [/* Define to 1 if you have the <stdlib.h> header file. */
 #undef HAVE_STDLIB_H])
-m4trace:configure.ac:134: -1- AH_OUTPUT([HAVE_STRING_H], [/* Define to 1 if you have the <string.h> header file. */
+m4trace:configure.ac:156: -1- AH_OUTPUT([HAVE_STRING_H], [/* Define to 1 if you have the <string.h> header file. */
 #undef HAVE_STRING_H])
-m4trace:configure.ac:134: -1- AH_OUTPUT([HAVE_MEMORY_H], [/* Define to 1 if you have the <memory.h> header file. */
+m4trace:configure.ac:156: -1- AH_OUTPUT([HAVE_MEMORY_H], [/* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H])
-m4trace:configure.ac:134: -1- AH_OUTPUT([HAVE_STRINGS_H], [/* Define to 1 if you have the <strings.h> header file. */
+m4trace:configure.ac:156: -1- AH_OUTPUT([HAVE_STRINGS_H], [/* Define to 1 if you have the <strings.h> header file. */
 #undef HAVE_STRINGS_H])
-m4trace:configure.ac:134: -1- AH_OUTPUT([HAVE_INTTYPES_H], [/* Define to 1 if you have the <inttypes.h> header file. */
+m4trace:configure.ac:156: -1- AH_OUTPUT([HAVE_INTTYPES_H], [/* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H])
-m4trace:configure.ac:134: -1- AH_OUTPUT([HAVE_STDINT_H], [/* Define to 1 if you have the <stdint.h> header file. */
+m4trace:configure.ac:156: -1- AH_OUTPUT([HAVE_STDINT_H], [/* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H])
-m4trace:configure.ac:134: -1- AH_OUTPUT([HAVE_UNISTD_H], [/* Define to 1 if you have the <unistd.h> header file. */
+m4trace:configure.ac:156: -1- AH_OUTPUT([HAVE_UNISTD_H], [/* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H])
-m4trace:configure.ac:139: -1- AC_FUNC_MALLOC
-m4trace:configure.ac:139: -1- AC_CHECK_HEADERS([stdlib.h])
-m4trace:configure.ac:139: -1- AH_OUTPUT([HAVE_STDLIB_H], [/* Define to 1 if you have the <stdlib.h> header file. */
+m4trace:configure.ac:161: -1- AC_FUNC_MALLOC
+m4trace:configure.ac:161: -1- AC_CHECK_HEADERS([stdlib.h])
+m4trace:configure.ac:161: -1- AH_OUTPUT([HAVE_STDLIB_H], [/* Define to 1 if you have the <stdlib.h> header file. */
 #undef HAVE_STDLIB_H])
-m4trace:configure.ac:139: -1- AC_DEFINE_TRACE_LITERAL([HAVE_MALLOC])
-m4trace:configure.ac:139: -1- AH_OUTPUT([HAVE_MALLOC], [/* Define to 1 if your system has a GNU libc compatible `malloc\' function, and
+m4trace:configure.ac:161: -1- AC_DEFINE_TRACE_LITERAL([HAVE_MALLOC])
+m4trace:configure.ac:161: -1- AH_OUTPUT([HAVE_MALLOC], [/* Define to 1 if your system has a GNU libc compatible `malloc\' function, and
    to 0 otherwise. */
 #undef HAVE_MALLOC])
-m4trace:configure.ac:139: -1- AC_DEFINE_TRACE_LITERAL([HAVE_MALLOC])
-m4trace:configure.ac:139: -1- AC_LIBSOURCE([malloc.c])
-m4trace:configure.ac:139: -1- AC_SUBST([LIB@&t@OBJS])
-m4trace:configure.ac:139: -1- AC_DEFINE_TRACE_LITERAL([malloc])
-m4trace:configure.ac:139: -1- AH_OUTPUT([malloc], [/* Define to rpl_malloc if the replacement function should be used. */
+m4trace:configure.ac:161: -1- AC_DEFINE_TRACE_LITERAL([HAVE_MALLOC])
+m4trace:configure.ac:161: -1- AC_LIBSOURCE([malloc.c])
+m4trace:configure.ac:161: -1- AC_SUBST([LIB@&t@OBJS])
+m4trace:configure.ac:161: -1- AC_DEFINE_TRACE_LITERAL([malloc])
+m4trace:configure.ac:161: -1- AH_OUTPUT([malloc], [/* Define to rpl_malloc if the replacement function should be used. */
 #undef malloc])
-m4trace:configure.ac:145: -1- AC_CONFIG_FILES([Makefile
+m4trace:configure.ac:167: -1- AC_CONFIG_FILES([Makefile
                  build/Makefile
 		 sample/Makefile
 		 sample/C/Makefile
 		 sample/FORTRAN/Makefile])
-m4trace:configure.ac:147: -1- AC_SUBST([TESTLIBS], [$TESTLIBS])
-m4trace:configure.ac:148: -1- AC_SUBST([LIB@&t@OBJS], [$ac_libobjs])
-m4trace:configure.ac:148: -1- AC_SUBST([LTLIBOBJS], [$ac_ltlibobjs])
+m4trace:configure.ac:169: -1- AC_SUBST([TESTLIBS], [$TESTLIBS])
+m4trace:configure.ac:170: -1- AC_SUBST([LIB@&t@OBJS], [$ac_libobjs])
+m4trace:configure.ac:170: -1- AC_SUBST([LTLIBOBJS], [$ac_ltlibobjs])

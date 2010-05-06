@@ -13,6 +13,7 @@ AC_ARG_ENABLE(single, [AC_HELP_STRING([--enable-single], [compile P3DFFT in sing
 AC_MSG_RESULT([$ok])
 if test "$ok" = "yes"; then
 	AC_SUBST(DFLAGS, "$DFLAGS -DSINGLE_PREC")
+	AC_DEFINE(SINGLE_PREC, 1, [Define if you want to compile P3DFFT in single precision])
 fi
 
 # check whether to enable 1D decomposition
@@ -21,7 +22,7 @@ AC_ARG_ENABLE(oned, [AC_HELP_STRING([--enable-oned], [for 1D decomposition (defa
 AC_MSG_RESULT([$ok])
 if test "$ok" = "yes"; then
         AC_SUBST(DFLAGS, "$DFLAGS -DONED")
-
+        AC_DEFINE(ONED, 1, [Define if you want 1D decomposition])
 fi
 
 # check whether to use ESSL
@@ -30,6 +31,7 @@ AC_ARG_ENABLE(essl, [AC_HELP_STRING([--enable-essl], [for using ESSL (on IBM) in
 AC_MSG_RESULT([$esslval])
 if test "$esslval" = "yes"; then
         AC_SUBST(DFLAGS, "DFLAGS -DESSL")
+        AC_DEFINE(ESSL, 1, [Define if you want to use the ESSL libray instead of FFTW])
 fi
 
 # check whether to enable estimation
@@ -38,6 +40,7 @@ AC_ARG_ENABLE(estimate, [AC_HELP_STRING([--enable-estimate], [for initialization
 AC_MSG_RESULT([$ok])
 if test "$ok" = "yes"; then
         AC_SUBST(DFLAGS, "$DFLAGS -DESTIMATE")
+        AC_DEFINE(ESTIMATE, 1, [Define whether you want to enable estimation])
 fi
 
 # check whether to enable the measure algorithm
@@ -46,6 +49,7 @@ AC_ARG_ENABLE(measure, [AC_HELP_STRING([--enable-measure], [for search-once-for-
 AC_MSG_RESULT([$ok])
 if test "$ok" = "yes"; then
         AC_SUBST(DFLAGS, "$DFLAGS -DMEASURE")
+        AC_DEFINE(MEASURE, 1, [Define if you want to enable the measure algorithm])
 fi
 
 # check whether to enable the patient algorithm
@@ -54,6 +58,7 @@ AC_ARG_ENABLE(patient, [AC_HELP_STRING([--enable-patient], [for search-once-for-
 AC_MSG_RESULT([$ok])
 if test "$ok" = "yes"; then
         AC_SUBST(DFLAGS, "$DFLAGS -DPATIENT")
+        AC_DEFINE(PATIENT, 1, [Define if you want to enable the patient algorithm])
 fi
 
 # check whether to enable C convention for processor dimensions
@@ -62,6 +67,7 @@ AC_ARG_ENABLE(dimsc, [AC_HELP_STRING([--enable-dimsc], [to assign processor rows
 AC_MSG_RESULT([$ok])
 if test "$ok" = "yes"; then
         AC_SUBST(DFLAGS, "$DFLAGS -DDIMS_C")
+        AC_DEFINE(DIMS_C, 1, [Define if you want to enable C convention for processor dimensions])
 fi
 
 # check whether to reverse processor dimensions
@@ -70,6 +76,7 @@ AC_ARG_ENABLE(reversedims, [AC_HELP_STRING([--enable-reversedims], [to interchan
 AC_MSG_RESULT([$ok])
 if test "$ok" = "yes"; then
 	AC_SUBST(DFLAGS, "$DFLAGS -DREVERSE_DIMS")
+	AC_DEFINE(REVERSE, 1, [Define if you want to reverse processor dimensions])
 fi
 
 # check whether to use MPI_Alltoall instead of MPI_Alltotallv
@@ -78,6 +85,7 @@ AC_ARG_ENABLE(useeven, [AC_HELP_STRING([--enable-useeven], [for using MPI_Alltoa
 AC_MSG_RESULT([$ok])
 if test "$ok" = "yes"; then
         AC_SUBST(DFLAGS, "$DFLAGS -DUSE_EVEN")
+        AC_DEFINE(USE_EVEN, 1, [Define if you want to MPI_Alltoall instead of MPI_Alltotallv])
 fi
 
 # check whether to enable stride-1 data structures
@@ -86,6 +94,7 @@ AC_ARG_ENABLE(stride1, [AC_HELP_STRING([--enable-stride1], [to enable stride-1 d
 AC_MSG_RESULT([$ok])
 if test "$ok" = "yes"; then
         AC_SUBST(DFLAGS, "$DFLAGS -DSTRIDE1")
+        AC_DEFINE(STRIDE1, 1, [Define if you want to enable stride-1 data structures])
 fi
 
 # check for fftw3
@@ -93,9 +102,10 @@ AC_MSG_CHECKING([whether to use FFTW library])
 AC_ARG_WITH(fftw, [AC_HELP_STRING([--with-fftw], [path to location of FFTW3 library])], withfftw=$withval, withfftw="")
 if test "$withfftw" != ""; then
 	AC_MSG_RESULT([yes])
-        AC_SUBST(DFLAGS, "$DFLAGS -DFFTW")
+    AC_SUBST(DFLAGS, "$DFLAGS -DFFTW")
 	AC_SUBST(FFTW3_INC, "$withfftw/include")
 	AC_SUBST(FFTW3_LIB, "$withfftw/lib")
+	AC_DEFINE(FFTW, 1, [Define if you want to use FFTW library])
 else
 	AC_MSG_RESULT([no])
 fi

@@ -1804,6 +1804,11 @@ echo "${ECHO_T}$ok" >&6
 if test "$ok" = "yes"; then
 	DFLAGS="$DFLAGS -DSINGLE_PREC"
 
+	
+cat >>confdefs.h <<\_ACEOF
+@%:@define SINGLE_PREC 1
+_ACEOF
+
 fi
 
 # check whether to enable 1D decomposition
@@ -1821,6 +1826,10 @@ echo "${ECHO_T}$ok" >&6
 if test "$ok" = "yes"; then
         DFLAGS="$DFLAGS -DONED"
 
+        
+cat >>confdefs.h <<\_ACEOF
+@%:@define ONED 1
+_ACEOF
 
 fi
 
@@ -1839,6 +1848,11 @@ echo "${ECHO_T}$esslval" >&6
 if test "$esslval" = "yes"; then
         DFLAGS="DFLAGS -DESSL"
 
+        
+cat >>confdefs.h <<\_ACEOF
+@%:@define ESSL 1
+_ACEOF
+
 fi
 
 # check whether to enable estimation
@@ -1855,6 +1869,11 @@ echo "$as_me:$LINENO: result: $ok" >&5
 echo "${ECHO_T}$ok" >&6
 if test "$ok" = "yes"; then
         DFLAGS="$DFLAGS -DESTIMATE"
+
+        
+cat >>confdefs.h <<\_ACEOF
+@%:@define ESTIMATE 1
+_ACEOF
 
 fi
 
@@ -1873,6 +1892,11 @@ echo "${ECHO_T}$ok" >&6
 if test "$ok" = "yes"; then
         DFLAGS="$DFLAGS -DMEASURE"
 
+        
+cat >>confdefs.h <<\_ACEOF
+@%:@define MEASURE 1
+_ACEOF
+
 fi
 
 # check whether to enable the patient algorithm
@@ -1889,6 +1913,11 @@ echo "$as_me:$LINENO: result: $ok" >&5
 echo "${ECHO_T}$ok" >&6
 if test "$ok" = "yes"; then
         DFLAGS="$DFLAGS -DPATIENT"
+
+        
+cat >>confdefs.h <<\_ACEOF
+@%:@define PATIENT 1
+_ACEOF
 
 fi
 
@@ -1907,6 +1936,11 @@ echo "${ECHO_T}$ok" >&6
 if test "$ok" = "yes"; then
         DFLAGS="$DFLAGS -DDIMS_C"
 
+        
+cat >>confdefs.h <<\_ACEOF
+@%:@define DIMS_C 1
+_ACEOF
+
 fi
 
 # check whether to reverse processor dimensions
@@ -1923,6 +1957,11 @@ echo "$as_me:$LINENO: result: $ok" >&5
 echo "${ECHO_T}$ok" >&6
 if test "$ok" = "yes"; then
 	DFLAGS="$DFLAGS -DREVERSE_DIMS"
+
+	
+cat >>confdefs.h <<\_ACEOF
+@%:@define REVERSE 1
+_ACEOF
 
 fi
 
@@ -1941,6 +1980,11 @@ echo "${ECHO_T}$ok" >&6
 if test "$ok" = "yes"; then
         DFLAGS="$DFLAGS -DUSE_EVEN"
 
+        
+cat >>confdefs.h <<\_ACEOF
+@%:@define USE_EVEN 1
+_ACEOF
+
 fi
 
 # check whether to enable stride-1 data structures
@@ -1958,6 +2002,11 @@ echo "${ECHO_T}$ok" >&6
 if test "$ok" = "yes"; then
         DFLAGS="$DFLAGS -DSTRIDE1"
 
+        
+cat >>confdefs.h <<\_ACEOF
+@%:@define STRIDE1 1
+_ACEOF
+
 fi
 
 # check for fftw3
@@ -1974,11 +2023,16 @@ fi;
 if test "$withfftw" != ""; then
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
-        DFLAGS="$DFLAGS -DFFTW"
+    DFLAGS="$DFLAGS -DFFTW"
 
 	FFTW3_INC="$withfftw/include"
 
 	FFTW3_LIB="$withfftw/lib"
+
+	
+cat >>confdefs.h <<\_ACEOF
+@%:@define FFTW 1
+_ACEOF
 
 else
 	echo "$as_me:$LINENO: result: no" >&5

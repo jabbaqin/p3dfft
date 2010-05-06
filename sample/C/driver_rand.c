@@ -63,7 +63,7 @@ int main(int argc,char **argv)
          printf("Cannot open file. Setting to default nx=ny=nz=128, ndim=2, n=1.\n");
          nx=ny=nz=128; n=1;
       } else {
-         fscanf(fp,"%d %d %d %d %d\n",&nx,&ny,&nz,&ndim,&n);
+         fscanf(fp,"%d,%d,%d,%d,%d\n",&nx,&ny,&nz,&ndim,&n);
          fclose(fp);
       }
      printf("Single precision\n (%d %d %d) grid\n %d proc. dimensions\n%d repetitions\n",nx,ny,nz,ndim,n);

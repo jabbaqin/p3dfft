@@ -26,9 +26,9 @@
 
       real(mytype), TARGET :: IN(1,1,*)
       complex(mytype), TARGET :: OUT(1,1,*)
-c      real(mytype) IN(nx_fft,jistart:jiend,kjstart:kjend)
-c      complex(mytype) OUT(iistart:iiend,jjstart:jjend,nz_fft)
-c      logical flg_inplace
+!      real(mytype) IN(nx_fft,jistart:jiend,kjstart:kjend)
+!      complex(mytype) OUT(iistart:iiend,jjstart:jjend,nz_fft)
+!      logical flg_inplace
 
       call p3dfft_ftran_r2c(IN,OUT)
 
@@ -41,9 +41,9 @@ c      logical flg_inplace
 
       real(mytype), TARGET :: OUT(1,1,*)
       complex(mytype), TARGET :: IN(1,1,*)
-c      real(mytype) OUT(nx_fft,jistart:jiend,kjstart:kjend)
-c      complex(mytype) IN(iistart:iiend,jjstart:jjend,nz_fft)
-c      logical flg_inplace
+!      real(mytype) OUT(nx_fft,jistart:jiend,kjstart:kjend)
+!      complex(mytype) IN(iistart:iiend,jjstart:jjend,nz_fft)
+!      logical flg_inplace
 
       call p3dfft_btran_c2r(IN,OUT)
 

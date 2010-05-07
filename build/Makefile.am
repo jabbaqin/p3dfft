@@ -1,6 +1,5 @@
-F77 = $(FC)
 FC = mpif90
-AM_FFLAGS = $(FCFLAGS) $(DFLAGS) 
+AM_FCFLAGS = $(FCFLAGS) $(DFLAGS)
 INCLUDES = -I$(FFTW3_INC)
 
 lib_LIBRARIES = libp3dfft.a

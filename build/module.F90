@@ -107,12 +107,12 @@
       integer,save :: gslab_csize(3,3), gslab_cstart(3,6), gslab_cend(3,6)
       integer(kind=8),save :: gmem_rstart(6), gmem_cstart(6)
 
-      public :: get_dims,p3dfft_setup,p3dfft_ftran_r2c,p3dfft_btran_c2r,
-     &           p3dfft_clean,print_buf,
-     &           p3dfft_init_ghosts, update_rghosts, 
-     &           update_cghosts, gr_ijk2i,
-     &           proc_id2coords, proc_coords2id,
-     &           gmem_rstart, gmem_cstart
+      public :: get_dims,p3dfft_setup,p3dfft_ftran_r2c,p3dfft_btran_c2r, &
+                 p3dfft_clean,print_buf, &
+                 p3dfft_init_ghosts, update_rghosts,  &
+                 update_cghosts, gr_ijk2i, &
+                 proc_id2coords, proc_coords2id, &
+                 gmem_rstart, gmem_cstart
 
 !-------------------
       contains
@@ -167,9 +167,9 @@
       endif
       end subroutine get_dims
 
-c =========================================================
+! =========================================================
       subroutine p3dfft_setup(dims,nx,ny,nz,overwrite)
-c========================================================
+! ========================================================
 
       implicit none
 
@@ -206,8 +206,8 @@ c========================================================
       call MPI_COMM_SIZE (MPI_COMM_WORLD,numtasks,ierr)
       call MPI_COMM_RANK (MPI_COMM_WORLD,taskid,ierr)
 
-      if(dims(1) .le. 0 .or. dims(2) .le. 0 .or. 
-     &     dims(1)*dims(2) .ne. numtasks) then
+      if(dims(1) .le. 0 .or. dims(2) .le. 0 .or. &
+           dims(1)*dims(2) .ne. numtasks) then
          print *,'Invalid processor geometry: ',dims,' for ',numtasks,'tasks'
          call abort
       endif
@@ -230,8 +230,8 @@ c========================================================
       periodic(1) = .false.
       periodic(2) = .false.
 ! creating cartesian processor grid
-      call MPI_Cart_create(MPI_COMM_WORLD,2,dims,periodic,
-     &     .false.,mpi_comm_cart,ierr)
+      call MPI_Cart_create(MPI_COMM_WORLD,2,dims,periodic, &
+           .false.,mpi_comm_cart,ierr)
 ! Obtaining process ids with in the cartesian grid
       call MPI_Cart_coords(mpi_comm_cart,taskid,2,cartid,ierr)
 ! process with a linear id of 5 may have cartid of (3,1)
@@ -248,13 +248,13 @@ c========================================================
       cartid(1) = ipid
       cartid(2) = jpid
       allocate(proc_id2coords(0:(iproc*jproc)*2-1))
-      call MPI_Allgather( cartid,        2, MPI_INTEGER,
-     &                    proc_id2coords, 2, MPI_INTEGER,
-     &                    mpi_comm_cart,ierr)
+      call MPI_Allgather( cartid,        2, MPI_INTEGER, &
+                          proc_id2coords, 2, MPI_INTEGER, &
+                          mpi_comm_cart,ierr)
       allocate(proc_coords2id(0:iproc-1,0:jproc-1))
       do i=0,(iproc*jproc)-1
-      	proc_coords2id(	proc_id2coords(2*i),
-     &					proc_id2coords(2*i+1)) = i
+      	proc_coords2id(	proc_id2coords(2*i), &
+      					proc_id2coords(2*i+1)) = i
       enddo
 
 ! here i is east-west j is north-south
@@ -448,7 +448,7 @@ c========================================================
 
 !==================================================================       
       subroutine MapDataToProc (data,proc,st,en,sz)
-c========================================================
+!========================================================
 !    
        implicit none
        integer data,proc,st(0:proc-1),en(0:proc-1),sz(0:proc-1)
@@ -477,7 +477,7 @@ c========================================================
       end subroutine
 
 
-c========================================================
+!========================================================
 
       subroutine init_fft(A,B,n1)
 
@@ -495,50 +495,50 @@ c========================================================
 #ifdef STRIDE1
       call plan_f_c1(A,iisize,1,A,iisize,1,ny_fft,iisize,.false.)
       call plan_b_c1(A,iisize,1,A,iisize,1,ny_fft,iisize,.false.)
-         call plan_f_c2(A,1,nz_fft, 
-     &     A,1,nz_fft,nz_fft,NB*iisize,.false.)
+         call plan_f_c2(A,1,nz_fft, &
+           A,1,nz_fft,nz_fft,NB*iisize,.false.)
       if(OW) then
-         call plan_b_c2(A,1,nz_fft, 
-     &     A,1,nz_fft,nz_fft,NB*iisize,.false.)
+         call plan_b_c2(A,1,nz_fft, &
+           A,1,nz_fft,nz_fft,NB*iisize,.false.)
       else
-         call plan_b_c2(A,1,nz_fft, 
-     &     B,1,nz_fft,nz_fft,NB*iisize,.false.)
+         call plan_b_c2(A,1,nz_fft,  &
+           B,1,nz_fft,nz_fft,NB*iisize,.false.)
       endif
 #else
       call plan_f_c1(A,iisize,1,A,iisize,1,ny_fft,iisize,.false.)
       call plan_b_c1(A,iisize,1,A,iisize,1,ny_fft,iisize,.false.)
-      call plan_f_c2(A,iisize*jjsize, 1,
-     &     A,iisize*jjsize, 1,nz_fft,iisize*jjsize,.false.)
+      call plan_f_c2(A,iisize*jjsize, 1, &
+           A,iisize*jjsize, 1,nz_fft,iisize*jjsize,.false.)
       if(OW) then
-         call plan_b_c2(A,iisize*jjsize, 1,
-     &     A,iisize*jjsize, 1,nz_fft,iisize*jjsize,.false.)
+         call plan_b_c2(A,iisize*jjsize, 1, &
+           A,iisize*jjsize, 1,nz_fft,iisize*jjsize,.false.)
       else
-         call plan_b_c2(A,iisize*jjsize, 1,
-     &     B,iisize*jjsize, 1,nz_fft,iisize*jjsize,.false.)
+         call plan_b_c2(A,iisize*jjsize, 1, &
+           B,iisize*jjsize, 1,nz_fft,iisize*jjsize,.false.)
       endif
 #endif
 
       return
       end subroutine
 
-c========================================================
-c  3D FFT inverse transform with 2D domain decomposition
-c
-c  The order of array elements in memory is the same in all stages: (x,y,z) 
-
-c Input: XYZg - comlpex array, with entire Z dimension local,
-c               while x and y are block-distributed among processors in 2D grid
-c Output: XgYZ - an array of real, x dimension is entirely local within 
-c processors memory  while y and z are block-distributed among processors 
-c in 2D grid
-c
-c The arrays may occupy the same memory space
-c In this case their first elements should coincide. 
-c Naturally, output overwrites input
-c
+!========================================================
+!  3D FFT inverse transform with 2D domain decomposition
+!
+!  The order of array elements in memory is the same in all stages: (x,y,z) 
+!
+! Input: XYZg - comlpex array, with entire Z dimension local,
+!               while x and y are block-distributed among processors in 2D grid
+! Output: XgYZ - an array of real, x dimension is entirely local within 
+! processors memory  while y and z are block-distributed among processors 
+! in 2D grid
+!
+! The arrays may occupy the same memory space
+! In this case their first elements should coincide. 
+! Naturally, output overwrites input
+!
 
       subroutine p3dfft_btran_c2r (XYZg,XgYZ)
-c========================================================
+!========================================================
 
       use fft_spec
       implicit none
@@ -561,37 +561,37 @@ c========================================================
       ny = ny_fft
       nz = nz_fft
 
-c FFT Tranform (C2C) in Z for all x and y 
+! FFT Tranform (C2C) in Z for all x and y 
 
       if(jproc .gt. 1) then
 
 #ifdef STRIDE1
-         call init_b_c(buf, 1,nz, 
-     &        buf, 1, nz,nz,NB*iisize)
+         call init_b_c(buf, 1,nz, &
+              buf, 1, nz,nz,NB*iisize)
          call bcomm1_trans(XYZg,buf2,buf,timers(3),timers(10))
 #else
 
          if(OW) then
 
             if(iisize*jjsize .gt. 0) then
-               call init_b_c(XYZg, iisize*jjsize, 1,
-     &              XYZg, iisize*jjsize, 1,nz,iisize*jjsize)
+               call init_b_c(XYZg, iisize*jjsize, 1, &
+                    XYZg, iisize*jjsize, 1,nz,iisize*jjsize)
 
                timers(10) = timers(10) - MPI_Wtime()
-               call exec_b_c2(XYZg, iisize*jjsize,1, 
-     &              XYZg, iisize*jjsize, 1,nz,iisize*jjsize)
+               call exec_b_c2(XYZg, iisize*jjsize,1,  &
+                    XYZg, iisize*jjsize, 1,nz,iisize*jjsize)
                timers(10) = timers(10) + MPI_Wtime()
             endif
             call bcomm1(XYZg,buf,timers(3),timers(10))
    
          else
             if(iisize*jjsize .gt. 0) then
-               call init_b_c(buf, iisize*jjsize, 1,
-     &           buf, iisize*jjsize, 1,nz,iisize*jjsize)
+               call init_b_c(buf, iisize*jjsize, 1, &
+                 buf, iisize*jjsize, 1,nz,iisize*jjsize)
             
                timers(10) = timers(10) - MPI_Wtime()
-               call exec_b_c2(XYZg, iisize*jjsize,1, 
-     &           buf, iisize*jjsize, 1,nz,iisize*jjsize)
+               call exec_b_c2(XYZg, iisize*jjsize,1, &
+                 buf, iisize*jjsize, 1,nz,iisize*jjsize)
                timers(10) = timers(10) + MPI_Wtime()
                call bcomm1(buf,buf,timers(3),timers(10))
             endif
@@ -606,25 +606,25 @@ c FFT Tranform (C2C) in Z for all x and y
 #else
          if(OW) then   
             Nl = iisize*jjsize*nz
-            call init_b_c(XYZg, iisize*jjsize, 1,
-     &        XYZg, iisize*jjsize, 1,nz,iisize*jjsize)
-            call exec_b_c2(XYZg, iisize*jjsize, 1,
-     &        XYZg, iisize*jjsize, 1,nz,iisize*jjsize)
+            call init_b_c(XYZg, iisize*jjsize, 1, &
+              XYZg, iisize*jjsize, 1,nz,iisize*jjsize)
+            call exec_b_c2(XYZg, iisize*jjsize, 1, &
+              XYZg, iisize*jjsize, 1,nz,iisize*jjsize)
             call ar_copy(XYZg,buf,Nl)
          else
-            call init_b_c(XYZg, iisize*jjsize, 1,
-     &        buf, iisize*jjsize, 1,nz,iisize*jjsize)
-            call exec_b_c2(XYZg, iisize*jjsize, 1,
-     &        buf, iisize*jjsize, 1,nz,iisize*jjsize)
+            call init_b_c(XYZg, iisize*jjsize, 1, &
+              buf, iisize*jjsize, 1,nz,iisize*jjsize)
+            call exec_b_c2(XYZg, iisize*jjsize, 1, &
+              buf, iisize*jjsize, 1,nz,iisize*jjsize)
          endif
 #endif
       endif
 
-c Exhange in columns if needed
+! Exhange in columns if needed
 
-c
-c FFT Transform (C2C) in y dimension for all x, one z-plane at a time
-c
+!
+! FFT Transform (C2C) in y dimension for all x, one z-plane at a time
+!
       if(iisize * kjsize .gt. 0) then
 
          call init_b_c(buf,iisize,1,buf,iisize,1,ny,iisize)
@@ -632,8 +632,8 @@ c
          timers(9) = timers(9) - MPI_Wtime()
          do z=kjstart,kjend
                
-            call btran_y_zplane(buf,z-kjstart,iisize,kjsize,iisize,1,
-     &           buf,z-kjstart,iisize,kjsize,iisize,1,ny,iisize) 
+            call btran_y_zplane(buf,z-kjstart,iisize,kjsize,iisize,1, &
+                 buf,z-kjstart,iisize,kjsize,iisize,1,ny,iisize) 
             
          enddo
          timers(9) = timers(9) + MPI_Wtime()
@@ -641,7 +641,7 @@ c
 
       if(iproc .gt. 1) call bcomm2(buf,buf,timers(4))
 
-c Perform Complex-to-real FFT in x dimension for all y and z
+! Perform Complex-to-real FFT in x dimension for all y and z
       if(jisize * kjsize .gt. 0) then
 
          call init_b_c2r(buf,nxhp,XgYZ,nx,nx,jisize*kjsize)
@@ -653,8 +653,8 @@ c Perform Complex-to-real FFT in x dimension for all y and z
       return
       end subroutine
 
-      subroutine wrap_exec_b_c2(A,strideA,B,strideB,
-     &     N,m,L,k)
+      subroutine wrap_exec_b_c2(A,strideA,B,strideB, &
+           N,m,L,k)
 
       complex(mytype) A(L,N),B(L,N)
       integer strideA,strideB,N,m,L,k
@@ -666,23 +666,23 @@ c Perform Complex-to-real FFT in x dimension for all y and z
       end subroutine
 
 
-c========================================================
-c  3D FFT Forward transform with 2D domain decomposition
-c
-c  The order of array elements in memory is the same in all stages: (x,y,z) 
-
-c Input: XgYZ - an array of real, x dimension is entirely local within 
-c processors memory  while y and z are block-distributed among processors 
-c in 2D grid
-c Output: XYZg - comlpex array, with entire Z dimension local,
-c               while x and y are block-distributed among processors in 2D grid
-c
-c The arrays may occupy the same memory space
-c In this case their first elements should coincide. 
-c Naturally, output overwrites input
-c
+!========================================================
+!  3D FFT Forward transform with 2D domain decomposition
+!
+!  The order of array elements in memory is the same in all stages: (x,y,z) 
+!
+! Input: XgYZ - an array of real, x dimension is entirely local within 
+! processors memory  while y and z are block-distributed among processors 
+! in 2D grid
+! Output: XYZg - comlpex array, with entire Z dimension local,
+!               while x and y are block-distributed among processors in 2D grid
+!
+! The arrays may occupy the same memory space
+! In this case their first elements should coincide. 
+! Naturally, output overwrites input
+!
       subroutine p3dfft_ftran_r2c (XgYZ,XYZg)
-c========================================================
+!========================================================
 
       use fft_spec
       implicit none
@@ -704,9 +704,9 @@ c========================================================
       nx = nx_fft
       ny = ny_fft
       nz = nz_fft
-c
-c FFT transform (R2C) in X for all z and y
-c
+!
+! FFT transform (R2C) in X for all z and y
+!
       if(jisize * kjsize .gt. 0) then
          call init_f_r2c(XgYZ,nx,buf,nxhp,nx,jisize*kjsize) 
 
@@ -715,48 +715,48 @@ c
          timers(5) = timers(5) + MPI_Wtime()
       endif
 
-c Exchange data in rows 
+! Exchange data in rows 
       if(iproc .gt. 1) call fcomm1(buf,buf,timers(1))
 
-c FFT transform (C2C) in Y for all x and z, one Z plane at a time
+! FFT transform (C2C) in Y for all x and z, one Z plane at a time
 
       if(iisize * kjsize .gt. 0) then
          call init_f_c(buf,iisize,1,buf,iisize,1,ny,iisize)
          timers(6) = timers(6) - MPI_Wtime()
          do z=1,kjsize
-            call ftran_y_zplane(buf,z-1,iisize,kjsize,iisize,1,
-     &           buf,z-1,iisize,kjsize,iisize,1,ny,iisize)
+            call ftran_y_zplane(buf,z-1,iisize,kjsize,iisize,1, &
+                 buf,z-1,iisize,kjsize,iisize,1,ny,iisize)
          enddo
          timers(6) = timers(6) + MPI_Wtime()
 
       endif
 
-c Exchange data in columns
+! Exchange data in columns
       if(jproc .gt. 1) then
 #ifdef STRIDE1
-c For stride1 option combine second transpose with transform in Z
+! For stride1 option combine second transpose with transform in Z
          call init_f_c(buf,1,nz, buf,1,nz,nz,iisize*NB)
          call fcomm2_trans(buf,XYZg,timers(2),timers(7))
 #else
 
 
-c FFT Transform (C2C) in Z for all x and y
+! FFT Transform (C2C) in Z for all x and y
 
-c Transpose y-z
+! Transpose y-z
 
          call fcomm2(buf,XYZg,timers(2),timers(7))
 
-c In forward transform we can safely use output array as one of the buffers
-c This speeds up FFTW since it is non-stride-1 transform and it is 
-c faster than done in-place
+! In forward transform we can safely use output array as one of the buffers
+! This speeds up FFTW since it is non-stride-1 transform and it is 
+! faster than done in-place
 
          if(iisize * jjsize .gt. 0) then
-            call init_f_c(XYZg,iisize*jjsize, 1,
-     &           XYZg,iisize*jjsize, 1,nz,iisize*jjsize)
+            call init_f_c(XYZg,iisize*jjsize, 1, &
+                 XYZg,iisize*jjsize, 1,nz,iisize*jjsize)
          
             timers(7) = timers(7) - MPI_Wtime()
-            call exec_f_c2(XYZg,iisize*jjsize, 1,
-     &           XYZg,iisize*jjsize, 1,nz,iisize*jjsize)
+            call exec_f_c2(XYZg,iisize*jjsize, 1, &
+                 XYZg,iisize*jjsize, 1,nz,iisize*jjsize)
             timers(7) = timers(7) + MPI_Wtime()
          endif
 
@@ -769,10 +769,10 @@ c faster than done in-place
 #else
          Nl = iisize*jjsize*nz
          call ar_copy(buf,XYZg,Nl)
-         call init_f_c(XYZg,iisize*jjsize, 1,
-     &        XYZg,iisize*jjsize, 1,nz,iisize*jjsize)         
-         call exec_f_c2(XYZg,iisize*jjsize, 1,
-     &        XYZg,iisize*jjsize, 1,nz,iisize*jjsize)
+         call init_f_c(XYZg,iisize*jjsize, 1, &
+              XYZg,iisize*jjsize, 1,nz,iisize*jjsize)         
+         call exec_f_c2(XYZg,iisize*jjsize, 1, &
+              XYZg,iisize*jjsize, 1,nz,iisize*jjsize)
 #endif
       endif
 
@@ -783,8 +783,8 @@ c faster than done in-place
 
 #ifdef STRIDE1
 
-c This routine is called only when jproc=1, and only when stride1 is used
-c transform backward in Z and transpose array in memory 
+! This routine is called only when jproc=1, and only when stride1 is used
+! transform backward in Z and transpose array in memory 
 
       subroutine reorder_trans_b(A,B,C)
 
@@ -833,14 +833,14 @@ c transform backward in Z and transpose array in memory
       end subroutine
 
 
-c This routine is called only when jproc=1, and only when stride1 is used
-c Transpose array in memory and transform forward in Z
+! This routine is called only when jproc=1, and only when stride1 is used
+! Transpose array in memory and transform forward in Z
 
       subroutine reorder_trans_f(A,B)
 
       complex(mytype) A(iisize,ny_fft,nz_fft)
       complex(mytype) B(nz_fft,iisize,ny_fft)
-c      complex(mytype) C(nz_fft,iisize,ny_fft)
+!      complex(mytype) C(nz_fft,iisize,ny_fft)
       integer x,y,z,iy,iz,y2,z2
 
       do y=1,ny_fft,nb
@@ -862,17 +862,17 @@ c      complex(mytype) C(nz_fft,iisize,ny_fft)
       end subroutine
 #endif      
 
-c Communication Module
-c 
-c Contains 4 routines for forward and backward exchanges inrows and columns 
-c of processors. Uses MPI_Alltoallv or MPI_Alltoall routine
-c
+! Communication Module
+! 
+! Contains 4 routines for forward and backward exchanges inrows and columns 
+! of processors. Uses MPI_Alltoallv or MPI_Alltoall routine
+!
 
-c========================================================
-c Transpose X and Y pencils
+!========================================================
+! Transpose X and Y pencils
 
       subroutine fcomm1(source,dest,t)
-c========================================================
+!========================================================
 
       implicit none
 
@@ -887,7 +887,7 @@ c========================================================
       integer x,y,i,ierr,z,xs,j,n,ix,iy
       integer*8 position,pos1
 
-c Pack the send buffer for exchanging y and x (within a given z plane ) into sendbuf
+! Pack the send buffer for exchanging y and x (within a given z plane ) into sendbuf
 
       position = 1
 
@@ -907,24 +907,24 @@ c Pack the send buffer for exchanging y and x (within a given z plane ) into sen
       
 #ifdef USE_EVEN
 
-c Use MPI_Alltoall
-c Exchange the y-x buffers (in rows of processors) 
+! Use MPI_Alltoall
+! Exchange the y-x buffers (in rows of processors) 
 
       t = t - MPI_Wtime()
-      call mpi_alltoall(buf1,IfCntMax, mpi_byte, 
-     &     buf2,IfCntMax, mpi_byte,mpi_comm_row,ierr)
+      call mpi_alltoall(buf1,IfCntMax, mpi_byte, &
+           buf2,IfCntMax, mpi_byte,mpi_comm_row,ierr)
       t = t + MPI_Wtime()
 
 #else
-c Use MPI_Alltoallv
-c Exchange the y-x buffers (in rows of processors)
+! Use MPI_Alltoallv
+! Exchange the y-x buffers (in rows of processors)
       t = t - MPI_Wtime() 
-      call mpi_alltoallv(buf1,IfSndCnts, IfSndStrt,mpi_byte, 
-     &     buf2,IfRcvCnts, IfRcvStrt,mpi_byte,mpi_comm_row,ierr)
+      call mpi_alltoallv(buf1,IfSndCnts, IfSndStrt,mpi_byte, &
+           buf2,IfRcvCnts, IfRcvStrt,mpi_byte,mpi_comm_row,ierr)
       t = MPI_Wtime() + t
 #endif
 
-c Unpack the data
+! Unpack the data
 
 #ifdef STRIDE12
       position = 1
@@ -969,11 +969,11 @@ c Unpack the data
       return
       end subroutine
 
-c========================================================
-c Transpose Y and Z pencils
+!========================================================
+! Transpose Y and Z pencils
 
       subroutine fcomm2(source,dest,t,tc)
-c========================================================
+!========================================================
 
       implicit none
 
@@ -988,7 +988,7 @@ c========================================================
       integer x,z,y,i,ierr,xs,ys,y2,z2,iy,iz
       integer*8 position,pos1
 
-c Pack send buffers for exchanging y and z for all x at once 
+! Pack send buffers for exchanging y and z for all x at once 
 
       position = 1
  
@@ -1007,17 +1007,17 @@ c Pack send buffers for exchanging y and z for all x at once
 #endif
       enddo
       
-c Exchange y-z buffers in columns of processors
+! Exchange y-z buffers in columns of processors
 
       t = t - MPI_Wtime()
 
 #ifdef USE_EVEN
-c Use MPI_Alltoall
+! Use MPI_Alltoall
 
       if(KfCntUneven) then
 
-         call mpi_alltoall(buf1,KfCntMax, mpi_byte,
-     &     buf2,KfCntMax, mpi_byte,mpi_comm_col,ierr)
+         call mpi_alltoall(buf1,KfCntMax, mpi_byte, &
+           buf2,KfCntMax, mpi_byte,mpi_comm_col,ierr)
 
          t = MPI_Wtime() + t
 
@@ -1040,17 +1040,17 @@ c Use MPI_Alltoall
 
       else
 
-         call mpi_alltoall(buf1,KfCntMax, mpi_byte,
-     &     dest,KfCntMax, mpi_byte,mpi_comm_col,ierr)
+         call mpi_alltoall(buf1,KfCntMax, mpi_byte, &
+           dest,KfCntMax, mpi_byte,mpi_comm_col,ierr)
          t = MPI_Wtime() + t
 
       endif
 
 #else
-c Use MPI_Alltoallv
+! Use MPI_Alltoallv
 
-      call mpi_alltoallv(buf1,KfSndCnts, KfSndStrt,mpi_byte,
-     &     dest,KfRcvCnts, KfRcvStrt,mpi_byte,mpi_comm_col,ierr)
+      call mpi_alltoallv(buf1,KfSndCnts, KfSndStrt,mpi_byte, &
+           dest,KfRcvCnts, KfRcvStrt,mpi_byte,mpi_comm_col,ierr)
       t = MPI_Wtime() + t
          
 #endif
@@ -1059,12 +1059,12 @@ c Use MPI_Alltoallv
 
 #ifdef STRIDE1
 
-c========================================================
-c Transpose Y and Z pencils
-c Assume Stride1 data structure
-
+!========================================================
+! Transpose Y and Z pencils
+! Assume Stride1 data structure
+!
       subroutine fcomm2_trans(source,dest,t,tc)
-c========================================================
+!========================================================
 
       implicit none
 
@@ -1076,7 +1076,7 @@ c========================================================
       integer x,z,y,i,ierr,xs,ys,y2,z2,iy,iz,ix,x2,n
       integer*8 position,pos1
 
-c Pack send buffers for exchanging y and z for all x at once 
+! Pack send buffers for exchanging y and z for all x at once 
 
       position = 1
  
@@ -1095,15 +1095,15 @@ c Pack send buffers for exchanging y and z for all x at once
 #endif
       enddo
       
-c Exchange y-z buffers in columns of processors
+! Exchange y-z buffers in columns of processors
 
       t = t - MPI_Wtime()
 
 #ifdef USE_EVEN
-c Use MPI_Alltoall
+! Use MPI_Alltoall
 
-      call mpi_alltoall(buf1,KfCntMax, mpi_byte,
-     &     buf,KfCntMax, mpi_byte,mpi_comm_col,ierr)
+      call mpi_alltoall(buf1,KfCntMax, mpi_byte, &
+           buf,KfCntMax, mpi_byte,mpi_comm_col,ierr)
 
       t = MPI_Wtime() + t
       tc = tc - MPI_Wtime()
@@ -1121,7 +1121,7 @@ c Use MPI_Alltoall
                   position = pos1
                   do iy=y,y2
                      do ix=x,x2
-c Here we are sure that dest and buf are different
+! Here we are sure that dest and buf are different
                         dest(z,ix,iy) = buf(position)
                         position = position +1
                      enddo
@@ -1131,17 +1131,17 @@ c Here we are sure that dest and buf are different
                enddo
             enddo
          enddo
-         call exec_f_c2(dest(1,1,y),1,nz_fft,dest(1,1,y),1,nz_fft,
-     &        nz_fft,NB*iisize)
+         call exec_f_c2(dest(1,1,y),1,nz_fft,dest(1,1,y),1,nz_fft, &
+              nz_fft,NB*iisize)
 
       enddo
       tc = tc + MPI_Wtime()
 
 #else
-c Use MPI_Alltoallv
+! Use MPI_Alltoallv
 
-      call mpi_alltoallv(buf1,KfSndCnts, KfSndStrt,mpi_byte,
-     &     buf,KfRcvCnts, KfRcvStrt,mpi_byte,mpi_comm_col,ierr)
+      call mpi_alltoallv(buf1,KfSndCnts, KfSndStrt,mpi_byte, &
+           buf,KfRcvCnts, KfRcvStrt,mpi_byte,mpi_comm_col,ierr)
       t = MPI_Wtime() + t
 
       tc = tc - MPI_Wtime()
@@ -1157,15 +1157,15 @@ c Use MPI_Alltoallv
                do z=1,nz_fft
                   position = pos1
                   do ix=x,x2
-c Here we are sure that dest and buf are different
+! Here we are sure that dest and buf are different
                      dest(z,ix,y) = buf(position)
                      position = position +1
                   enddo
                   pos1 = pos1 + iisize * jjsize
                enddo
             enddo
-            call exec_f_c2(dest(1,1,y),1,nz_fft,dest(1,1,y),1,nz_fft,
-     &           nz_fft,iisize)
+            call exec_f_c2(dest(1,1,y),1,nz_fft,dest(1,1,y),1,nz_fft, &
+                 nz_fft,iisize)
          enddo
 
       else
@@ -1181,9 +1181,9 @@ c Here we are sure that dest and buf are different
                do z=1,nz_fft
                   position = pos1
                   do iy=y,y2
-c                  position = ((z-1)*jjsize +iy-1)*iisize + x
+!                  position = ((z-1)*jjsize +iy-1)*iisize + x
                      do ix=x,x2
-c Here we are sure that dest and buf are different
+! Here we are sure that dest and buf are different
                         dest(z,ix,iy) = buf(position)
                         position = position +1
                      enddo
@@ -1192,8 +1192,8 @@ c Here we are sure that dest and buf are different
                   pos1 = pos1 + iisize * jjsize
                enddo
             enddo
-            call exec_f_c2(dest(1,1,y),1,nz_fft,dest(1,1,y),1,nz_fft,
-     &           nz_fft,NB*iisize)
+            call exec_f_c2(dest(1,1,y),1,nz_fft,dest(1,1,y),1,nz_fft, &
+                 nz_fft,NB*iisize)
          enddo
          
       endif
@@ -1205,11 +1205,11 @@ c Here we are sure that dest and buf are different
 
 #endif
 
-c========================================================
-c Transpose back Z to Y pencils
+!========================================================
+! Transpose back Z to Y pencils
 
       subroutine bcomm1 (source,dest,t,tc)
-c========================================================
+!========================================================
 
       implicit none
 
@@ -1219,7 +1219,7 @@ c========================================================
       integer x,y,z,i,ierr,xs,ys,iy,iz,y2,z2
       integer*8 position,pos1
       
-c     Pack the data for sending
+!     Pack the data for sending
 
 
 #ifdef USE_EVEN
@@ -1241,26 +1241,26 @@ c     Pack the data for sending
          tc = tc + MPI_Wtime()
   
          t = t - MPI_Wtime() 
-         call mpi_alltoall(buf1,KfCntMax,mpi_byte,
-     &        buf2,KfCntMax,mpi_byte,mpi_comm_col,ierr)
+         call mpi_alltoall(buf1,KfCntMax,mpi_byte, &
+              buf2,KfCntMax,mpi_byte,mpi_comm_col,ierr)
                   
       else
          t = t - MPI_Wtime() 
-         call mpi_alltoall(source,KfCntMax,mpi_byte,
-     &        buf2,KfCntMax,mpi_byte,mpi_comm_col,ierr)
+         call mpi_alltoall(source,KfCntMax,mpi_byte, &
+              buf2,KfCntMax,mpi_byte,mpi_comm_col,ierr)
       endif
 #else      
  
-c     Exchange data in columns
+!     Exchange data in columns
       t = t - MPI_Wtime() 
-      call mpi_alltoallv(source,JrSndCnts, JrSndStrt,mpi_byte,
-     &     buf2,JrRcvCnts, JrRcvStrt,mpi_byte,mpi_comm_col,ierr)
+      call mpi_alltoallv(source,JrSndCnts, JrSndStrt,mpi_byte, &
+           buf2,JrRcvCnts, JrRcvStrt,mpi_byte,mpi_comm_col,ierr)
 #endif      
 
 
       t = t + MPI_Wtime() 
 
-c Unpack receive buffers into dest
+! Unpack receive buffers into dest
 
       position=1
       do i=0,jproc-1
@@ -1292,12 +1292,12 @@ c Unpack receive buffers into dest
 
 #ifdef STRIDE1
 
-c========================================================
-c Transpose back Z to Y pencils
-c Assumes stride1 data structure
+!========================================================
+! Transpose back Z to Y pencils
+! Assumes stride1 data structure
 
       subroutine bcomm1_trans (source,buf3,dest,t,tc)
-c========================================================
+!========================================================
 
       implicit none
 
@@ -1309,11 +1309,11 @@ c========================================================
       integer x,y,z,i,ierr,xs,ys,iy,y2,z2,ix,x2,n
       integer*8 position,pos1
       
-c     Pack the data for sending
+!     Pack the data for sending
 
 
 #ifdef USE_EVEN
-c Use MPI_Alltoall
+! Use MPI_Alltoall
 
       tc = tc - MPI_Wtime()
 
@@ -1322,8 +1322,8 @@ c Use MPI_Alltoall
          do y=1,jjsize,NB
             y2 = min(y+NB-1,jjsize)
 
-            call exec_b_c2(source(1,1,y),1,nz_fft,source(1,1,y),1,nz_fft,
-     &        nz_fft,NB*iisize)
+            call exec_b_c2(source(1,1,y),1,nz_fft,source(1,1,y),1,nz_fft, &
+              nz_fft,NB*iisize)
 
             do x=1,iisize,NB1
                x2 = min(x+NB1-1,iisize)
@@ -1347,18 +1347,18 @@ c Use MPI_Alltoall
 
          tc = tc + MPI_Wtime()
          t = t - MPI_Wtime() 
-         call mpi_alltoall(buf1,KfCntMax, mpi_byte,
-     &     buf2,KfCntMax,mpi_byte,mpi_comm_col,ierr)
+         call mpi_alltoall(buf1,KfCntMax, mpi_byte, &
+           buf2,KfCntMax,mpi_byte,mpi_comm_col,ierr)
          t = t + MPI_Wtime() 
 
-c Unpack receive buffers into dest
+! Unpack receive buffers into dest
 
          position=1
          do i=0,jproc-1
             do z=1,kjsize
                do y=jjst(i),jjen(i)
                   do x=1,iisize
-c Here we are sure that buf is not the same as dest
+! Here we are sure that buf is not the same as dest
                      dest(x,y,z) = buf2(position)
                      position = position+1
                   enddo
@@ -1372,8 +1372,8 @@ c Here we are sure that buf is not the same as dest
          do y=1,jjsize,NB
             y2 = min(y+NB-1,jjsize)
             
-            call exec_b_c2(source(1,1,y),1,nz_fft,buf3(1,1,y),1,nz_fft,
-     &           nz_fft,NB*iisize)
+            call exec_b_c2(source(1,1,y),1,nz_fft,buf3(1,1,y),1,nz_fft, &
+                 nz_fft,NB*iisize)
 
             do x=1,iisize,NB1
                x2 = min(x+NB1-1,iisize)
@@ -1398,12 +1398,12 @@ c Here we are sure that buf is not the same as dest
          
          tc = tc + MPI_Wtime()
          t = t - MPI_Wtime() 
-         call mpi_alltoall(buf1,KfCntMax, mpi_byte,
-     &        buf2,KfCntMax,mpi_byte,mpi_comm_col,ierr)
+         call mpi_alltoall(buf1,KfCntMax, mpi_byte, &
+              buf2,KfCntMax,mpi_byte,mpi_comm_col,ierr)
          
          t = t + MPI_Wtime() 
 
-c Unpack receive buffers into dest
+! Unpack receive buffers into dest
 
          position=1
          do i=0,jproc-1
@@ -1421,7 +1421,7 @@ c Unpack receive buffers into dest
       endif
          
 #else
-c Use MPI_Alltoallv
+! Use MPI_Alltoallv
 
       tc = tc - MPI_Wtime()
 
@@ -1431,8 +1431,8 @@ c Use MPI_Alltoallv
 
             do y=1,jjsize
 
-               call exec_b_c2(source(1,1,y),1,nz_fft,source(1,1,y),1,nz_fft,
-     &            nz_fft,iisize)
+               call exec_b_c2(source(1,1,y),1,nz_fft,source(1,1,y),1,nz_fft, &
+                  nz_fft,iisize)
 
                do x=1,iisize,NB1
                   x2 = min(x+NB1-1,iisize)
@@ -1454,8 +1454,8 @@ c Use MPI_Alltoallv
             do y=1,jjsize,NB
                y2 = min(y+NB-1,jjsize)
                
-               call exec_b_c2(source(1,1,y),1,nz_fft,source(1,1,y),1,nz_fft,
-     &              nz_fft,NB*iisize)
+               call exec_b_c2(source(1,1,y),1,nz_fft,source(1,1,y),1,nz_fft, &
+                    nz_fft,NB*iisize)
                
                do x=1,iisize,NB1
                   x2 = min(x+NB1-1,iisize)
@@ -1481,18 +1481,18 @@ c Use MPI_Alltoallv
          tc = tc + MPI_Wtime()
 
          t = t - MPI_Wtime() 
-         call mpi_alltoallv(buf1,JrSndCnts, JrSndStrt,mpi_byte,
-     &        buf2,JrRcvCnts, JrRcvStrt,mpi_byte,mpi_comm_col,ierr)
+         call mpi_alltoallv(buf1,JrSndCnts, JrSndStrt,mpi_byte, &
+              buf2,JrRcvCnts, JrRcvStrt,mpi_byte,mpi_comm_col,ierr)
          t = t + MPI_Wtime() 
 
-c Unpack receive buffers into dest
+! Unpack receive buffers into dest
 
          position=1
          do i=0,jproc-1
             do z=1,kjsize
                do y=jjst(i),jjen(i)
                   do x=1,iisize
-c Here we are sure that buf is not the same as dest
+! Here we are sure that buf is not the same as dest
                      dest(x,y,z) = buf2(position)
                      position = position+1
                   enddo
@@ -1505,8 +1505,8 @@ c Here we are sure that buf is not the same as dest
          do y=1,jjsize,NB
             y2 = min(y+NB-1,jjsize)
 
-            call exec_b_c2(source(1,1,y),1,nz_fft,buf3(1,1,y),1,nz_fft,
-     &        nz_fft,NB*iisize)
+            call exec_b_c2(source(1,1,y),1,nz_fft,buf3(1,1,y),1,nz_fft, &
+              nz_fft,NB*iisize)
 
             do x=1,iisize,NB1
                x2 = min(x+NB1-1,iisize)
@@ -1530,12 +1530,12 @@ c Here we are sure that buf is not the same as dest
          tc = tc + MPI_Wtime()
          
          t = t - MPI_Wtime() 
-         call mpi_alltoallv(buf1,JrSndCnts, JrSndStrt,mpi_byte,
-     &        buf2,JrRcvCnts, JrRcvStrt,mpi_byte,mpi_comm_col,ierr)
+         call mpi_alltoallv(buf1,JrSndCnts, JrSndStrt,mpi_byte, &
+              buf2,JrRcvCnts, JrRcvStrt,mpi_byte,mpi_comm_col,ierr)
 
          t = t + MPI_Wtime() 
 
-c Unpack receive buffers into dest
+! Unpack receive buffers into dest
 
          position=1
          do i=0,jproc-1
@@ -1558,11 +1558,11 @@ c Unpack receive buffers into dest
 
 #endif
 
-c========================================================
-c Transpose back Y to X pencils
+!========================================================
+! Transpose back Y to X pencils
 
       subroutine bcomm2(source,dest,t)
-c========================================================
+!========================================================
 
       implicit none
 
@@ -1572,7 +1572,7 @@ c========================================================
       integer x,y,z,i,ierr
       integer*8 position
 
-c Pack and exchange x-z buffers in rows
+! Pack and exchange x-z buffers in rows
       
       position = 1
       do i=0,iproc-1
@@ -1592,17 +1592,17 @@ c Pack and exchange x-z buffers in rows
       t = t - MPI_Wtime() 
 
 #ifdef USE_EVEN
-      call mpi_alltoall (buf1,IfCntMax, 
-     &           mpi_byte, buf2,IfCntMax,mpi_byte,   
-     &           mpi_comm_row,ierr)
+      call mpi_alltoall (buf1,IfCntMax, &
+                 mpi_byte, buf2,IfCntMax,mpi_byte, &
+                 mpi_comm_row,ierr)
 #else
-      call mpi_alltoallv (buf1,KrSndCnts, KrSndStrt,
-     &           mpi_byte, buf2,KrRcvCnts,KrRcvStrt,mpi_byte,   
-     &           mpi_comm_row,ierr)
+      call mpi_alltoallv (buf1,KrSndCnts, KrSndStrt, &
+                 mpi_byte, buf2,KrRcvCnts,KrRcvStrt,mpi_byte, &
+                 mpi_comm_row,ierr)
 #endif
       t = t + MPI_Wtime() 
 
-c Unpack receive buffers into dest
+! Unpack receive buffers into dest
 
       position=1
       do i=0,iproc-1
@@ -1622,11 +1622,11 @@ c Unpack receive buffers into dest
       return
       end subroutine
 
-c========================================================
+!========================================================
       subroutine p3dfft_clean
 
 !!--------------------------------------------------------------
-c Clean-up routines for FFTW
+! Clean-up routines for FFTW
 
       use fft_spec
 
@@ -1692,105 +1692,105 @@ c Clean-up routines for FFTW
 
       end subroutine
 
-c=======================================================================
-c                 ghost cell support
-c               ----------------------
-c
-c  how to use:
-c ==============
-c     1) init ghost-support:
-c       ==>> call p3dfft_init_ghosts(goverlap)
-c       goverlap = overlap of ghost-cell-slab
-c                  (limitations: only one goverlap supported)
-c       (of cause we are still assuming periodic boundary conditions)
-c
-c     2) allocation of memory
-c       each array which needs ghost-cell-support has to have
-c       the min. size:	fsize(1)+2*goverlap *
-c                       fsize(2)+2*goverlap *
-c                       fsize(3)+2*goverlap
-c
-c     3) exchange ghost-cells among processors
-c       to update the ghost-cells among the proceesors
-c       ==>> call update_rghosts(array).
-c       This will assume data represents physical space!
-c
-c     4) use/read ghost-cells
-c       if you want to access/read ghost-cells
-c       ==>> call ijk2i(i,j,k)
-c       which returns the position in a 1D-array as an integer*8
-c
-c  array-memory:
-c ==============
-c     1) size if complex-type: fsize(1)+2*goverlap *
-c                              fsize(2)+2*goverlap *
-c                              fsize(3)+2*goverlap
-c     2a) structure in memory:
-c      |000000000000000000000000000|11111|22222|33333|44444|55555|66666|
-c                 ^^^^              ^     ^     ^     ^     ^     ^
-c          input/output of FFT      A     B     C     D     E     F
-c
-c      ghost-cell-slab at each pencil-side:
-c      A:  -X,Y*Z	A(istart(1)-i, j,k)		=> gmem_start(1)
-c      B:  +X,Y*Z	B(i,j,k)				=> gmem_start(2)
-c      C:  -Y,X*Z	C(i,j,k)				=> gmem_start(3)
-c      D:  +Y,X*Z	D(i,j,k)				=> gmem_start(4)
-c      E:  -Z,X*Y	E(i,j,k)				=> gmem_start(5)
-c      F:  +Z,X*Y	F(i,j,k)				=> gmem_start(6)
-c
-c     2b) a more closer look at "A":
-c      ....|aaaaaabbbbbbccccccdddddd|....
-c           ^     ^     ^     ^
-c           a1    b1    c1    d1
-c
-c      each ghost-cell-slab is build up by no. goverlap planes:
-c      a1:  Y*Z-plane with lowest X-coord
-c       |
-c      d1:  Y*Z-plane with highest X-coord
-c
-c  important variables:
-c =====================
-c     1) goverlap
-c       the data overlap between two processors - equal to the thickness
-c       of a ghost-slab
-c       This version supports only one fixed overlap value, because it simplifies
-c       the coding. If different overlaps for different arrays are needed the
-c       following varables must be dependent on the overlap-value and therefor
-c       should have one additional dimension.
-c       A good idea would be to make p3dfft_init_ghosts(..) return an id,which
-c       has to get set when calling update_ghosts(data,id).
-c
-c     2) gmem_start(1..6) (-X,-Y,-Z,+X,+Y,+Z)
-c       start of data in memory for ghost-cells of certain side
-c
-c     3) gmess_size(1..3) (X,Y,Z)
-c       size of mpi message needed to send/recieve ghost-slab each dimension(1..3)
-c
-c     4a) gslab_start(1..3, 1..6)
-c       relative start coord. of ghost-slab in pencil ijk(1..3), [neg./pos side(1..2) for each dimension(1..3)](1..6)
-c           -X   -Y   -Z   +X   +Y   +Z
-c         i
-c         j
-c         k
-c
-c     4b) gslab_end(1..3, 1..6)
-c       relative end coord. of ghost-slab in pencil ijk(1..3), [neg./pos side(1..2) for each dimension(1..3)](1..6)
-c           -X   -Y   -Z   +X   +Y   +Z
-c         i
-c         j
-c         k
-c
-c     4c) gslab_size(1..3, 1..3)
-c       size of ghost-slab for each dimension(1..3), ijk(1..3)
-c
-c     6) gneighb_(numtasks*(3*2))
-c       extended processor grid with all processor neighbours in -/+XYZ(1..6)
-c       including periodic boundary neighbours
-c        example for 2 processors with gneighb_r(:) = 0,0,0,0,1,1,1,1,1,1,0,0
-c         pencil-side: -X  +X  -Y  +Y  -Z  +Z
-c         taskid 0:     0   0   0   0   1   1
-c         taskid 1:     1   1   1   1   0   0
-c=======================================================================
+!=======================================================================
+!                 ghost cell support
+!               ----------------------
+!
+!  how to use:
+! ==============
+!     1) init ghost-support:
+!       ==>> call p3dfft_init_ghosts(goverlap)
+!       goverlap = overlap of ghost-cell-slab
+!                  (limitations: only one goverlap supported)
+!       (of cause we are still assuming periodic boundary conditions)
+!
+!     2) allocation of memory
+!       each array which needs ghost-cell-support has to have
+!       the min. size:	fsize(1)+2*goverlap *
+!                       fsize(2)+2*goverlap *
+!                       fsize(3)+2*goverlap
+!
+!     3) exchange ghost-cells among processors
+!       to update the ghost-cells among the proceesors
+!       ==>> call update_rghosts(array).
+!       This will assume data represents physical space!
+!
+!     4) use/read ghost-cells
+!       if you want to access/read ghost-cells
+!       ==>> call ijk2i(i,j,k)
+!       which returns the position in a 1D-array as an integer*8
+!
+!  array-memory:
+! ==============
+!     1) size if complex-type: fsize(1)+2*goverlap *
+!                              fsize(2)+2*goverlap *
+!                              fsize(3)+2*goverlap
+!     2a) structure in memory:
+!      |000000000000000000000000000|11111|22222|33333|44444|55555|66666|
+!                 ^^^^              ^     ^     ^     ^     ^     ^
+!          input/output of FFT      A     B     C     D     E     F
+!
+!      ghost-cell-slab at each pencil-side:
+!      A:  -X,Y*Z	A(istart(1)-i, j,k)		=> gmem_start(1)
+!      B:  +X,Y*Z	B(i,j,k)				=> gmem_start(2)
+!      C:  -Y,X*Z	C(i,j,k)				=> gmem_start(3)
+!      D:  +Y,X*Z	D(i,j,k)				=> gmem_start(4)
+!      E:  -Z,X*Y	E(i,j,k)				=> gmem_start(5)
+!      F:  +Z,X*Y	F(i,j,k)				=> gmem_start(6)
+!
+!     2b) a more closer look at "A":
+!      ....|aaaaaabbbbbbccccccdddddd|....
+!           ^     ^     ^     ^
+!           a1    b1    c1    d1
+!
+!      each ghost-cell-slab is build up by no. goverlap planes:
+!      a1:  Y*Z-plane with lowest X-coord
+!       |
+!      d1:  Y*Z-plane with highest X-coord
+!
+!  important variables:
+! =====================
+!     1) goverlap
+!       the data overlap between two processors - equal to the thickness
+!       of a ghost-slab
+!       This version supports only one fixed overlap value, because it simplifies
+!       the coding. If different overlaps for different arrays are needed the
+!       following varables must be dependent on the overlap-value and therefor
+!       should have one additional dimension.
+!       A good idea would be to make p3dfft_init_ghosts(..) return an id,which
+!       has to get set when calling update_ghosts(data,id).
+!
+!     2) gmem_start(1..6) (-X,-Y,-Z,+X,+Y,+Z)
+!       start of data in memory for ghost-cells of certain side
+!
+!     3) gmess_size(1..3) (X,Y,Z)
+!       size of mpi message needed to send/recieve ghost-slab each dimension(1..3)
+!
+!     4a) gslab_start(1..3, 1..6)
+!       relative start coord. of ghost-slab in pencil ijk(1..3), [neg./pos side(1..2) for each dimension(1..3)](1..6)
+!           -X   -Y   -Z   +X   +Y   +Z
+!         i
+!         j
+!         k
+!
+!     4b) gslab_end(1..3, 1..6)
+!       relative end coord. of ghost-slab in pencil ijk(1..3), [neg./pos side(1..2) for each dimension(1..3)](1..6)
+!           -X   -Y   -Z   +X   +Y   +Z
+!         i
+!         j
+!         k
+!
+!     4c) gslab_size(1..3, 1..3)
+!       size of ghost-slab for each dimension(1..3), ijk(1..3)
+!
+!     6) gneighb_(numtasks*(3*2))
+!       extended processor grid with all processor neighbours in -/+XYZ(1..6)
+!       including periodic boundary neighbours
+!        example for 2 processors with gneighb_r(:) = 0,0,0,0,1,1,1,1,1,1,0,0
+!         pencil-side: -X  +X  -Y  +Y  -Z  +Z
+!         taskid 0:     0   0   0   0   1   1
+!         taskid 1:     1   1   1   1   0   0
+!=======================================================================
 
       subroutine p3dfft_init_ghosts(goverlap_in)
       	implicit none
@@ -1816,9 +1816,9 @@ c=======================================================================
       	call get_dims(gproc_rstart, gproc_rend, gproc_rsize, 1)
       	call get_dims(gproc_cstart, gproc_cend, gproc_csize, 2)
 
-      	if(     goverlap .gt. gproc_csize(1)
-     &	   .or. goverlap .gt. gproc_csize(2)
-     &	   .or. goverlap .gt. gproc_csize(3) ) then
+      	if(     goverlap .gt. gproc_csize(1) &
+      	   .or. goverlap .gt. gproc_csize(2) &
+      	   .or. goverlap .gt. gproc_csize(3) ) then
       			print *,'P3DFFT error: in one direction goverlap is greater then complex pencil size'
       			ierr = 1
       			call abort
@@ -1934,9 +1934,9 @@ c=======================================================================
       		mp1 = mp*2-3	! 1=>-1 , 2=>+1
 
 !      		! build pneighb_r
-      		if(	d .eq. 0 .or.						! no decomp. in X
-     &			d .eq. 1 .and. iproc .eq. 1 .or.	! no decomp. in Y
-     &			d .eq. 2 .and. jproc .eq. 1) then	! no decomp. in Z
+      		if(	d .eq. 0 .or.			 &	! no decomp. in X  
+      			d .eq. 1 .and. iproc .eq. 1 .or. &	! no decomp. in Y  
+      			d .eq. 2 .and. jproc .eq. 1) then	! no decomp. in Z
       				pneighb_r(d*2+mp) = taskid
       		else if(d .eq. 1) then					! decomp. in Y
       			pneighb_r(d*2+mp) = coords2id(pCoo(1)+mp1, pCoo(2))
@@ -1945,9 +1945,9 @@ c=======================================================================
       		endif
 
 !      		! build pneighb_c
-      		if(	d .eq. 0 .and. iproc .eq. 1 .or.	! no decomp. in X
-     &			d .eq. 1 .and. jproc .eq. 1 .or.	! no decomp. in Y
-     &			d .eq. 2) then						! no decomp. in Z
+      		if(	d .eq. 0 .and. iproc .eq. 1 .or. &	! no decomp. in X  
+      			d .eq. 1 .and. jproc .eq. 1 .or. &	! no decomp. in Y  
+      			d .eq. 2) then						! no decomp. in Z
       				pneighb_c(d*2+mp) = taskid
       		else if(d .eq. 0) then					! decomp. in X
       			pneighb_c(d*2+mp) = coords2id(pCoo(1)+mp1, pCoo(2))
@@ -1960,15 +1960,15 @@ c=======================================================================
 
 !     ! distribute pneigh_r
       	allocate(gneighb_r(numtasks*6))
-      	call MPI_Allgather(	pneighb_r,	6, MPI_INTEGER,
-     &						gneighb_r,	6, MPI_INTEGER,
-     &						mpi_comm_cart,ierr)
+      	call MPI_Allgather(	pneighb_r,	6, MPI_INTEGER, &
+      						gneighb_r,	6, MPI_INTEGER, &
+      						mpi_comm_cart,ierr)
 
 !     ! distribute pneigh_c
       	allocate(gneighb_c(numtasks*6))
-      	call MPI_Allgather(	pneighb_c,	6, MPI_INTEGER,
-     &						gneighb_c,	6, MPI_INTEGER,
-     &						mpi_comm_cart,ierr)
+      	call MPI_Allgather(	pneighb_c,	6, MPI_INTEGER, &
+      						gneighb_c,	6, MPI_INTEGER, &
+      						mpi_comm_cart,ierr)
 
 !      	if(taskid .eq. 0) write(*,*) 'gneighb: ',gneighb_r(:)
 
@@ -1987,8 +1987,8 @@ c=======================================================================
 !     !                        +[(fsize(2)*2) *(fsize(3)*2) *goverlap]*2	2* YZ-plane
 !     !     # gneighb    - neighbours of all pencils in all directions
 
-      subroutine p3dfft_update_ghosts(XYZ, gneighb, gproc_size,
-     &                               gmem_start, gslab_start, gslab_end)
+      subroutine p3dfft_update_ghosts(XYZ, gneighb, gproc_size, &
+                                     gmem_start, gslab_start, gslab_end)
       	implicit none
 
 !     !	function args
@@ -2057,12 +2057,12 @@ c=======================================================================
 
 !     				start a receive, send ghost-cells then wait
       				buf_size = g*mytype
-      				call MPI_IRecv(	gbuf_recv, buf_size, MPI_BYTE,
-     &						gneighb(send_neighb), d, mpi_comm_cart,
-     &						request, ierr)
+      				call MPI_IRecv(	gbuf_recv, buf_size, MPI_BYTE, &
+      						gneighb(send_neighb), d, mpi_comm_cart, &
+      						request, ierr) 
 
-      				call MPI_Send(	gbuf_snd, buf_size, MPI_BYTE,
-     &						gneighb(recv_neighb), d, mpi_comm_cart, ierr)
+      				call MPI_Send(	gbuf_snd, buf_size, MPI_BYTE, &
+      						gneighb(recv_neighb), d, mpi_comm_cart, ierr)
 
       				call MPI_Wait( request, status, ierr )
 
@@ -2096,51 +2096,51 @@ c=======================================================================
 
 !     	ghost-cell in i-dim
       	if(i .lt. gproc_rstart(1)) then
-      	  gr_ijk2i = gmem_rstart(1)
-     &		+int( gslab_rsize(1,1)*gslab_rsize(2,1),8) *int( k-gproc_rstart(3),8)
-     &		+int( gslab_rsize(1,1)                 ,8) *int( j-gproc_rstart(2),8)
-     &		+                                           int( i-gproc_rstart(1) +gslab_rsize(1,1),8)
+      	  gr_ijk2i = gmem_rstart(1) &
+      		+int( gslab_rsize(1,1)*gslab_rsize(2,1),8) *int( k-gproc_rstart(3),8) &
+      		+int( gslab_rsize(1,1)                 ,8) *int( j-gproc_rstart(2),8) &
+      		+                                           int( i-gproc_rstart(1) +gslab_rsize(1,1),8)
       		return
       	else if(i .gt. gproc_rend(1)  ) then
-      	  gr_ijk2i = gmem_rstart(4)
-     &		+int( gslab_rsize(1,1)*gslab_rsize(1,2),8) *int( k-gproc_rstart(3),8)
-     &		+int( gslab_rsize(1,1)                 ,8) *int( j-gproc_rstart(2),8)
-     &		+                                           int( i-gproc_rend(1)-1,8)
+      	  gr_ijk2i = gmem_rstart(4) &
+      		+int( gslab_rsize(1,1)*gslab_rsize(1,2),8) *int( k-gproc_rstart(3),8) &
+      		+int( gslab_rsize(1,1)                 ,8) *int( j-gproc_rstart(2),8) &
+      		+                                           int( i-gproc_rend(1)-1,8)
       		return
 
 !     	ghost-cell in j-dim
       	else if(j .lt. gproc_rstart(2)) then
-      	  gr_ijk2i = gmem_rstart(2)
-     &		+int( gslab_rsize(1,2)*gslab_rsize(2,2),8) *int( k-gproc_rstart(3),8)
-     &		+int( gslab_rsize(1,2)                 ,8) *int( j-gproc_rstart(2) +gslab_rsize(2,2),8)
-     &		+                                           int( i-gproc_rstart(1),8)
+      	  gr_ijk2i = gmem_rstart(2) &
+      		+int( gslab_rsize(1,2)*gslab_rsize(2,2),8) *int( k-gproc_rstart(3),8) &
+      		+int( gslab_rsize(1,2)                 ,8) *int( j-gproc_rstart(2) +gslab_rsize(2,2),8) &
+      		+                                           int( i-gproc_rstart(1),8)
       		return
       	else if(j .gt. gproc_rend(2)  ) then
-      	  gr_ijk2i = gmem_rstart(5)
-     &		+int( gslab_rsize(1,2)*gslab_rsize(2,2),8) *int( k-gproc_rstart(3),8)
-     &		+int( gslab_rsize(1,2)                 ,8) *int( j-gproc_rend(2)-1,8)
-     &		+                                           int( i-gproc_rstart(1),8)
+      	  gr_ijk2i = gmem_rstart(5) &
+      		+int( gslab_rsize(1,2)*gslab_rsize(2,2),8) *int( k-gproc_rstart(3),8) &
+      		+int( gslab_rsize(1,2)                 ,8) *int( j-gproc_rend(2)-1,8) &
+      		+                                           int( i-gproc_rstart(1),8)
       		return
 
 !     	ghost-cell in k-dim
       	else if(k .lt. gproc_rstart(3)) then
-      	  gr_ijk2i = gmem_rstart(3)
-     &		+int( gslab_rsize(1,3)*gslab_rsize(2,3),8) *int( k-gproc_rstart(3) +gslab_rsize(3,3),8)
-     &		+int( gslab_rsize(1,3)                 ,8) *int( j-gproc_rstart(2),8)
-     &		+                                           int( i-gproc_rstart(1),8)
+      	  gr_ijk2i = gmem_rstart(3) &
+      		+int( gslab_rsize(1,3)*gslab_rsize(2,3),8) *int( k-gproc_rstart(3) +gslab_rsize(3,3),8) &
+      		+int( gslab_rsize(1,3)                 ,8) *int( j-gproc_rstart(2),8) &
+      		+                                           int( i-gproc_rstart(1),8)
       	else if(k .gt. gproc_rend(3)  ) then
-      	  gr_ijk2i = gmem_rstart(6)
-     &		+int( gslab_rsize(1,3)*gslab_rsize(2,3),8) *int( k-gproc_rend(3)-1,8)
-     &		+int( gslab_rsize(1,3)                 ,8) *int( j-gproc_rstart(2),8)
-     &		+                                           int( i-gproc_rstart(1),8)
+      	  gr_ijk2i = gmem_rstart(6) &
+      		+int( gslab_rsize(1,3)*gslab_rsize(2,3),8) *int( k-gproc_rend(3)-1,8) &
+      		+int( gslab_rsize(1,3)                 ,8) *int( j-gproc_rstart(2),8) &
+      		+                                           int( i-gproc_rstart(1),8)
       		return
 
 !     	no ghost-cell
       	else
-      	  gr_ijk2i = 1
-     &		+int(gproc_rsize(1)*gproc_rsize(2),8) *int(k-gproc_rstart(3),8)
-     &		+int(gproc_rsize(1)               ,8) *int(j-gproc_rstart(2),8)
-     &		+                                      int(i-gproc_rstart(1),8)
+      	  gr_ijk2i = 1 &
+      		+int(gproc_rsize(1)*gproc_rsize(2),8) *int(k-gproc_rstart(3),8) &
+      		+int(gproc_rsize(1)               ,8) *int(j-gproc_rstart(2),8) &
+      		+                                      int(i-gproc_rstart(1),8)
       	endif
 
       end function gr_ijk2i
@@ -2153,8 +2153,8 @@ c=======================================================================
       		print *,'P3DFFT error: call p3dfft_init_ghosts before'
       		return
       	endif
-      	call p3dfft_update_ghosts(XgYZ, gneighb_r, gproc_rsize,
-     &                             gmem_rstart, gslab_rstart, gslab_rend)
+      	call p3dfft_update_ghosts(XgYZ, gneighb_r, gproc_rsize, &
+                                   gmem_rstart, gslab_rstart, gslab_rend)
 
       end subroutine update_rghosts
 
@@ -2171,8 +2171,8 @@ c=======================================================================
       		print *,'P3DFFT error: call p3dfft_init_ghosts before'
       		return
       	endif
-      	call p3dfft_update_ghosts(XYZg, gneighb_c, gproc_csize,
-     &                             gmem_cstart, gslab_cstart, gslab_cend)
+      	call p3dfft_update_ghosts(XYZg, gneighb_c, gproc_csize, &
+                                   gmem_cstart, gslab_cstart, gslab_cend)
 
       end subroutine update_cghosts
 

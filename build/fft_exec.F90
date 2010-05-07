@@ -20,11 +20,11 @@
 
 !----------------------------------------------------------------------------
 
-c This file contains routines for executing pre-initialized 1D FFT operations
+! This file contains routines for executing pre-initialized 1D FFT operations
 
-      subroutine ftran_y_zplane(In,z_in,xsize_in,zsize_in,stride1_in,
-     &   stride2_in, Out,z_out,xsize_out,zsize_out,stride1_out,stride2_out, 
-     &   ny,m)
+      subroutine ftran_y_zplane(In,z_in,xsize_in,zsize_in,stride1_in, &
+         stride2_in, Out,z_out,xsize_out,zsize_out,stride1_out,stride2_out, &
+         ny,m)
 
       use p3dfft
       implicit none
@@ -39,9 +39,9 @@ c This file contains routines for executing pre-initialized 1D FFT operations
       end
 
 
-      subroutine btran_y_zplane(In,z_in,xsize_in,zsize_in,stride1_in,
-     &   stride2_in, Out,z_out,xsize_out,zsize_out,stride1_out,stride2_out, 
-     &   ny,m)
+      subroutine btran_y_zplane(In,z_in,xsize_in,zsize_in,stride1_in, &
+         stride2_in, Out,z_out,xsize_out,zsize_out,stride1_out,stride2_out, &
+         ny,m)
 
       use p3dfft
       implicit none
@@ -56,10 +56,10 @@ c This file contains routines for executing pre-initialized 1D FFT operations
       end
 
 
-c Execute backward complex-to-complex 1D FFT
+! Execute backward complex-to-complex 1D FFT
 
-      subroutine exec_b_c1(X,stride_x1,stride_x2,Y,stride_y1,
-     &    stride_y2,N,m)
+      subroutine exec_b_c1(X,stride_x1,stride_x2,Y,stride_y1, &
+          stride_y2,N,m)
 
       use fft_spec
       use p3dfft
@@ -90,8 +90,8 @@ c Execute backward complex-to-complex 1D FFT
       return
       end
 
-      subroutine exec_b_c2(X,stride_x1,stride_x2,Y,stride_y1,
-     &    stride_y2,N,m)
+      subroutine exec_b_c2(X,stride_x1,stride_x2,Y,stride_y1, &
+          stride_y2,N,m)
 
       use fft_spec
       use p3dfft
@@ -122,7 +122,7 @@ c Execute backward complex-to-complex 1D FFT
       return
       end
 
-c Execute backward complex-to-real 1D FFT
+! Execute backward complex-to-real 1D FFT
 
       subroutine exec_b_c2r(X,dimx,Y,dimy,N,m)
 
@@ -144,11 +144,11 @@ c Execute backward complex-to-real 1D FFT
 #elif defined ESSL
 
 #ifndef SINGLE_PREC
-      call dcrft(0,X,dimx,Y,dimy,N,m,-1,1.0d0,
-     &      raux1, rnaux1,raux2,rnaux2,raux3,1)  
+      call dcrft(0,X,dimx,Y,dimy,N,m,-1,1.0d0, &
+            raux1, rnaux1,raux2,rnaux2,raux3,1)  
 #else
-      call scrft(0,X,dimx,Y,dimy,N,m,-1,1.0,
-     &      raux1, rnaux1,raux2,rnaux2,raux3,1)  
+      call scrft(0,X,dimx,Y,dimy,N,m,-1,1.0, &
+            raux1, rnaux1,raux2,rnaux2,raux3,1)  
 #endif
 #else
       Error: unknown FFT library
@@ -157,7 +157,7 @@ c Execute backward complex-to-real 1D FFT
       return
       end
 
-c Execute forward complex-to-complex 1D FFT
+! Execute forward complex-to-complex 1D FFT
 
       subroutine exec_f_c1(X,stride_x1,stride_x2,Y,stride_y1,stride_y2,N,m) 
 
@@ -224,7 +224,7 @@ c Execute forward complex-to-complex 1D FFT
       return
       end
 
-c Execute forward real-to-complex 1D FFT
+! Execute forward real-to-complex 1D FFT
 
       subroutine exec_f_r2c(X,dimx,Y,dimy,N,m)
 
@@ -246,11 +246,11 @@ c Execute forward real-to-complex 1D FFT
 #elif defined ESSL
 
 #ifndef SINGLE_PREC
-      call drcft(0,X,dimx,Y,dimy,N,m,1,1.0d0,
-     &      raux1, rnaux1,raux2,rnaux2,raux3,1)     
+      call drcft(0,X,dimx,Y,dimy,N,m,1,1.0d0, &
+            raux1, rnaux1,raux2,rnaux2,raux3,1)     
 #else
-      call srcft(0,X,dimx,Y,dimy,N,m,1,1.0,
-     &      raux1, rnaux1,raux2,rnaux2,raux3,1)     
+      call srcft(0,X,dimx,Y,dimy,N,m,1,1.0, &
+            raux1, rnaux1,raux2,rnaux2,raux3,1)     
 #endif
 #else
       Error: undefined FFT library

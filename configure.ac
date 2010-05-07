@@ -9,9 +9,9 @@ AC_CONFIG_HEADER([config.h])
 
 # check whether to enable single precision
 AC_MSG_CHECKING([whether to enable single precision])
-AC_ARG_ENABLE(single, [AC_HELP_STRING([--enable-single], [compile P3DFFT in single precision (default is double precision)])], ok=$enableval, ok=no)
+AC_ARG_ENABLE(single, [AC_HELP_STRING([--enable-single], [compile P3DFFT in single precision (default is double precision)])], spval=$enableval, spval=no)
 AC_MSG_RESULT([$ok])
-if test "$ok" = "yes"; then
+if test "$spval" = "yes"; then
 	AC_SUBST(DFLAGS, "$DFLAGS -DSINGLE_PREC")
 	AC_DEFINE(SINGLE_PREC, 1, [Define if you want to compile P3DFFT in single precision])
 fi
@@ -121,13 +121,17 @@ fi
 
 # check for fftw3
 AC_MSG_CHECKING([whether to use FFTW library])
-AC_ARG_WITH(fftw, [AC_HELP_STRING([--with-fftw], [path to location of FFTW3 library])], withfftw=$withval, withfftw="")
+AC_ARG_WITH(fftw, [AC_HELP_STRING([--with-fftw], [path to location of FFTW library])], withfftw=$withval, withfftw="")
 if test "$withfftw" != ""; then
 	AC_MSG_RESULT([yes])
 	AC_SUBST(DFLAGS, "$DFLAGS -DFFTW")
-	AC_SUBST(FFTW3_INC, "$withfftw/include")
-	AC_SUBST(FFTW3_LIB, "$withfftw/lib")
+	AC_SUBST(FFTW_INC, "$withfftw/include")
+	AC_SUBST(FFTW_LIB, "$withfftw/lib")
 	AC_DEFINE(FFTW, 1, [Define if you want to use FFTW library])
+
+	if test "$spval" == "yes"; then
+		AC_SUBST(FFTWF, "$FFTW_LIB/libfftw3f.a")
+	fi
 else
 	AC_MSG_RESULT([no])
 fi

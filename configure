@@ -311,7 +311,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar DFLAGS FFTW3_INC FFTW3_LIB FC FCFLAGS LDFLAGS ac_ct_FC EXEEXT OBJEXT CC RANLIB ac_ct_RANLIB CFLAGS CPPFLAGS ac_ct_CC CPP EGREP LIBOBJS TESTLIBS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar DFLAGS FFTW_INC FFTW_LIB FFTWF FC FCFLAGS LDFLAGS ac_ct_FC EXEEXT OBJEXT CC RANLIB ac_ct_RANLIB CFLAGS CPPFLAGS ac_ct_CC CPP EGREP LIBOBJS TESTLIBS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -888,7 +888,7 @@ Optional Features:
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
-  --with-fftw             path to location of FFTW3 library
+  --with-fftw             path to location of FFTW library
 
 Some influential environment variables:
   FC          Fortran compiler command
@@ -1797,13 +1797,13 @@ echo $ECHO_N "checking whether to enable single precision... $ECHO_C" >&6
 # Check whether --enable-single or --disable-single was given.
 if test "${enable_single+set}" = set; then
   enableval="$enable_single"
-  ok=$enableval
+  spval=$enableval
 else
-  ok=no
+  spval=no
 fi;
 echo "$as_me:$LINENO: result: $ok" >&5
 echo "${ECHO_T}$ok" >&6
-if test "$ok" = "yes"; then
+if test "$spval" = "yes"; then
 	DFLAGS="$DFLAGS -DSINGLE_PREC"
 
 
@@ -2077,15 +2077,20 @@ if test "$withfftw" != ""; then
 echo "${ECHO_T}yes" >&6
 	DFLAGS="$DFLAGS -DFFTW"
 
-	FFTW3_INC="$withfftw/include"
+	FFTW_INC="$withfftw/include"
 
-	FFTW3_LIB="$withfftw/lib"
+	FFTW_LIB="$withfftw/lib"
 
 
 cat >>confdefs.h <<\_ACEOF
 #define FFTW 1
 _ACEOF
 
+
+	if test "$spval" == "yes"; then
+		FFTWF="$FFTW_LIB/libfftw3f.a"
+
+	fi
 else
 	echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
@@ -2198,7 +2203,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:2201:" \
+echo "$as_me:2206:" \
      "checking for Fortran compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -5002,8 +5007,9 @@ s,@AMTAR@,$AMTAR,;t t
 s,@am__tar@,$am__tar,;t t
 s,@am__untar@,$am__untar,;t t
 s,@DFLAGS@,$DFLAGS,;t t
-s,@FFTW3_INC@,$FFTW3_INC,;t t
-s,@FFTW3_LIB@,$FFTW3_LIB,;t t
+s,@FFTW_INC@,$FFTW_INC,;t t
+s,@FFTW_LIB@,$FFTW_LIB,;t t
+s,@FFTWF@,$FFTWF,;t t
 s,@FC@,$FC,;t t
 s,@FCFLAGS@,$FCFLAGS,;t t
 s,@LDFLAGS@,$LDFLAGS,;t t

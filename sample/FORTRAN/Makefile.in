@@ -49,23 +49,24 @@ PROGRAMS = $(noinst_PROGRAMS)
 am_test_rand_x_OBJECTS = driver_rand.$(OBJEXT)
 test_rand_x_OBJECTS = $(am_test_rand_x_OBJECTS)
 test_rand_x_LDADD = $(LDADD)
+am__DEPENDENCIES_1 =
 test_rand_x_DEPENDENCIES = $(top_builddir)/build/libp3dfft.a \
-	$(FFTW3_LIB)/libfftw3.a $(FFTW3_LIB)/libfftw3f.a
+	$(FFTW_LIB)/libfftw3.a $(am__DEPENDENCIES_1)
 am_test_sine_x_OBJECTS = driver_sine.$(OBJEXT)
 test_sine_x_OBJECTS = $(am_test_sine_x_OBJECTS)
 test_sine_x_LDADD = $(LDADD)
 test_sine_x_DEPENDENCIES = $(top_builddir)/build/libp3dfft.a \
-	$(FFTW3_LIB)/libfftw3.a $(FFTW3_LIB)/libfftw3f.a
+	$(FFTW_LIB)/libfftw3.a $(am__DEPENDENCIES_1)
 am_test_sine_inplace_x_OBJECTS = driver_sine_inplace.$(OBJEXT)
 test_sine_inplace_x_OBJECTS = $(am_test_sine_inplace_x_OBJECTS)
 test_sine_inplace_x_LDADD = $(LDADD)
 test_sine_inplace_x_DEPENDENCIES = $(top_builddir)/build/libp3dfft.a \
-	$(FFTW3_LIB)/libfftw3.a $(FFTW3_LIB)/libfftw3f.a
+	$(FFTW_LIB)/libfftw3.a $(am__DEPENDENCIES_1)
 am_test_spec_x_OBJECTS = driver_spec.$(OBJEXT)
 test_spec_x_OBJECTS = $(am_test_spec_x_OBJECTS)
 test_spec_x_LDADD = $(LDADD)
 test_spec_x_DEPENDENCIES = $(top_builddir)/build/libp3dfft.a \
-	$(FFTW3_LIB)/libfftw3.a $(FFTW3_LIB)/libfftw3f.a
+	$(FFTW_LIB)/libfftw3.a $(am__DEPENDENCIES_1)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp =
 am__depfiles_maybe =
@@ -100,8 +101,9 @@ EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FC = mpif90
 FCFLAGS = @FCFLAGS@
-FFTW3_INC = @FFTW3_INC@
-FFTW3_LIB = @FFTW3_LIB@
+FFTWF = @FFTWF@
+FFTW_INC = @FFTW_INC@
+FFTW_LIB = @FFTW_LIB@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
@@ -154,7 +156,7 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 AM_FCFLAGS = $(FCFLAGS) $(DFLAGS) $(INCLUDES) 
 INCLUDES = -I$(top_builddir)/include/
-LDADD = $(top_builddir)/build/libp3dfft.a $(FFTW3_LIB)/libfftw3.a $(FFTW3_LIB)/libfftw3f.a
+LDADD = $(top_builddir)/build/libp3dfft.a $(FFTW_LIB)/libfftw3.a $(FFTWF) 
 test_sine_x_SOURCES = driver_sine.f90
 test_sine_inplace_x_SOURCES = driver_sine_inplace.f90
 test_rand_x_SOURCES = driver_rand.f90

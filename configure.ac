@@ -4,7 +4,7 @@
 AC_PREREQ(2.59)
 AC_INIT(P3DFFT, 2.3.1, dmitry@sdsc.edu)
 AM_INIT_AUTOMAKE(no-dependencies)
-AC_CONFIG_SRCDIR([build/module.F])
+AC_CONFIG_SRCDIR([build/module.F90])
 AC_CONFIG_HEADER([config.h])
 
 # check whether to enable single precision
@@ -162,9 +162,9 @@ AC_FUNC_MALLOC
 
 AC_CONFIG_FILES([Makefile
                  build/Makefile
-		 sample/Makefile
-		 sample/C/Makefile
-		 sample/FORTRAN/Makefile])
+	 	 sample/Makefile
+	 	 sample/C/Makefile
+	 	 sample/FORTRAN/Makefile])
 
 AC_SUBST(TESTLIBS, $TESTLIBS)
 AC_OUTPUT

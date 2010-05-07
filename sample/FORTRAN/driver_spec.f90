@@ -57,16 +57,16 @@
       gtcomm=0.0
 
       if (proc_id.eq.0) then 
-         open (unit=3,file='stdin',status='old',
-     &         access='sequential',form='formatted', iostat=fstatus)
+         open (unit=3,file='stdin',status='old', &
+               access='sequential',form='formatted', iostat=fstatus)
          if (fstatus .eq. 0) then
             write(*, *) ' Reading from input file stdin'
          endif 
          ndim = 2
 
         read (3,*) nx, ny, nz, ndim
-        write (*,*) "procs=",nproc," nx=",nx,
-     &          " ny=", ny," nz=", nz,"ndim=",ndim
+        write (*,*) "procs=",nproc," nx=",nx, &
+                " ny=", ny," nz=", nz,"ndim=",ndim
         if(mytype .eq. 4) then
            print *,'Single precision version'
         else if(mytype .eq. 8) then
@@ -116,31 +116,31 @@
          print *,'Using processor grid ',iproc,' x ',jproc
       endif
 
-c Initialize P3DFFT
+! Initialize P3DFFT
 
       call p3dfft_setup (dims,nx,ny,nz,.false.)
 
-c Get dimensions for initial and outcoming arrays
+! Get dimensions for initial and outcoming arrays
 
       call get_dims(istart,iend,isize,1)
       call get_dims(fstart,fend,fsize,2)
 
-c Allocate array for initial data
+! Allocate array for initial data
 
       allocate (BEG(istart(1):iend(1),istart(2):iend(2),istart(3):iend(3)), stat=ierr)
       if(ierr .ne. 0) then
          print *,'Error ',ierr,' allocating array BEG'
       endif
 
-c Allocate the (complex) array for transformed data
+! Allocate the (complex) array for transformed data
 
       allocate (AEND(fstart(1):fend(1),fstart(2):fend(2),fstart(3):fend(3)), stat=ierr)
       if(ierr .ne. 0) then
          print *,'Error ',ierr,' allocating array AEND'
       endif
 
-c Initialize with random numbers
-c
+! Initialize with random numbers
+!
       do z=istart(3),iend(3)
          do y=istart(2),iend(2)
             do x=istart(1),iend(1)
@@ -149,27 +149,27 @@ c
          enddo
       enddo
 
-c
-c transform from physical space to wavenumber space
-c (XgYiZj to XiYjZg)
-c then transform back to physical space
-c (XiYjZg to XgYiZj)
-c
+!
+! transform from physical space to wavenumber space
+! (XgYiZj to XiYjZg)
+! then transform back to physical space
+! (XiYjZg to XgYiZj)
+!
 
       factor = 1.0d0/(nx*ny)
       factor = factor / nz
       Ntot = fsize(1)*fsize(2)*fsize(3)
 
-c Barrier for correct timing
+! Barrier for correct timing
       call MPI_Barrier(MPI_COMM_WORLD,ierr)
       rtime1 = - MPI_wtime()
 
-c Do forward Fourier transform
+! Do forward Fourier transform
       call p3dfft_ftran_r2c (BEG,AEND)
          
       rtime1 = rtime1 + MPI_wtime()
          
-c Normalize
+! Normalize
       call mult_array(AEND, Ntot,factor)
 
       kmax = sqrt(real(nx)*nx + ny*ny + nz*nz)*0.5 + 0.5
@@ -178,7 +178,7 @@ c Normalize
       ng(2) = ny
       ng(3) = nz
 
-c Compute power spectrum
+! Compute power spectrum
       call compute_spectrum(AEND,fstart,fsize,fend,ng,E,kmax,0)
 
       if(proc_id .eq. 0) then
@@ -188,32 +188,32 @@ c Compute power spectrum
          enddo
       endif
 
-c Free work space
+! Free work space
       call p3dfft_clean
 
-c Process timing statistics
-      call MPI_Reduce(rtime1,rtime2,1,mpi_real8,MPI_MAX,0,
-     &  MPI_COMM_WORLD,ierr)
+! Process timing statistics
+      call MPI_Reduce(rtime1,rtime2,1,mpi_real8,MPI_MAX,0, &
+        MPI_COMM_WORLD,ierr)
 
-      if (proc_id.eq.0) write(6,*)'proc_id, cpu time',
-     &   proc_id,rtime2
+      if (proc_id.eq.0) write(6,*)'proc_id, cpu time', &
+         proc_id,rtime2
 
-      call MPI_Reduce(timers,gt(1,1),4,mpi_real8,MPI_SUM,0,
-     &  MPI_COMM_WORLD,ierr)
+      call MPI_Reduce(timers,gt(1,1),4,mpi_real8,MPI_SUM,0, &
+        MPI_COMM_WORLD,ierr)
 
-      call MPI_Reduce(timers,gt(1,2),4,mpi_real8,MPI_MAX,0,
-     &  MPI_COMM_WORLD,ierr)
+      call MPI_Reduce(timers,gt(1,2),4,mpi_real8,MPI_MAX,0, &
+        MPI_COMM_WORLD,ierr)
 
-      call MPI_Reduce(timers,gt(1,3),4,mpi_real8,MPI_MIN,0,
-     &  MPI_COMM_WORLD,ierr)
+      call MPI_Reduce(timers,gt(1,3),4,mpi_real8,MPI_MIN,0, &
+        MPI_COMM_WORLD,ierr)
 
       tc = (timers(1)+timers(2)+timers(3)+timers(4))
-      call MPI_Reduce(tc,gtcomm(1),1,mpi_real8,MPI_SUM,0,
-     &  MPI_COMM_WORLD,ierr)
-      call MPI_Reduce(tc,gtcomm(2),1,mpi_real8,MPI_MAX,0,
-     &  MPI_COMM_WORLD,ierr)
-      call MPI_Reduce(tc,gtcomm(3),1,mpi_real8,MPI_MIN,0,
-     &  MPI_COMM_WORLD,ierr)
+      call MPI_Reduce(tc,gtcomm(1),1,mpi_real8,MPI_SUM,0, &
+        MPI_COMM_WORLD,ierr)
+      call MPI_Reduce(tc,gtcomm(2),1,mpi_real8,MPI_MAX,0, &
+        MPI_COMM_WORLD,ierr)
+      call MPI_Reduce(tc,gtcomm(3),1,mpi_real8,MPI_MIN,0, &
+        MPI_COMM_WORLD,ierr)
 
       gt(1:4,1) = gt(1:4,1) / dble(nproc)
       gtcomm(1) = gtcomm(1) / dble(nproc)
@@ -245,8 +245,8 @@ c Process timing statistics
          call abort
       endif
 
-c      print *,'B='
-c      call print_buf_c(B,sz(1),sz(2),sz(3),ng(1))
+!      print *,'B='
+!      call print_buf_c(B,sz(1),sz(2),sz(3),ng(1))
 
 
       do ik=0,kmax
@@ -273,8 +273,8 @@ c      call print_buf_c(B,sz(1),sz(2),sz(3),ng(1))
 
                k2 = kx**2 + ky**2 + kz**2
                ik = sqrt(k2) + 0.5
-               el(ik) = el(ik) + k2 * real(B(x-st(1)+1,y-st(2)+1,z-st(3)+1) * 
-     &             conjg(B(x-st(1)+1,y-st(2)+1,z-st(3)+1))) 
+               el(ik) = el(ik) + k2 * real(B(x-st(1)+1,y-st(2)+1,z-st(3)+1) * &
+                   conjg(B(x-st(1)+1,y-st(2)+1,z-st(3)+1))) 
 
             enddo
          enddo

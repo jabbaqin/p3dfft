@@ -69,9 +69,9 @@ test_spec_x_DEPENDENCIES = $(top_builddir)/build/libp3dfft.a \
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp =
 am__depfiles_maybe =
-F77COMPILE = $(F77) $(AM_FFLAGS) $(FFLAGS)
-F77LD = $(F77)
-F77LINK = $(F77LD) $(AM_FFLAGS) $(FFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o \
+FCCOMPILE = $(FC) $(AM_FCFLAGS) $(FCFLAGS)
+FCLD = $(FC)
+FCLINK = $(FCLD) $(AM_FCFLAGS) $(FCFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o \
 	$@
 SOURCES = $(test_rand_x_SOURCES) $(test_sine_x_SOURCES) \
 	$(test_sine_inplace_x_SOURCES) $(test_spec_x_SOURCES)
@@ -152,18 +152,17 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-F77 = $(FC)
-AM_FFLAGS = $(FCFLAGS) $(DFLAGS) $(INCLUDES) 
+AM_FCFLAGS = $(FCFLAGS) $(DFLAGS) $(INCLUDES) 
 INCLUDES = -I$(top_builddir)/include/
 LDADD = $(top_builddir)/build/libp3dfft.a $(FFTW3_LIB)/libfftw3.a
-test_sine_x_SOURCES = driver_sine.f
-test_sine_inplace_x_SOURCES = driver_sine_inplace.f
-test_rand_x_SOURCES = driver_rand.f
-test_spec_x_SOURCES = driver_spec.f
+test_sine_x_SOURCES = driver_sine.f90
+test_sine_inplace_x_SOURCES = driver_sine_inplace.f90
+test_rand_x_SOURCES = driver_rand.f90
+test_spec_x_SOURCES = driver_spec.f90
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .f .o .obj
+.SUFFIXES: .f90 .o .obj
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -198,16 +197,16 @@ clean-noinstPROGRAMS:
 	-test -z "$(noinst_PROGRAMS)" || rm -f $(noinst_PROGRAMS)
 test_rand.x$(EXEEXT): $(test_rand_x_OBJECTS) $(test_rand_x_DEPENDENCIES) 
 	@rm -f test_rand.x$(EXEEXT)
-	$(F77LINK) $(test_rand_x_LDFLAGS) $(test_rand_x_OBJECTS) $(test_rand_x_LDADD) $(LIBS)
+	$(FCLINK) $(test_rand_x_LDFLAGS) $(test_rand_x_OBJECTS) $(test_rand_x_LDADD) $(LIBS)
 test_sine.x$(EXEEXT): $(test_sine_x_OBJECTS) $(test_sine_x_DEPENDENCIES) 
 	@rm -f test_sine.x$(EXEEXT)
-	$(F77LINK) $(test_sine_x_LDFLAGS) $(test_sine_x_OBJECTS) $(test_sine_x_LDADD) $(LIBS)
+	$(FCLINK) $(test_sine_x_LDFLAGS) $(test_sine_x_OBJECTS) $(test_sine_x_LDADD) $(LIBS)
 test_sine_inplace.x$(EXEEXT): $(test_sine_inplace_x_OBJECTS) $(test_sine_inplace_x_DEPENDENCIES) 
 	@rm -f test_sine_inplace.x$(EXEEXT)
-	$(F77LINK) $(test_sine_inplace_x_LDFLAGS) $(test_sine_inplace_x_OBJECTS) $(test_sine_inplace_x_LDADD) $(LIBS)
+	$(FCLINK) $(test_sine_inplace_x_LDFLAGS) $(test_sine_inplace_x_OBJECTS) $(test_sine_inplace_x_LDADD) $(LIBS)
 test_spec.x$(EXEEXT): $(test_spec_x_OBJECTS) $(test_spec_x_DEPENDENCIES) 
 	@rm -f test_spec.x$(EXEEXT)
-	$(F77LINK) $(test_spec_x_LDFLAGS) $(test_spec_x_OBJECTS) $(test_spec_x_LDADD) $(LIBS)
+	$(FCLINK) $(test_spec_x_LDFLAGS) $(test_spec_x_OBJECTS) $(test_spec_x_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -215,11 +214,11 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-.f.o:
-	$(F77COMPILE) -c -o $@ $<
+.f90.o:
+	$(FCCOMPILE) -c -o $@ $<
 
-.f.obj:
-	$(F77COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+.f90.obj:
+	$(FCCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 uninstall-info-am:
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)

@@ -59,16 +59,16 @@
       gtcomm=0.0
 
       if (proc_id.eq.0) then 
-         open (unit=3,file='stdin',status='old',
-     &         access='sequential',form='formatted', iostat=fstatus)
+         open (unit=3,file='stdin',status='old', &
+               access='sequential',form='formatted', iostat=fstatus)
          if (fstatus .eq. 0) then
             write(*, *) ' Reading from input file stdin'
          endif 
          ndim = 2
 
         read (3,*) nx, ny, nz, ndim,n
-        write (*,*) "procs=",nproc," nx=",nx,
-     &          " ny=", ny," nz=", nz,"ndim=",ndim," repeat=", n
+        write (*,*) "procs=",nproc," nx=",nx, &
+                " ny=", ny," nz=", nz,"ndim=",ndim," repeat=", n
         if(mytype .eq. 4) then
            print *,'Single precision version'
         else if(mytype .eq. 8) then
@@ -124,9 +124,9 @@
       allocate (sinx(nx))
       allocate (siny(ny))
       allocate (sinz(nz))
-c
-c initialize
-c
+!
+! initialize
+!
       do z=istart(3),iend(3)
          sinz(z)=sin((z-1)*twopi/nz)
       enddo
@@ -137,18 +137,18 @@ c
          sinx(x)=sin((x-1)*twopi/nx)
       enddo
 
-c      print *,'Allocating BEG (',isize,istart,iend
+!      print *,'Allocating BEG (',isize,istart,iend
       allocate (BEG(istart(1):iend(1),istart(2):iend(2),istart(3):iend(3)), stat=ierr)
       if(ierr .ne. 0) then
          print *,'Error ',ierr,' allocating array BEG'
       endif
-c      print *,'Allocating AEND (',fsize,fstart,fend
+!      print *,'Allocating AEND (',fsize,fstart,fend
       allocate (AEND(fstart(1):fend(1),fstart(2):fend(2),fstart(3):fend(3)), stat=ierr)
       if(ierr .ne. 0) then
          print *,'Error ',ierr,' allocating array AEND'
       endif
 
-c Initialize with 3D sine wave
+! Initialize with 3D sine wave
 
       do z=istart(3),iend(3)
          do y=istart(2),iend(2)
@@ -159,12 +159,12 @@ c Initialize with 3D sine wave
          enddo
       enddo
 
-c
-c transform from physical space to wavenumber space
-c (XgYiZj to XiYjZg)
-c then transform back to physical space
-c (XiYjZg to XgYiZj)
-c
+!
+! transform from physical space to wavenumber space
+! (XgYiZj to XiYjZg)
+! then transform back to physical space
+! (XiYjZg to XgYiZj)
+!
 
       Ntot = fsize(1)*fsize(2)*fsize(3)
       Nglob = nx * ny 
@@ -177,10 +177,10 @@ c
             print *,'Iteration ',m
          endif
          
-c Barrier for correct timing
+! Barrier for correct timing
          call MPI_Barrier(MPI_COMM_WORLD,ierr)
          rtime1 = rtime1 - MPI_wtime()
-c Forward transform
+! Forward transform
          call p3dfft_ftran_r2c (BEG,AEND)
          
          rtime1 = rtime1 + MPI_wtime()
@@ -190,22 +190,22 @@ c Forward transform
          endif
          call print_all(AEND,Ntot,proc_id,Nglob)
          
-c normalize
+! normalize
          call mult_array(AEND, Ntot,factor)
     
-c Barrier for correct timing
+! Barrier for correct timing
          call MPI_Barrier(MPI_COMM_WORLD,ierr)
          rtime1 = rtime1 - MPI_wtime()
-c Backward transform     
+! Backward transform     
          call p3dfft_btran_c2r (AEND,BEG)       
          rtime1 = rtime1 + MPI_wtime()
          
       end do
 
-c Free work space
+! Free work space
       call p3dfft_clean
 
-c Check results
+! Check results
       cdiff=0.0d0
       do 20 z=istart(3),iend(3)
          do 20 y=istart(2),iend(2)
@@ -214,39 +214,39 @@ c Check results
             ans=sinx(x)*sinyz
             if(cdiff .lt. abs(BEG(x,y,z)-ans)) then
                cdiff = abs(BEG(x,y,z)-ans)
-c               print *,'x,y,z,cdiff=',x,y,z,cdiff
+!               print *,'x,y,z,cdiff=',x,y,z,cdiff
             endif
  20   continue
-      call MPI_Reduce(cdiff,ccdiff,1,mpireal,MPI_MAX,0,
-     &  MPI_COMM_WORLD,ierr)
+      call MPI_Reduce(cdiff,ccdiff,1,mpireal,MPI_MAX,0, &
+        MPI_COMM_WORLD,ierr)
 
       if (proc_id.eq.0) write (6,*) 'max diff =',ccdiff
 
-c Gather timing statistics
-      call MPI_Reduce(rtime1,rtime2,1,mpi_real8,MPI_MAX,0,
-     &  MPI_COMM_WORLD,ierr)
+! Gather timing statistics
+      call MPI_Reduce(rtime1,rtime2,1,mpi_real8,MPI_MAX,0, &
+        MPI_COMM_WORLD,ierr)
 
-      if (proc_id.eq.0) write(6,*)'proc_id, cpu time per loop',
-     &   proc_id,rtime2/dble(n)
+      if (proc_id.eq.0) write(6,*)'proc_id, cpu time per loop', &
+         proc_id,rtime2/dble(n)
 
       timers = timers / dble(n)
 
-      call MPI_Reduce(timers,gt(1,1),10,mpi_real8,MPI_SUM,0,
-     &  MPI_COMM_WORLD,ierr)
+      call MPI_Reduce(timers,gt(1,1),10,mpi_real8,MPI_SUM,0, &
+        MPI_COMM_WORLD,ierr)
 
-      call MPI_Reduce(timers,gt(1,2),10,mpi_real8,MPI_MAX,0,
-     &  MPI_COMM_WORLD,ierr)
+      call MPI_Reduce(timers,gt(1,2),10,mpi_real8,MPI_MAX,0, &
+        MPI_COMM_WORLD,ierr)
 
-      call MPI_Reduce(timers,gt(1,3),10,mpi_real8,MPI_MIN,0,
-     &  MPI_COMM_WORLD,ierr)
+      call MPI_Reduce(timers,gt(1,3),10,mpi_real8,MPI_MIN,0, &
+        MPI_COMM_WORLD,ierr)
 
       tc = (timers(1)+timers(2)+timers(3)+timers(4))
-      call MPI_Reduce(tc,gtcomm(1),1,mpi_real8,MPI_SUM,0,
-     &  MPI_COMM_WORLD,ierr)
-      call MPI_Reduce(tc,gtcomm(2),1,mpi_real8,MPI_MAX,0,
-     &  MPI_COMM_WORLD,ierr)
-      call MPI_Reduce(tc,gtcomm(3),1,mpi_real8,MPI_MIN,0,
-     &  MPI_COMM_WORLD,ierr)
+      call MPI_Reduce(tc,gtcomm(1),1,mpi_real8,MPI_SUM,0, &
+        MPI_COMM_WORLD,ierr)
+      call MPI_Reduce(tc,gtcomm(2),1,mpi_real8,MPI_MAX,0, &
+        MPI_COMM_WORLD,ierr)
+      call MPI_Reduce(tc,gtcomm(3),1,mpi_real8,MPI_MIN,0, &
+        MPI_COMM_WORLD,ierr)
 
       gt(1:10,1) = gt(1:10,1) / dble(nproc)
       gtcomm(1) = gtcomm(1) / dble(nproc)
@@ -289,7 +289,7 @@ c Gather timing statistics
       integer Fstart(3),Fend(3),Fsize(3)
       real(8) Nglob
 
-c      print *,'Nglob =',Nglob
+!      print *,'Nglob =',Nglob
       call get_dims(Fstart,Fend,Fsize,2)
       do i=1,Nar
          if(abs(Ar(1,1,i)) .gt. Nglob *1.25e-4) then

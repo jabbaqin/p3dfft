@@ -273,7 +273,7 @@ PACKAGE_VERSION='2.3.1'
 PACKAGE_STRING='P3DFFT 2.3.1'
 PACKAGE_BUGREPORT='dmitry@sdsc.edu'
 
-ac_unique_file="build/module.F"
+ac_unique_file="build/module.F90"
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stdio.h>

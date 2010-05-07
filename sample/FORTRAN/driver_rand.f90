@@ -59,16 +59,16 @@
       gtcomm = 0.0
 
       if (proc_id.eq.0) then 
-         open (unit=3,file='stdin',status='old',
-     &         access='sequential',form='formatted', iostat=fstatus)
+         open (unit=3,file='stdin',status='old', &
+               access='sequential',form='formatted', iostat=fstatus)
          if (fstatus .eq. 0) then
             write(*, *) ' Reading from input file stdin'
          endif 
          ndim = 2
 
         read (3,*) nx, ny, nz, ndim,n
-        write (*,*) "procs=",nproc," nx=",nx,
-     &          " ny=", ny," nz=", nz,"ndim=",ndim," repeat=", n
+        write (*,*) "procs=",nproc," nx=",nx, &
+                " ny=", ny," nz=", nz,"ndim=",ndim," repeat=", n
         if(mytype .eq. 4) then
            print *,'Single precision version'
         else if(mytype .eq. 8) then
@@ -124,11 +124,11 @@
       allocate (sinx(nx))
       allocate (siny(ny))
       allocate (sinz(nz))
-c
-c initialize
-c
+!
+! initialize
+!
 
-c      print *,'Allocating BEG (',isize,istart,iend
+!      print *,'Allocating BEG (',isize,istart,iend
       allocate (BEG(istart(1):iend(1),istart(2):iend(2),istart(3):iend(3)), stat=ierr)
       if(ierr .ne. 0) then
          print *,'Error ',ierr,' allocating array BEG'
@@ -137,7 +137,7 @@ c      print *,'Allocating BEG (',isize,istart,iend
       if(ierr .ne. 0) then
          print *,'Error ',ierr,' allocating array CP'
       endif
-c      print *,'Allocating AEND (',fsize,fstart,fend
+!      print *,'Allocating AEND (',fsize,fstart,fend
       allocate (AEND(fstart(1):fend(1),fstart(2):fend(2),fstart(3):fend(3)), stat=ierr)
       if(ierr .ne. 0) then
          print *,'Error ',ierr,' allocating array AEND'
@@ -147,8 +147,8 @@ c      print *,'Allocating AEND (',fsize,fstart,fend
          print *,'Error ',ierr,' allocating array FIN'
       endif
 
-c start with x-z slabs in physical space
-c
+! start with x-z slabs in physical space
+!
       do z=istart(3),iend(3)
          do y=istart(2),iend(2)
             do x=istart(1),iend(1)
@@ -159,12 +159,12 @@ c
 
       CP = BEG
 
-c
-c transform from physical space to wavenumber space
-c (XgYiZj to XiYjZg)
-c then transform back to physical space
-c (XiYjZg to XgYiZj)
-c
+!
+! transform from physical space to wavenumber space
+! (XgYiZj to XiYjZg)
+! then transform back to physical space
+! (XiYjZg to XgYiZj)
+!
 
       Nglob = nx * ny 
       Nglob = Nglob * nz
@@ -176,7 +176,7 @@ c
             print *,'Iteration ',m
          endif
 
-c Barrier for correct timing
+! Barrier for correct timing
          call MPI_Barrier(MPI_COMM_WORLD,ierr)
 ! Forward transform
          rtime1 = rtime1 - MPI_wtime()
@@ -189,7 +189,7 @@ c Barrier for correct timing
 !            call print_all(AEND,Ntot,proc_id,Nglob)
 !         endif
 
-c Normalize
+! Normalize
          call mult_array(AEND, Ntot,factor)
          
 !        if(proc_id .eq. 0) then
@@ -197,9 +197,9 @@ c Normalize
 !       call print_all(AEND,Ntot,proc_id,Nglob)
 !    endif
 
-c Barrier for correct timing
+! Barrier for correct timing
          call MPI_Barrier(MPI_COMM_WORLD,ierr)
-c Backward transform
+! Backward transform
          rtime1 = rtime1 - MPI_wtime()
          call p3dfft_btran_c2r (AEND,FIN)       
          rtime1 = rtime1 + MPI_wtime()
@@ -211,11 +211,11 @@ c Backward transform
          
       end do
 
-c Free work space
+! Free work space
 
       call p3dfft_clean
 
-c Check results
+! Check results
 
       cdiff=0.0d0
       ccdiff = 0.0d0
@@ -229,38 +229,38 @@ c Check results
 !               print *,'x,y,z,cdiff=',x,y,z,cdiff
             endif
  20   continue
-      call MPI_Reduce(cdiff,ccdiff,1,mpireal,MPI_MAX,0,
-     &  MPI_COMM_WORLD,ierr)
+      call MPI_Reduce(cdiff,ccdiff,1,mpireal,MPI_MAX,0, &
+        MPI_COMM_WORLD,ierr)
 
       if (proc_id.eq.0) write (6,*) 'max diff =',ccdiff
 
-c Process timing statistics
+! Process timing statistics
 
-      call MPI_Reduce(rtime1,rtime2,1,mpi_real8,MPI_MAX,0,
-     &  MPI_COMM_WORLD,ierr)
+      call MPI_Reduce(rtime1,rtime2,1,mpi_real8,MPI_MAX,0, &
+        MPI_COMM_WORLD,ierr)
 
-      if (proc_id.eq.0) write(6,*)'proc_id, cpu time per loop',
-     &   proc_id,rtime2/dble(n )
+      if (proc_id.eq.0) write(6,*)'proc_id, cpu time per loop', &
+         proc_id,rtime2/dble(n )
 
 
       timers = timers / dble(n)
 
-      call MPI_Reduce(timers,gt(1,1),10,mpi_real8,MPI_SUM,0,
-     &  MPI_COMM_WORLD,ierr)
+      call MPI_Reduce(timers,gt(1,1),10,mpi_real8,MPI_SUM,0, &
+        MPI_COMM_WORLD,ierr)
 
-      call MPI_Reduce(timers,gt(1,2),10,mpi_real8,MPI_MAX,0,
-     &  MPI_COMM_WORLD,ierr)
+      call MPI_Reduce(timers,gt(1,2),10,mpi_real8,MPI_MAX,0, &
+        MPI_COMM_WORLD,ierr)
 
-      call MPI_Reduce(timers,gt(1,3),10,mpi_real8,MPI_MIN,0,
-     &  MPI_COMM_WORLD,ierr)
+      call MPI_Reduce(timers,gt(1,3),10,mpi_real8,MPI_MIN,0, &
+        MPI_COMM_WORLD,ierr)
 
       tc = (timers(1)+timers(2)+timers(3)+timers(4))
-      call MPI_Reduce(tc,gtcomm(1),1,mpi_real8,MPI_SUM,0,
-     &  MPI_COMM_WORLD,ierr)
-      call MPI_Reduce(tc,gtcomm(2),1,mpi_real8,MPI_MAX,0,
-     &  MPI_COMM_WORLD,ierr)
-      call MPI_Reduce(tc,gtcomm(3),1,mpi_real8,MPI_MIN,0,
-     &  MPI_COMM_WORLD,ierr)
+      call MPI_Reduce(tc,gtcomm(1),1,mpi_real8,MPI_SUM,0, &
+        MPI_COMM_WORLD,ierr)
+      call MPI_Reduce(tc,gtcomm(2),1,mpi_real8,MPI_MAX,0, &
+        MPI_COMM_WORLD,ierr)
+      call MPI_Reduce(tc,gtcomm(3),1,mpi_real8,MPI_MIN,0, &
+        MPI_COMM_WORLD,ierr)
 
       gt(1:10,1) = gt(1:10,1) / dble(nproc)
       gtcomm(1) = gtcomm(1) / dble(nproc)
@@ -304,7 +304,7 @@ c Process timing statistics
       call get_dims(Fstart,Fend,Fsize,2)
       do i=1,Nar
          if(abs(Ar(1,1,i)) .gt. 1.25e-4) then
-c Nglob
+! Nglob
             z = (i-1)/(Fsize(1)*Fsize(2))
             y = (i-1 - z * Fsize(1)*Fsize(2))/Fsize(1)
             x = i-1-z*Fsize(1)*Fsize(2) - y*Fsize(1)

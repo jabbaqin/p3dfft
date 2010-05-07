@@ -35,7 +35,13 @@ double FORTNAME(t1),FORTNAME(t2),FORTNAME(t3),FORTNAME(t4),FORTNAME(tp1);
 
 int main(int argc,char **argv)
 {
+
+#ifndef SINGLE_PREC
+   double *A,*B, *C,*p1,*p2,*p;
+#else
    float *A,*B, *C,*p1,*p2,*p;
+#endif
+
    int i,j,k,x,y,z,nx,ny,nz,proc_id,nproc,dims[2],ndim,nu;
    int istart[3],isize[3],iend[3];
    int fstart[3],fsize[3],fend[3];
@@ -45,7 +51,12 @@ int main(int argc,char **argv)
    double *sinx,*siny,*sinz,factor,r;
    double rtime1,rtime2,gt1,gt2,gt3,gt4,gtp1,gtcomm,tcomm;
    FILE *fp;
+
+#ifndef SINGLE_PREC
+   void print_all(double *,long int,int,long int),mult_array(double *,long int,double);
+#else
    void print_all(float *,long int,int,long int),mult_array(float *,long int,double);
+#endif
 
    MPI_Init(&argc,&argv);
    MPI_Comm_size(MPI_COMM_WORLD,&nproc);
@@ -122,9 +133,15 @@ int main(int argc,char **argv)
      sinx[x] = sin((x+istart[0]-1)*twopi/nx);
 
    /* Allocate and initialize */
+#ifndef SINGLE_PREC
+   A = (double *) malloc(sizeof(double) * isize[0]*isize[1]*isize[2]);
+   C = (double *) malloc(sizeof(double) * isize[0]*isize[1]*isize[2]);
+   B = (double *) malloc(sizeof(double) * fsize[0]*fsize[1]*fsize[2]*2);
+#else
    A = (float *) malloc(sizeof(float) * isize[0]*isize[1]*isize[2]);
    C = (float *) malloc(sizeof(float) * isize[0]*isize[1]*isize[2]);
    B = (float *) malloc(sizeof(float) * fsize[0]*fsize[1]*fsize[2]*2);
+#endif
 
    p1 = A;
    p2 = C;
@@ -218,7 +235,11 @@ int main(int argc,char **argv)
 
 }
 
+#ifndef SINGLE_PREC
+void mult_array(double *A,long int nar,double f)
+#else
 void mult_array(float *A,long int nar,double f)
+#endif
 {
   long int i;
 
@@ -226,7 +247,11 @@ void mult_array(float *A,long int nar,double f)
     A[i] *= f;
 }
 
+#ifndef SINGLE_PREC
+void print_all(double *A,long int nar,int proc_id,long int Nglob)
+#else
 void print_all(float *A,long int nar,int proc_id,long int Nglob)
+#endif
 {
   int x,y,z,conf,Fstart[3],Fsize[3],Fend[3];
   long int i;

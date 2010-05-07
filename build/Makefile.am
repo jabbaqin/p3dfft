@@ -1,7 +1,7 @@
 FC = mpif90
 AM_FCFLAGS = $(FCFLAGS) $(DFLAGS)
 INCLUDES = -I$(FFTW3_INC)
-LDADD = $(FFTW3_LIB)/libfftw3.a
+LDADD = $(FFTW3_LIB)/libfftw3.a # $(FFTW3_LIB)/libfftw3f.a
 
 lib_LIBRARIES = libp3dfft.a
 

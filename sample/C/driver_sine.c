@@ -254,7 +254,7 @@ void mult_array(float *A,long int nar,double f)
 #ifndef SINGLE_PREC
 void print_all(double *A,long int nar,int proc_id,long int Nglob)
 #else
-void print_all(float *A,long int nar,int proc_id,long int Nglob)a
+void print_all(float *A,long int nar,int proc_id,long int Nglob)
 #endif
 {
   int x,y,z,conf,Fstart[3],Fsize[3],Fend[3];

@@ -22,7 +22,7 @@ clean:
 install:
 	cp -f C/test_rand.x test_rand.C.x
 	cp -f C/test_sine.x test_sine.C.x
-	cp -f C/test_sine_inplace.x test_since_inplace.C.x
+	cp -f C/test_sine_inplace.x test_sine_inplace.C.x
 	cp -f C/test_spec.x test_spec.C.x
 	cp -f FORTRAN/test_rand.x test_rand.F.x
 	cp -f FORTRAN/test_sine.x test_sine.F.x

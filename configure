@@ -1801,8 +1801,8 @@ if test "${enable_single+set}" = set; then
 else
   spval=no
 fi;
-echo "$as_me:$LINENO: result: $ok" >&5
-echo "${ECHO_T}$ok" >&6
+echo "$as_me:$LINENO: result: $spval" >&5
+echo "${ECHO_T}$spval" >&6
 if test "$spval" = "yes"; then
 	DFLAGS="$DFLAGS -DSINGLE_PREC"
 

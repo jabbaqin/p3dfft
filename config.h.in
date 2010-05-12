@@ -3,13 +3,13 @@
 /* Define if you want to enable C convention for processor dimensions */
 #undef DIMS_C
 
-/* Define if you want to use the ESSL libray instead of FFTW */
+/* Define if you want to use the ESSL library instead of FFTW */
 #undef ESSL
 
 /* Define whether you want to enable estimation */
 #undef ESTIMATE
 
-/* Define if you want to use the FFTW libray */
+/* Define if you want to use the FFTW library */
 #undef FFTW
 
 /* Define if you want to compile P3DFFT using GCC compiler */

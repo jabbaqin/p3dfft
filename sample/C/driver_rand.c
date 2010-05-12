@@ -1,24 +1,24 @@
 /*
-! This sample program illustrates the 
-! use of P3DFFT library for highly scalable parallel 3D FFT. 
+! This sample program illustrates the
+! use of P3DFFT library for highly scalable parallel 3D FFT.
 !
-! This program initializes a 3D array with random numbers, then 
-! performs forward 3D Fourier transform, then backward transform, 
-  and checks that 
-! the results are correct, namely the same as in the start except 
+! This program initializes a 3D array with random numbers, then
+! performs forward 3D Fourier transform, then backward transform,
+  and checks that
+! the results are correct, namely the same as in the start except
 ! for a normalization factor. It can be used both as a correctness
-! test and for timing the library functions. 
+! test and for timing the library functions.
 !
-! The program expects 'stdin' file in the working directory, with 
+! The program expects 'stdin' file in the working directory, with
 ! a single line of numbers : Nx,Ny,Nz,Ndim,Nrep. Here Nx,Ny,Nz
 ! are box dimensions, Ndim is the dimentionality of processor grid
 ! (1 or 2), and Nrep is the number of repititions. Optionally
-! a file named 'dims' can also be provided to guide in the choice 
-! of processor geometry in case of 2D decomposition. It should contain 
+! a file named 'dims' can also be provided to guide in the choice
+! of processor geometry in case of 2D decomposition. It should contain
 ! two numbers in a line, with their product equal to the total number
 ! of tasks. Otherwise processor grid geometry is chosen automatically.
-! For better performance, experiment with this setting, varying 
-! iproc and jproc. In many cases, minimizing iproc gives best results. 
+! For better performance, experiment with this setting, varying
+! iproc and jproc. In many cases, minimizing iproc gives best results.
 ! Setting it to 1 corresponds to one-dimensional decomposition.
 !
 ! If you have questions please contact Dmitry Pekurovsky, dmitry@sdsc.edu
@@ -35,7 +35,13 @@ double FORTNAME(t1),FORTNAME(t2),FORTNAME(t3),FORTNAME(t4),FORTNAME(tp1);
 
 int main(int argc,char **argv)
 {
+
+#ifndef SINGLE_PREC
+   double *A,*B, *C,*p1,*p2,*p;
+#else
    float *A,*B, *C,*p1,*p2,*p;
+#endif
+
    int i,j,k,x,y,z,nx,ny,nz,proc_id,nproc,dims[2],ndim,nu;
    int istart[3],isize[3],iend[3];
    int fstart[3],fsize[3],fend[3];
@@ -45,7 +51,12 @@ int main(int argc,char **argv)
    double *sinx,*siny,*sinz,factor,r;
    double rtime1,rtime2,gt1,gt2,gt3,gt4,gtp1,gtcomm,tcomm;
    FILE *fp;
+
+#ifndef SINGLE_PREC
+   void print_all(double *,long int,int,long int),mult_array(double *,long int,double);
+#else
    void print_all(float *,long int,int,long int),mult_array(float *,long int,double);
+#endif
 
    MPI_Init(&argc,&argv);
    MPI_Comm_size(MPI_COMM_WORLD,&nproc);
@@ -84,11 +95,11 @@ int main(int argc,char **argv)
          printf("Reading proc. grid from file dims\n");
        fscanf(fp,"%d %d\n",dims,dims+1);
        fclose(fp);
-       if(dims[0]*dims[1] != nproc) 
+       if(dims[0]*dims[1] != nproc)
           dims[1] = nproc / dims[0];
      }
      else {
-       if(proc_id == 0) 
+       if(proc_id == 0)
           printf("Creating proc. grid with mpi_dims_create\n");
        dims[0]=dims[1]=0;
        MPI_Dims_create(nproc,2,dims);
@@ -99,7 +110,7 @@ int main(int argc,char **argv)
      }
    }
 
-   if(proc_id == 0) 
+   if(proc_id == 0)
       printf("Using processor grid %d x %d\n",dims[0],dims[1]);
 
    /* Initialize P3DFFT */
@@ -122,17 +133,23 @@ int main(int argc,char **argv)
      sinx[x] = sin((x+istart[0]-1)*twopi/nx);
 
    /* Allocate and initialize */
+#ifndef SINGLE_PREC
+   A = (double *) malloc(sizeof(double) * isize[0]*isize[1]*isize[2]);
+   C = (double *) malloc(sizeof(double) * isize[0]*isize[1]*isize[2]);
+   B = (double *) malloc(sizeof(double) * fsize[0]*fsize[1]*fsize[2]*2);
+#else
    A = (float *) malloc(sizeof(float) * isize[0]*isize[1]*isize[2]);
    C = (float *) malloc(sizeof(float) * isize[0]*isize[1]*isize[2]);
    B = (float *) malloc(sizeof(float) * fsize[0]*fsize[1]*fsize[2]*2);
+#endif
 
    p1 = A;
    p2 = C;
    for(z=0;z < isize[2];z++)
-     for(y=0;y < isize[1];y++) 
+     for(y=0;y < isize[1];y++)
        for(x=0;x < isize[0];x++) {
-          r = 1.0*rand()/RAND_MAX;
-	  *p1++ = *p2++ = r;
+          r = rand()/RAND_MAX;
+          *p1++ = *p2++ = r;
        }
 
    Ntot = fsize[0]*fsize[1];
@@ -144,7 +161,7 @@ int main(int argc,char **argv)
    rtime1 = 0.0;
    for(m=0;m < n;m++) {
 
-     if(proc_id == 0) 
+     if(proc_id == 0)
         printf("Iteration %d\n",m);
 
      MPI_Barrier(MPI_COMM_WORLD);
@@ -153,7 +170,7 @@ int main(int argc,char **argv)
      p3dfft_ftran_r2c(A,B);
      rtime1 = rtime1 + MPI_Wtime();
 
-     if(proc_id == 0) 
+     if(proc_id == 0)
         printf("Result of forward transform\n");
 
      print_all(B,Ntot,proc_id,Nglob);
@@ -166,10 +183,10 @@ int main(int argc,char **argv)
      p3dfft_btran_c2r(B,C);
      rtime1 = rtime1 + MPI_Wtime();
 
-   } 
+   }
    /* Free work space */
   p3dfft_clean();
-  
+ 
   /* Check results */
   cdiff = 0.0; p2 = C;p1 = A;
   for(z=0;z < isize[2];z++)
@@ -177,11 +194,12 @@ int main(int argc,char **argv)
        for(x=0;x < isize[0];x++) {
           if(cdiff < fabs(*p2 - *p1))
            cdiff = fabs(*p2 - *p1);
-	  p1++;
-	  p2++; 
+          p1++;
+          p2++;
         }
 
    MPI_Reduce(&cdiff,&ccdiff,1,MPI_DOUBLE,MPI_MAX,0,MPI_COMM_WORLD);
+
 
   if(proc_id == 0)
     printf("max diff =%g\n",ccdiff);
@@ -218,7 +236,11 @@ int main(int argc,char **argv)
 
 }
 
+#ifndef SINGLE_PREC
+void mult_array(double *A,long int nar,double f)
+#else
 void mult_array(float *A,long int nar,double f)
+#endif
 {
   long int i;
 
@@ -226,7 +248,11 @@ void mult_array(float *A,long int nar,double f)
     A[i] *= f;
 }
 
+#ifndef SINGLE_PREC
+void print_all(double *A,long int nar,int proc_id,long int Nglob)
+#else
 void print_all(float *A,long int nar,int proc_id,long int Nglob)
+#endif
 {
   int x,y,z,conf,Fstart[3],Fsize[3],Fend[3];
   long int i;
@@ -244,4 +270,5 @@ void print_all(float *A,long int nar,int proc_id,long int Nglob)
     }
 }
 
-  
+
+

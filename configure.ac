@@ -143,7 +143,7 @@ AC_MSG_CHECKING([whether to use FFTW library])
 AC_ARG_ENABLE(essl, [AC_HELP_STRING([--enable-fftw], [for using the FFTW library (default)])], fftwval=$enableval, fftwval=yes)
 AC_MSG_RESULT([$fftwval])
 if test "$fftwval" = "yes"; then
-        AC_SUBST(DFLAGS, "DFLAGS -DFFTW")
+        AC_SUBST(DFLAGS, "$DFLAGS -DFFTW")
         AC_DEFINE(FFTW, 1, [Define if you want to use the FFTW library])
 fi
 
@@ -152,7 +152,7 @@ AC_MSG_CHECKING([whether to use ESSL library])
 AC_ARG_ENABLE(essl, [AC_HELP_STRING([--enable-essl], [for using ESSL (on IBM) in 1D FFTs.])], esslval=$enableval, esslval=no)
 AC_MSG_RESULT([$esslval])
 if test "$esslval" = "yes"; then
-        AC_SUBST(DFLAGS, "DFLAGS -DESSL")
+        AC_SUBST(DFLAGS, "$DFLAGS -DESSL")
         AC_DEFINE(ESSL, 1, [Define if you want to use the ESSL library instead of FFTW])
 fi
 

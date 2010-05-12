@@ -2108,7 +2108,7 @@ fi;
 echo "$as_me:$LINENO: result: $fftwval" >&5
 echo "${ECHO_T}$fftwval" >&6
 if test "$fftwval" = "yes"; then
-        DFLAGS="DFLAGS -DFFTW"
+        DFLAGS="$DFLAGS -DFFTW"
 
 
 cat >>confdefs.h <<\_ACEOF
@@ -2130,7 +2130,7 @@ fi;
 echo "$as_me:$LINENO: result: $esslval" >&5
 echo "${ECHO_T}$esslval" >&6
 if test "$esslval" = "yes"; then
-        DFLAGS="DFLAGS -DESSL"
+        DFLAGS="$DFLAGS -DESSL"
 
 
 cat >>confdefs.h <<\_ACEOF

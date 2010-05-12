@@ -1,4 +1,3 @@
-FC = mpif90
 AM_FCFLAGS = $(FCFLAGS) $(DFLAGS)
 INCLUDES = -I$(FFTW_INC)
 LDADD = $(FFTW_LIB)/libfftw3.a 

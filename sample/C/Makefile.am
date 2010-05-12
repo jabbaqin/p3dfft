@@ -1,4 +1,3 @@
-CC = mpicc
 AM_CPPFLAGS = $(DFLAGS) 
 INCLUDES = -I$(top_builddir)/include/ 
 LDADD = $(top_builddir)/build/libp3dfft.a $(FFTW_LIB)/libfftw3.a $(FFTWF)

@@ -9,8 +9,11 @@
 /* Define whether you want to enable estimation */
 #undef ESTIMATE
 
-/* Define if you want to use FFTW library */
+/* Define if you want to use the FFTW libray */
 #undef FFTW
+
+/* Define if you want to compile P3DFFT using GCC compiler */
+#undef GCC
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
@@ -42,6 +45,9 @@
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
+
+/* Define if you want to compile P3DFFT using IBM compiler */
+#undef IBM
 
 /* Define if you want to enable the measure algorithm */
 #undef MEASURE
@@ -76,8 +82,8 @@
 /* Define if you want to enable the patient algorithm */
 #undef PATIENT
 
-/* Define if you want to reverse processor dimensions */
-#undef REVERSE
+/* Define if you want to compile P3DFFT using PGI compiler */
+#undef PGI
 
 /* Define if you want to compile P3DFFT in single precision */
 #undef SINGLE_PREC

@@ -35,13 +35,7 @@ double FORTNAME(t1),FORTNAME(t2),FORTNAME(t3),FORTNAME(t4),FORTNAME(tp1);
 
 int main(int argc,char **argv)
 {
-
-#ifndef SINGLE_PREC
-   double *A,*B,*p;
-#else
    float *A,*B,*p;
-#endif
-
    int i,j,k,x,y,z,nx,ny,nz,proc_id,nproc,dims[2],ndim,nu;
    int istart[3],isize[3],iend[3];
    int fstart[3],fsize[3],fend[3];
@@ -51,12 +45,7 @@ int main(int argc,char **argv)
    double *sinx,*siny,*sinz,factor;
    double rtime1,rtime2,gt1,gt2,gt3,gt4,gtp1,gtcomm,tcomm;
    FILE *fp;
-
-#ifndef SINGLE_PREC
-   void print_all(double *,long int,int,long int),mult_array(double *,long int,double);
-#else
    void print_all(float *,long int,int,long int),mult_array(float *,long int,double);
-#endif
 
    MPI_Init(&argc,&argv);
    MPI_Comm_size(MPI_COMM_WORLD,&nproc);
@@ -76,11 +65,7 @@ int main(int argc,char **argv)
         fscanf(fp,"%d %d %d %d %d\n",&nx,&ny,&nz,&ndim,&n);
         fclose(fp);
      }
-#ifndef SINGLE_PREC
-     printf("Double precision\n (%d %d %d) grid\n %d proc. dimensions\n%d repetitions\n",nx,ny,nz,ndim,n);
-#else
      printf("Single precision\n (%d %d %d) grid\n %d proc. dimensions\n%d repetitions\n",nx,ny,nz,ndim,n);
-#endif
    }
    MPI_Bcast(&nx,1,MPI_INT,0,MPI_COMM_WORLD);
    MPI_Bcast(&ny,1,MPI_INT,0,MPI_COMM_WORLD);
@@ -139,12 +124,7 @@ int main(int argc,char **argv)
    nm = isize[0]*isize[1]*isize[2];
    if(nm < fsize[0]*fsize[1]*fsize[2]*2)
      nm = fsize[0]*fsize[1]*fsize[2]*2;
-
-#ifndef SINGLE_PREC
-   A = (double *) malloc(sizeof(double) * nm);
-#else
    A = (float *) malloc(sizeof(float) * nm);
-#endif
 
    p = A;
    for(z=0;z < isize[2];z++)
@@ -241,11 +221,7 @@ int main(int argc,char **argv)
 
 }
 
-#ifndef SINGLE_PREC
-void mult_array(double *A,long int nar,double f)
-#else
 void mult_array(float *A,long int nar,double f)
-#endif
 {
   long int i;
 
@@ -253,11 +229,7 @@ void mult_array(float *A,long int nar,double f)
     A[i] *= f;
 }
 
-#ifndef SINGLE_PREC
-void print_all(double *A,long int nar,int proc_id,long int Nglob)
-#else
 void print_all(float *A,long int nar,int proc_id,long int Nglob)
-#endif
 {
   int x,y,z,conf,Fstart[3],Fsize[3],Fend[3];
   long int i;

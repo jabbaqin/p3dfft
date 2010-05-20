@@ -311,7 +311,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar DFLAGS FFTW_INC FFTW_LIB FFTWF FC FCFLAGS LDFLAGS ac_ct_FC EXEEXT OBJEXT CC RANLIB ac_ct_RANLIB CFLAGS CPPFLAGS ac_ct_CC CPP EGREP LIBOBJS TESTLIBS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar DFLAGS FFTW_INC FFTW_LIB FFTWF SUCCESS FC FCFLAGS LDFLAGS ac_ct_FC EXEEXT OBJEXT CC RANLIB ac_ct_RANLIB CFLAGS CPPFLAGS ac_ct_CC CPP EGREP LIBOBJS TESTLIBS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -2179,6 +2179,10 @@ echo "$as_me: error: location to FFTW was not given!" >&2;}
 	fi
 fi
 
+# Custom strings
+SUCCESS="Build successful!"
+
+
 # Checks for programs.
 ac_ext=${FC_SRCEXT-f}
 ac_compile='$FC -c $FCFLAGS $FCFLAGS_SRCEXT conftest.$ac_ext >&5'
@@ -2272,7 +2276,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:2275:" \
+echo "$as_me:2279:" \
      "checking for Fortran compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -5079,6 +5083,7 @@ s,@DFLAGS@,$DFLAGS,;t t
 s,@FFTW_INC@,$FFTW_INC,;t t
 s,@FFTW_LIB@,$FFTW_LIB,;t t
 s,@FFTWF@,$FFTWF,;t t
+s,@SUCCESS@,$SUCCESS,;t t
 s,@FC@,$FC,;t t
 s,@FCFLAGS@,$FCFLAGS,;t t
 s,@LDFLAGS@,$LDFLAGS,;t t
@@ -5609,3 +5614,5 @@ if test "$no_create" != yes; then
   $ac_cs_success || { (exit 1); exit 1; }
 fi
 
+{ echo "$as_me:$LINENO: \"Configure script complete!\"" >&5
+echo "$as_me: \"Configure script complete!\"" >&6;}

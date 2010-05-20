@@ -180,6 +180,9 @@ else
 	fi
 fi
 
+# Custom strings
+AC_SUBST(SUCCESS, "Build successful!")
+
 # Checks for programs.
 AC_PROG_FC(mpif90)
 AC_CHECK_PROGS(CC, mpicc, $CC)
@@ -206,3 +209,4 @@ AC_CONFIG_FILES([Makefile
 
 AC_SUBST(TESTLIBS, $TESTLIBS)
 AC_OUTPUT()
+AC_MSG_NOTICE("Configure script complete!")

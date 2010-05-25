@@ -292,6 +292,10 @@
       return
       end subroutine
 
+!=========================================================
+! Translate one-dimensional index into three dimensions,
+!    print out significantly non-zero values
+!
       subroutine print_all(Ar,Nar,proc_id,Nglob)
 
       use p3dfft
@@ -315,6 +319,10 @@
       return
       end subroutine
 
+!=========================================================
+! Translate one-dimensional index into three dimensions,
+!    print out significantly non-zero values
+!
       subroutine print_all_real(Ar,Nar,proc_id,Nglob)
 
       use p3dfft

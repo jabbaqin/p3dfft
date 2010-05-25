@@ -115,11 +115,14 @@ int main(int argc,char **argv)
 
    /* Initialize P3DFFT */
    p3dfft_setup(dims,nx,ny,nz,0);
-   /* Get dimensions for input and output arrays */
+   /* Get dimensions for input array - real numbers, X-pencil shape.
+      Note that we are following the Fortran ordering, i.e. 
+      the dimension  with stride-1 is X. */
    conf = 1;
    get_dims(istart,iend,isize,conf);
-   conf = 2;
-   get_dims(fstart,fend,fsize,conf);
+   /* Get dimensions for output array - complex numbers, Z-pencil shape.
+      Stride-1 dimension could be X or Z, depending on how the library 
+      was compiled (stride1 option) */
 
    sinx = malloc(sizeof(double)*nx);
    siny = malloc(sizeof(double)*ny);
@@ -148,7 +151,7 @@ int main(int argc,char **argv)
    for(z=0;z < isize[2];z++)
      for(y=0;y < isize[1];y++)
        for(x=0;x < isize[0];x++) {
-          r = rand()/RAND_MAX;
+          r = rand()*1.0/RAND_MAX;
           *p1++ = *p2++ = r;
        }
 

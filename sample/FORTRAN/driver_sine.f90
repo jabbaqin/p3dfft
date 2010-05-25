@@ -32,11 +32,11 @@
       integer fstatus
       logical flg_inplace
 
-      real(mytype), dimension(:,:,:),  allocatable :: BEG
+      real(mytype), dimension(:,:,:),  allocatable :: BEG,C
       complex(mytype), dimension(:,:,:),  allocatable :: AEND
       real(mytype) pi,twopi,sinyz,diff,cdiff,ccdiff,ans
 
-      integer*8 Ntot
+      integer(8) Ntot
       real(mytype) factor
       real(mytype),dimension(:),allocatable:: sinx,siny,sinz
       real(8) rtime1,rtime2,Nglob
@@ -117,16 +117,24 @@
          print *,'Using processor grid ',iproc,' x ',jproc
       endif
 
+! Set up work structures for P3DFFT
       call p3dfft_setup (dims,nx,ny,nz,.true.)
-      call get_dims(istart,iend,isize,1)
-      call get_dims(fstart,fend,fsize,2)
 
+! Get dimensions for the original array of real numbers, X-pencils
+      call get_dims(istart,iend,isize,1)
+
+! Get dimensions for the R2C-forward-transformed array of complex numbers
+!   Z-pencils (depending on how the library was compiled, the first 
+!   dimension could be either X or Z)
+! 
+      call get_dims(fstart,fend,fsize,2)
+!
+! Initialize the array to be transformed
+!
       allocate (sinx(nx))
       allocate (siny(ny))
       allocate (sinz(nz))
-!
-! initialize
-!
+
       do z=istart(3),iend(3)
          sinz(z)=sin((z-1)*twopi/nz)
       enddo
@@ -147,6 +155,10 @@
       if(ierr .ne. 0) then
          print *,'Error ',ierr,' allocating array AEND'
       endif
+      allocate (C(istart(1):iend(1),istart(2):iend(2),istart(3):iend(3)), stat=ierr)
+      if(ierr .ne. 0) then
+         print *,'Error ',ierr,' allocating array C'
+      endif
 
 ! Initialize with 3D sine wave
 
@@ -165,6 +177,7 @@
 ! then transform back to physical space
 ! (XiYjZg to XgYiZj)
 !
+! Repeat n times
 
       Ntot = fsize(1)*fsize(2)*fsize(3)
       Nglob = nx * ny 
@@ -172,6 +185,7 @@
       factor = 1.0d0/Nglob
 
       rtime1 = 0.0               
+
       do  m=1,n
          if(proc_id .eq. 0) then
             print *,'Iteration ',m
@@ -197,7 +211,7 @@
          call MPI_Barrier(MPI_COMM_WORLD,ierr)
          rtime1 = rtime1 - MPI_wtime()
 ! Backward transform     
-         call p3dfft_btran_c2r (AEND,BEG)       
+         call p3dfft_btran_c2r (AEND,C)       
          rtime1 = rtime1 + MPI_wtime()
          
       end do
@@ -212,8 +226,8 @@
             sinyz=siny(y)*sinz(z)
             do 20 x=istart(1),iend(1)
             ans=sinx(x)*sinyz
-            if(cdiff .lt. abs(BEG(x,y,z)-ans)) then
-               cdiff = abs(BEG(x,y,z)-ans)
+            if(cdiff .lt. abs(C(x,y,z)-ans)) then
+               cdiff = abs(C(x,y,z)-ans)
 !               print *,'x,y,z,cdiff=',x,y,z,cdiff
             endif
  20   continue
@@ -268,7 +282,7 @@
 
       use p3dfft
 
-      integer*8 nar,i
+      integer(8) nar,i
       complex(mytype) X(nar)
       real(mytype) f
 
@@ -278,6 +292,11 @@
 
       return
       end subroutine
+
+!=========================================================
+! Translate one-dimensional index into three dimensions,
+!    print out significantly non-zero values
+!
 
       subroutine print_all(Ar,Nar,proc_id,Nglob)
 

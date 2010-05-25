@@ -33,7 +33,7 @@
       complex(mytype), dimension(:,:,:),  allocatable :: AEND
       real(mytype) pi,twopi,sinyz,diff,cdiff,ccdiff,ans
 
-      integer*8 Ntot
+      integer(8) Ntot
       real(mytype) factor
       real(mytype),dimension(:),allocatable:: sinx,siny,sinz
       real(8) rtime1,rtime2
@@ -245,10 +245,6 @@
          call abort
       endif
 
-!      print *,'B='
-!      call print_buf_c(B,sz(1),sz(2),sz(3),ng(1))
-
-
       do ik=0,kmax
          el(ik) = 0.0
          E(ik) = 0.0
@@ -286,11 +282,12 @@
       end subroutine
 
 
+!=========================================================
       subroutine mult_array(X,nar,f)
 
       use p3dfft
 
-      integer*8 nar,i
+      integer(8) nar,i
       complex(mytype) X(nar)
       real(mytype) f
 
@@ -299,29 +296,6 @@
       enddo
 
       return
-      end subroutine
-
-      subroutine print_all(Ar,Nar,proc_id)
-
-      use p3dfft
-
-      integer x,y,z,proc_id
-      integer(8) i,Nar
-      complex(mytype) Ar(1,1,*)
-      integer Fstart(3),Fend(3),Fsize(3)
-
-      call get_dims(Fstart,Fend,Fsize,2)
-      do i=1,Nar
-         if(abs(Ar(1,1,i)) .gt. Nar *1.25e-4) then
-            z = (i-1)/(Fsize(1)*Fsize(2))
-            y = (i-1 - z * Fsize(1)*Fsize(2))/Fsize(1)
-            x = i-1-z*Fsize(1)*Fsize(2) - y*Fsize(1)
-            print *,'(',x+Fstart(1),y+Fstart(2),z+Fstart(3),') ',Ar(1,1,i)
-         endif
-      enddo
-
-      return
-
       end subroutine
 
       end

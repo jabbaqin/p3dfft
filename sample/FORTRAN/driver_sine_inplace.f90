@@ -119,15 +119,20 @@
          print *,'Using processor grid ',iproc,' x ',jproc
       endif
 
-! Initializing P3DFFT
-
+! Set up work structures for P3DFFT
       call p3dfft_setup (dims,nx,ny,nz,.true.)
 
-! Obtaining dimensions for input and output arrays
-
+! Get dimensions for the original array of real numbers, X-pencils
       call get_dims(istart,iend,isize,1)
+
+! Get dimensions for the R2C-forward-transformed array of complex numbers
+!   Z-pencils (depending on how the library was compiled, the first 
+!   dimension could be either X or Z)
+! 
       call get_dims(fstart,fend,fsize,2)
 
+! Initialize the array to be transformed
+!
       allocate (sinx(nx))
       allocate (siny(ny))
       allocate (sinz(nz))
@@ -143,10 +148,11 @@
       enddo
 
 ! Now allocate the main array, used both for input and output
-! Since the input and output sizes may be likely be different, 
-! we need to allocate the larger of the two 
+! Since the input and output sizes may be different, 
+! we need to allocate the larger of the two. 
 ! This is achieved in this example by extending the third dimension 
-! of the input array so it's large enough to contain the output
+! of the input array so it's large enough to contain the output,
+! while at the same time has the correct shape to begin with. 
 ! Factor of 2 accounts for complex storage of the output
 
        add = (fsize(1)*fsize(2)*fsize(3)*2 +0.5 - isize(1)*isize(2)*isize(3))
@@ -204,7 +210,9 @@
 ! Barrier for correct timing
          call MPI_Barrier(MPI_COMM_WORLD,ierr)
          rtime1 = rtime1 - MPI_wtime()
-! Forward transform
+
+! Forward transform: note - we pass the same array both as 
+! original (real) and transformed (complex)
 
          call ftran_r2c (B,B)
          
@@ -221,7 +229,9 @@
 ! Barrier for correct timing
          call MPI_Barrier(MPI_COMM_WORLD,ierr)
          rtime1 = rtime1 - MPI_wtime()
-! Backward transform
+
+! Backward transform: note - we pass the same array both as 
+! original (complex) and transformed (real)
 
          call btran_c2r (B,B)       
          rtime1 = rtime1 + MPI_wtime()
@@ -308,6 +318,9 @@
       end subroutine
 
 !=========================================================
+! Translate one-dimensional index into three dimensions,
+!    print out significantly non-zero values
+!
       subroutine print_all_real(Ar,Nar,proc_id,Nglob)
 
       use p3dfft
@@ -331,27 +344,5 @@
       return
       end subroutine
 
-
-      subroutine print_all(Ar,Nar,proc_id,Nglob)
-
-      use p3dfft
-
-      integer x,y,z,proc_id
-      integer(8) i,Nar,Nglob
-      complex(mytype), target :: Ar(1,1,*)
-      integer Fstart(3),Fend(3),Fsize(3)
-      
-      call get_dims(Fstart,Fend,Fsize,2)
-      do i=1,Nar
-         if(abs(Ar(1,1,i)) .gt. Nglob *1.25e-4) then
-            z = (i-1)/(Fsize(1)*Fsize(2))
-            y = (i-1 - z * Fsize(1)*Fsize(2))/Fsize(1)
-            x = i-1-z*Fsize(1)*Fsize(2) - y*Fsize(1)
-            print *,'(',x+Fstart(1),y+Fstart(2),z+Fstart(3),') ',Ar(1,1,i)
-         endif
-      enddo
-
-      return
-      end subroutine
 
       end

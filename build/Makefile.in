@@ -147,8 +147,6 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-
-#FC = mpif90
 AM_FCFLAGS = $(FCFLAGS) $(DFLAGS)
 INCLUDES = -I$(FFTW_INC)
 LDADD = $(FFTW_LIB)/libfftw3.a 

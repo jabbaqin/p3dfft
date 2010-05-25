@@ -168,7 +168,7 @@ fi
 
 # check for fftw3
 AC_ARG_WITH(fftw, [AC_HELP_STRING([--with-fftw], [path to location of FFTW library])], withfftw=$withval, withfftw="")
-if test "$withfftw" != ""; then
+if test "$withfftw" != "yes" && test "$withfftw" != ""; then
 	AC_SUBST(FFTW_INC, "$withfftw/include")
 	AC_SUBST(FFTW_LIB, "$withfftw/lib")
 	if test "$spval" == "yes"; then

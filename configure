@@ -2162,7 +2162,7 @@ if test "${with_fftw+set}" = set; then
 else
   withfftw=""
 fi;
-if test "$withfftw" != ""; then
+if test "$withfftw" != "yes" && test "$withfftw" != ""; then
 	FFTW_INC="$withfftw/include"
 
 	FFTW_LIB="$withfftw/lib"

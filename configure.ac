@@ -7,6 +7,7 @@ AM_INIT_AUTOMAKE(no-dependencies)
 AC_CONFIG_SRCDIR([build/module.F90])
 AC_CONFIG_HEADER([config.h])
 
+AC_DEFINE_UNQUOTED([LAL_CONFIGURE_ARGS],["$ac_configure_args"],[LAL Configure Arguments])
 
 # check whether to compile using IBM
 AC_MSG_CHECKING([whether to use IBM compiler])
@@ -167,14 +168,17 @@ if test "$fftwval" == "yes" && test "$esslval" == "yes"; then
 fi
 
 # check for fftw3
+AC_MSG_CHECKING([FFTW directory])
 AC_ARG_WITH(fftw, [AC_HELP_STRING([--with-fftw], [path to location of FFTW library])], withfftw=$withval, withfftw="")
 if test "$withfftw" != "yes" && test "$withfftw" != ""; then
+	AC_MSG_RESULT([$withfftw])
 	AC_SUBST(FFTW_INC, "$withfftw/include")
 	AC_SUBST(FFTW_LIB, "$withfftw/lib")
 	if test "$spval" == "yes"; then
 		AC_SUBST(FFTWF, "$FFTW_LIB/libfftw3f.a")
 	fi
 else
+        AC_MSG_RESULT([none])
 	if test "$fftwval" == "yes"; then
 		AC_MSG_ERROR([location to FFTW was not given!])
 	fi

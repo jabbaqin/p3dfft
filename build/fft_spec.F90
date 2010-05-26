@@ -24,7 +24,7 @@
 
 #ifdef FFTW
       include "fftw3.f"
-      integer*8 plan1_frc,plan1_bcr,plan1_fc,plan2_fc,plan1_bc,plan2_bc      
+      integer*8 plan1_frc,plan1_bcr,plan1_fc,plan2_fc,plan1_bc,plan2_bc 
 !      integer*8 plan1,plan2,plan3      
       integer fftw_flag,NULL
 #ifdef ESTIMATE

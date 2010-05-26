@@ -1794,6 +1794,11 @@ am__tar='${AMTAR} chof - "$$tardir"'; am__untar='${AMTAR} xf -'
 
 
 
+cat >>confdefs.h <<_ACEOF
+#define LAL_CONFIGURE_ARGS "$ac_configure_args"
+_ACEOF
+
+
 # check whether to compile using IBM
 echo "$as_me:$LINENO: checking whether to use IBM compiler" >&5
 echo $ECHO_N "checking whether to use IBM compiler... $ECHO_C" >&6
@@ -2154,6 +2159,8 @@ echo "$as_me: error: You must only choose either ESSL or FFTW!" >&2;}
 fi
 
 # check for fftw3
+echo "$as_me:$LINENO: checking FFTW directory" >&5
+echo $ECHO_N "checking FFTW directory... $ECHO_C" >&6
 
 # Check whether --with-fftw or --without-fftw was given.
 if test "${with_fftw+set}" = set; then
@@ -2163,6 +2170,8 @@ else
   withfftw=""
 fi;
 if test "$withfftw" != "yes" && test "$withfftw" != ""; then
+	echo "$as_me:$LINENO: result: $withfftw" >&5
+echo "${ECHO_T}$withfftw" >&6
 	FFTW_INC="$withfftw/include"
 
 	FFTW_LIB="$withfftw/lib"
@@ -2172,6 +2181,8 @@ if test "$withfftw" != "yes" && test "$withfftw" != ""; then
 
 	fi
 else
+        echo "$as_me:$LINENO: result: none" >&5
+echo "${ECHO_T}none" >&6
 	if test "$fftwval" == "yes"; then
 		{ { echo "$as_me:$LINENO: error: location to FFTW was not given!" >&5
 echo "$as_me: error: location to FFTW was not given!" >&2;}
@@ -2276,7 +2287,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:2279:" \
+echo "$as_me:2290:" \
      "checking for Fortran compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5

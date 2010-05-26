@@ -49,6 +49,9 @@
 /* Define if you want to compile P3DFFT using IBM compiler */
 #undef IBM
 
+/* LAL Configure Arguments */
+#undef LAL_CONFIGURE_ARGS
+
 /* Define if you want to enable the measure algorithm */
 #undef MEASURE
 

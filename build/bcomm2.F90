@@ -2,7 +2,7 @@
 ! Transpose an array in Y=pencils into X-pencils
 !
       subroutine bcomm2(source,dest,t,tc)
-c========================================================
+!========================================================
 
       implicit none
 
@@ -24,12 +24,12 @@ c========================================================
       ithr = 0
 #endif
 
-c !$OMP BARRIER
+! !$OMP BARRIER
 !$OMP MASTER 
       tc = tc - MPI_Wtime()
 !$OMP END MASTER 
 
-c Pack and exchange x-z buffers in rows
+! Pack and exchange x-z buffers in rows
       
       do i=0,iproc-1
 
@@ -95,13 +95,13 @@ c Pack and exchange x-z buffers in rows
       t = t - MPI_Wtime() 
 
 #ifdef USE_EVEN
-      call mpi_alltoall (buf1,IfCntMax, 
-     &           mpi_byte, buf2,IfCntMax,mpi_byte,   
-     &           mpi_comm_row,ierr)
+      call mpi_alltoall (buf1,IfCntMax, &
+                 mpi_byte, buf2,IfCntMax,mpi_byte, &
+                 mpi_comm_row,ierr)
 #else
-      call mpi_alltoallv (buf1,KrSndCnts, KrSndStrt,
-     &           mpi_byte, buf2,KrRcvCnts,KrRcvStrt,mpi_byte,   
-     &           mpi_comm_row,ierr)
+      call mpi_alltoallv (buf1,KrSndCnts, KrSndStrt, &
+                 mpi_byte, buf2,KrRcvCnts,KrRcvStrt,mpi_byte, &
+                 mpi_comm_row,ierr)
 #endif
 
       t = t + MPI_Wtime() 
@@ -109,7 +109,7 @@ c Pack and exchange x-z buffers in rows
 !$OMP END MASTER
 !$OMP BARRIER
 
-c Unpack receive buffers into dest
+! Unpack receive buffers into dest
 
       l = mod(jisize,num_thr)
       if(ithr .lt. num_thr-l) then

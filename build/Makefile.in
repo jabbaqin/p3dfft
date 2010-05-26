@@ -57,8 +57,7 @@ ARFLAGS = cru
 libp3dfft_a_AR = $(AR) $(ARFLAGS)
 libp3dfft_a_LIBADD =
 am_libp3dfft_a_OBJECTS = fft_spec.$(OBJEXT) module.$(OBJEXT) \
-	btran.$(OBJEXT) fft_init.$(OBJEXT) fft_exec.$(OBJEXT) \
-	wrap.$(OBJEXT)
+	fft_init.$(OBJEXT) fft_exec.$(OBJEXT) wrap.$(OBJEXT)
 libp3dfft_a_OBJECTS = $(am_libp3dfft_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp =
@@ -152,7 +151,7 @@ AM_FCFLAGS = $(FCFLAGS) $(DFLAGS)
 INCLUDES = -I$(FFTW_INC)
 LDADD = $(FFTW_LIB)/libfftw3.a 
 lib_LIBRARIES = libp3dfft.a
-libp3dfft_a_SOURCES = fft_spec.F90 module.F90 btran.F90 fft_init.F90 fft_exec.F90 wrap.f90
+libp3dfft_a_SOURCES = fft_spec.F90 module.F90 fft_init.F90 fft_exec.F90 wrap.f90
 all: all-am
 
 .SUFFIXES:

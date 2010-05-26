@@ -116,7 +116,7 @@
          timers(9) = timers(9) + MPI_Wtime()
       endif
 
-      if(iproc .gt. 1) call bcomm2(buf,buf,timers(4))
+      if(iproc .gt. 1) call bcomm2(buf,buf,timers(4),timers(10))
 
 ! Perform Complex-to-real FFT in x dimension for all y and z
       if(jisize * kjsize .gt. 0) then

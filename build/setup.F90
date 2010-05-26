@@ -78,15 +78,15 @@
 ! store processor-grid-informations
       cartid(1) = ipid
       cartid(2) = jpid
-      allocate(proc_id2coords(0:(iproc*jproc)*2-1))
-      call MPI_Allgather( cartid,        2, MPI_INTEGER, &
-                          proc_id2coords, 2, MPI_INTEGER, &
-                          mpi_comm_cart,ierr)
-      allocate(proc_coords2id(0:iproc-1,0:jproc-1))
-      do i=0,(iproc*jproc)-1
-      	proc_coords2id(	proc_id2coords(2*i), &
-      					proc_id2coords(2*i+1)) = i
-      enddo
+!      allocate(proc_id2coords(0:(iproc*jproc)*2-1))
+!      call MPI_Allgather( cartid,        2, MPI_INTEGER, &
+!                          proc_id2coords, 2, MPI_INTEGER, &
+!                          mpi_comm_cart,ierr)
+!      allocate(proc_coords2id(0:iproc-1,0:jproc-1))
+!      do i=0,(iproc*jproc)-1
+!      	proc_coords2id(	proc_id2coords(2*i), &
+!      					proc_id2coords(2*i+1)) = i
+!      enddo
 
 ! here i is east-west j is north-south
 ! impid is west neighbour ippid is east neighbour and so on

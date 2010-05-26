@@ -1,8 +1,0 @@
-FF = mpxlf90
-FFLAGS = -O3 -qfixed=132 -qarch=440 -qstrict -qsave -qtune=440 -qcache=auto -d
-LDFFLAGS= -O3  -L/usr/local/apps/fftw301d/lib -lfftw3f -L/usr/local/apps/lib -lmass 
-INC_FFT = /usr/local/apps/fftw301d/include
-
-CC = mpcc
-CFLAGS = -O3 -qarch=440d -qstrict -qtune=440 -qcache=auto -DIBM -DSINGLE_PREC
-LDCFLAGS= $(LDFFLAGS) -L/opt/ibmcmp/xlf/bg/10.1/blrts_lib -lxlf90 -lxl

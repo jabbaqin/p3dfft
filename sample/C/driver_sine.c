@@ -104,14 +104,9 @@ int main(int argc,char **argv)
 
    /* Initialize P3DFFT */
    p3dfft_setup(dims,nx,ny,nz,1);
-   /* Get dimensions for input array - real numbers, X-pencil shape.
-      Note that we are following the Fortran ordering, i.e. 
-      the dimension  with stride-1 is X. */
+   /* Get dimensions for input and output arrays */
    conf = 1;
    get_dims(istart,iend,isize,conf);
-   /* Get dimensions for output array - complex numbers, Z-pencil shape.
-      Stride-1 dimension could be X or Z, depending on how the library 
-      was compiled (stride1 option) */
    conf = 2;
    get_dims(fstart,fend,fsize,conf);
 
@@ -163,7 +158,7 @@ int main(int argc,char **argv)
      /* normalize */
      mult_array(B,Ntot,factor);
 
-     /* Compute backward transform on B, store results in C */
+     /* Compute backward transform on B, store results in A */
      MPI_Barrier(MPI_COMM_WORLD);
      rtime1 = rtime1 - MPI_Wtime();
      p3dfft_btran_c2r(B,C);

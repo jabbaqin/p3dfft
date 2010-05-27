@@ -31,11 +31,9 @@
 
       real(mytype), dimension(:,:,:),  allocatable :: BEG
       complex(mytype), dimension(:,:,:),  allocatable :: AEND
-      real(mytype) pi,twopi,sinyz,diff,cdiff,ccdiff,ans
 
       integer(8) Ntot
       real(mytype) factor
-      real(mytype),dimension(:),allocatable:: sinx,siny,sinz
       real(8) rtime1,rtime2
       real(8) gt(4,3),gtcomm(3),tc
       integer ierr,nu,ndim,dims(2),nproc,proc_id
@@ -48,9 +46,6 @@
       call MPI_INIT (ierr)
       call MPI_COMM_SIZE (MPI_COMM_WORLD,nproc,ierr)
       call MPI_COMM_RANK (MPI_COMM_WORLD,proc_id,ierr)
-
-      pi=atan(1.)*4.
-      twopi=2.*pi
 
       timers = 0.0
       gt=0.0

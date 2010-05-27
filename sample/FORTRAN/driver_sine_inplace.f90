@@ -53,8 +53,7 @@
       call MPI_COMM_SIZE (MPI_COMM_WORLD,nproc,ierr)
       call MPI_COMM_RANK (MPI_COMM_WORLD,proc_id,ierr)
 
-      pi=atan(1.)*4.
-      twopi=2.*pi
+      twopi=atan(1.0d0)*8.0d0
 
       timers = 0.0
       gt=0.0

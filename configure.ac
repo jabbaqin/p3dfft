@@ -213,5 +213,9 @@ AC_CONFIG_FILES([Makefile
 
 AC_SUBST(TESTLIBS, $TESTLIBS)
 AC_OUTPUT()
+
+cp include/p3dfft.h.original include/p3dfft.h
+cat config.h >> include/p3dfft.h
+
 AC_MSG_NOTICE("Configure script complete!")
 

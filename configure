@@ -5625,8 +5625,10 @@ if test "$no_create" != yes; then
   $ac_cs_success || { (exit 1); exit 1; }
 fi
 
+
+cp include/p3dfft.h.original include/test.h
+cat config.h >> include/test.h
+
 { echo "$as_me:$LINENO: \"Configure script complete!\"" >&5
 echo "$as_me: \"Configure script complete!\"" >&6;}
 
-if test "$(top_builddir)/include/p3dfft.c"; then echo "yes"
-fi

@@ -5626,8 +5626,8 @@ if test "$no_create" != yes; then
 fi
 
 
-cp include/p3dfft.h.original include/test.h
-cat config.h >> include/test.h
+cp include/p3dfft.h.original include/p3dfft.h
+cat config.h >> include/p3dfft.h
 
 { echo "$as_me:$LINENO: \"Configure script complete!\"" >&5
 echo "$as_me: \"Configure script complete!\"" >&6;}

@@ -214,3 +214,4 @@ AC_CONFIG_FILES([Makefile
 AC_SUBST(TESTLIBS, $TESTLIBS)
 AC_OUTPUT()
 AC_MSG_NOTICE("Configure script complete!")
+

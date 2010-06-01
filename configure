@@ -895,8 +895,8 @@ Optional Packages:
 Some influential environment variables:
   FC          Fortran compiler command
   FCFLAGS     Fortran compiler flags
-  LDFLAGS     linker flags for the  C compiler, e.g. -L<lib dir> if you 
-              have libraries in a nonstandard directory <lib dir>
+  LDFLAGS     linker flags, e.g. -L<lib dir> if you have libraries in a
+              nonstandard directory <lib dir>
   CC          C compiler command
   CFLAGS      C compiler flags
   CPPFLAGS    C/C++ preprocessor flags, e.g. -I<include dir> if you have
@@ -5627,3 +5627,6 @@ fi
 
 { echo "$as_me:$LINENO: \"Configure script complete!\"" >&5
 echo "$as_me: \"Configure script complete!\"" >&6;}
+
+if test "$(top_builddir)/include/p3dfft.c"; then echo "yes"
+fi

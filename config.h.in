@@ -1,5 +1,8 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* arguments passed to configure script */
+#undef CONFIGURE_ARGS
+
 /* Define if you want to enable C convention for processor dimensions */
 #undef DIMS_C
 
@@ -48,9 +51,6 @@
 
 /* Define if you want to compile P3DFFT using IBM compiler */
 #undef IBM
-
-/* LAL Configure Arguments */
-#undef LAL_CONFIGURE_ARGS
 
 /* Define if you want to enable the measure algorithm */
 #undef MEASURE

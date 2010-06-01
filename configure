@@ -1795,7 +1795,7 @@ am__tar='${AMTAR} chof - "$$tardir"'; am__untar='${AMTAR} xf -'
 
 
 cat >>confdefs.h <<_ACEOF
-#define LAL_CONFIGURE_ARGS "$ac_configure_args"
+#define CONFIGURE_ARGS "$ac_configure_args"
 _ACEOF
 
 

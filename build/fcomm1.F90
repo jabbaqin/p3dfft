@@ -16,7 +16,7 @@
 
       real(8) t
       integer x,y,i,ierr,z,xs,j,n,ix,iy
-      integer*8 position,pos1
+      integer(8) position,pos1
 
 ! Pack the send buffer for exchanging y and x (within a given z plane ) into sendbuf
 

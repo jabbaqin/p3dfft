@@ -15,7 +15,7 @@
 
       real(8) t,tc
       integer x,y,z,i,ierr,xs,ys,iy,y2,z2,ix,x2,n
-      integer*8 position,pos1
+      integer(8) position,pos1
       
 !     Pack the data for sending
 

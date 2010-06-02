@@ -15,7 +15,7 @@
       real(8) t,tc
       integer x,y,z,i,ierr,ix,iy,x2,y2,l
       integer OMP_GET_THREAD_NUM,ithr,st_y,en_y,sz_y
-      integer*8 position,pos1,pos0,pos2
+      integer(8) position,pos1,pos0,pos2
 
       
 #ifdef OPENMP
@@ -29,7 +29,7 @@
       tc = tc - MPI_Wtime()
 !$OMP END MASTER 
 
-! Pack and exchange x-z buffers in rows
+! c Pack and exchange x-z buffers in rows
       
       do i=0,iproc-1
 
@@ -95,13 +95,9 @@
       t = t - MPI_Wtime() 
 
 #ifdef USE_EVEN
-      call mpi_alltoall (buf1,IfCntMax, &
-                 mpi_byte, buf2,IfCntMax,mpi_byte, &
-                 mpi_comm_row,ierr)
+      call mpi_alltoall (buf1,IfCntMax, mpi_byte, buf2,IfCntMax,mpi_byte, mpi_comm_row,ierr)
 #else
-      call mpi_alltoallv (buf1,KrSndCnts, KrSndStrt, &
-                 mpi_byte, buf2,KrRcvCnts,KrRcvStrt,mpi_byte, &
-                 mpi_comm_row,ierr)
+      call mpi_alltoallv (buf1,KrSndCnts, KrSndStrt, mpi_byte, buf2,KrRcvCnts,KrRcvStrt,mpi_byte, mpi_comm_row,ierr)
 #endif
 
       t = t + MPI_Wtime() 

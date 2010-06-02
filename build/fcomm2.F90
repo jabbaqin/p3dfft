@@ -16,7 +16,7 @@
 #endif
       real(8) t,tc
       integer x,z,y,i,ierr,xs,ys,y2,z2,iy,iz
-      integer*8 position,pos1
+      integer(8) position,pos1
 
 ! Pack send buffers for exchanging y and z for all x at once 
 

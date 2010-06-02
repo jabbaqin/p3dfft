@@ -75,7 +75,7 @@
       complex(mytype), save, allocatable :: buf(:),buf1(:),buf2(:)
       logical :: OW = .false.
 #ifdef USE_EVEN
-      integer*8,save :: IfCntMax,KfCntMax
+      integer(8),save :: IfCntMax,KfCntMax
       logical KfCntUneven
 #endif
 

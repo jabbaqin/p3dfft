@@ -173,8 +173,13 @@ AC_MSG_CHECKING([FFTW directory])
 AC_ARG_WITH(fftw, [AC_HELP_STRING([--with-fftw], [path to location of FFTW library])], withfftw=$withval, withfftw="")
 if test "$withfftw" != "yes" && test "$withfftw" != ""; then
 	AC_MSG_RESULT([$withfftw])
-	AC_SUBST(FFTW_INC, "$withfftw/include")
-	AC_SUBST(FFTW_LIB, "$withfftw/lib")
+	if test -e [$withfftw/lib/libfftw3.a ]; then
+		AC_SUBST(FFTW_INC, "$withfftw/include")
+		AC_SUBST(FFTW_LIB, "$withfftw/lib")
+	else
+		AC_MSG_ERROR([libfftw3.a was not found in given location!])
+	fi
+
 	if test "$spval" == "yes"; then
 		AC_SUBST(FFTWF, "$FFTW_LIB/libfftw3f.a")
 	fi

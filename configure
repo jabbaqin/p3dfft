@@ -2173,9 +2173,16 @@ fi;
 if test "$withfftw" != "yes" && test "$withfftw" != ""; then
 	echo "$as_me:$LINENO: result: $withfftw" >&5
 echo "${ECHO_T}$withfftw" >&6
-	FFTW_INC="$withfftw/include"
+	if test -e $withfftw/lib/libfftw3.a ; then
+		FFTW_INC="$withfftw/include"
 
-	FFTW_LIB="$withfftw/lib"
+		FFTW_LIB="$withfftw/lib"
+
+	else
+		{ { echo "$as_me:$LINENO: error: libfftw3.a was not found in given location!" >&5
+echo "$as_me: error: libfftw3.a was not found in given location!" >&2;}
+   { (exit 1); exit 1; }; }
+	fi
 
 	if test "$spval" == "yes"; then
 		FFTWF="$FFTW_LIB/libfftw3f.a"
@@ -2288,7 +2295,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:2291:" \
+echo "$as_me:2298:" \
      "checking for Fortran compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5

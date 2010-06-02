@@ -8,3 +8,5 @@ SUBDIRS = \
 
 all-local: 
 	echo $(SUCCESS)
+clean-local:
+	-test -z "include/p3dfft.mod" || rm -f include/p3dfft.mod

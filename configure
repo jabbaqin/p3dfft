@@ -311,7 +311,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar DFLAGS FFTW_INC FFTW_LIB FFTWF SUCCESS FC FCFLAGS LDFLAGS ac_ct_FC EXEEXT OBJEXT CC RANLIB ac_ct_RANLIB CFLAGS CPPFLAGS ac_ct_CC CPP EGREP LIBOBJS TESTLIBS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar DFLAGS LDFLAGS FFTW_INC FFTW_LIB FFTWF SUCCESS FC FCFLAGS ac_ct_FC EXEEXT OBJEXT CC RANLIB ac_ct_RANLIB CFLAGS CPPFLAGS ac_ct_CC CPP EGREP LIBOBJS TESTLIBS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1837,6 +1837,8 @@ echo "${ECHO_T}$ok" >&6
 if test "$ok" = "yes"; then
         DFLAGS="$DFLAGS -DPGI"
 
+	LDFLAGS="$LDFLAGS -pgf90libs"
+
 
 cat >>confdefs.h <<\_ACEOF
 #define PGI 1
@@ -2295,7 +2297,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:2298:" \
+echo "$as_me:2300:" \
      "checking for Fortran compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -5099,13 +5101,13 @@ s,@AMTAR@,$AMTAR,;t t
 s,@am__tar@,$am__tar,;t t
 s,@am__untar@,$am__untar,;t t
 s,@DFLAGS@,$DFLAGS,;t t
+s,@LDFLAGS@,$LDFLAGS,;t t
 s,@FFTW_INC@,$FFTW_INC,;t t
 s,@FFTW_LIB@,$FFTW_LIB,;t t
 s,@FFTWF@,$FFTWF,;t t
 s,@SUCCESS@,$SUCCESS,;t t
 s,@FC@,$FC,;t t
 s,@FCFLAGS@,$FCFLAGS,;t t
-s,@LDFLAGS@,$LDFLAGS,;t t
 s,@ac_ct_FC@,$ac_ct_FC,;t t
 s,@EXEEXT@,$EXEEXT,;t t
 s,@OBJEXT@,$OBJEXT,;t t

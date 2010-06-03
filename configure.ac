@@ -25,6 +25,7 @@ AC_ARG_ENABLE(pgi, [AC_HELP_STRING([--enable-pgi], [compile P3DFFT using PGI com
 AC_MSG_RESULT([$ok])
 if test "$ok" = "yes"; then
         AC_SUBST(DFLAGS, "$DFLAGS -DPGI")
+	AC_SUBST(LDFLAGS,"$LDFLAGS -pgf90libs")
         AC_DEFINE(PGI, 1, [Define if you want to compile P3DFFT using PGI compiler])
 fi
 

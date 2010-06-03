@@ -35,7 +35,11 @@ double FORTNAME(t1),FORTNAME(t2),FORTNAME(t3),FORTNAME(t4),FORTNAME(tp1);
 
 int main(int argc,char **argv)
 {
-   float *A,*B,*p;
+#ifndef SINGLE_PREC
+   double *A,*B,*p,*C;
+#else
+   float *A,*B,*p,*C;
+#endif
    int i,j,k,x,y,z,nx,ny,nz,proc_id,nproc,dims[2],ndim,nu;
    int istart[3],isize[3],iend[3];
    int fstart[3],fsize[3],fend[3];
@@ -45,7 +49,12 @@ int main(int argc,char **argv)
    double *sinx,*siny,*sinz,factor;
    double rtime1,rtime2,gt1,gt2,gt3,gt4,gtp1,gtcomm,tcomm;
    FILE *fp;
+
+#ifndef SINGLE_PREC
+   void print_all(double *,long int,int,long int),mult_array(double *,long int,double);
+#else
    void print_all(float *,long int,int,long int),mult_array(float *,long int,double);
+#endif
 
    MPI_Init(&argc,&argv);
    MPI_Comm_size(MPI_COMM_WORLD,&nproc);
@@ -65,7 +74,11 @@ int main(int argc,char **argv)
         fscanf(fp,"%d %d %d %d %d\n",&nx,&ny,&nz,&ndim,&n);
         fclose(fp);
      }
+#ifndef SINGLE_PREC
+     printf("Double precision\n (%d %d %d) grid\n %d proc. dimensions\n%d repetitions\n",nx,ny,nz,ndim,n);
+#else
      printf("Single precision\n (%d %d %d) grid\n %d proc. dimensions\n%d repetitions\n",nx,ny,nz,ndim,n);
+#endif
    }
    MPI_Bcast(&nx,1,MPI_INT,0,MPI_COMM_WORLD);
    MPI_Bcast(&ny,1,MPI_INT,0,MPI_COMM_WORLD);
@@ -108,6 +121,8 @@ int main(int argc,char **argv)
       the dimension  with stride-1 is X. */
    conf = 1;
    get_dims(istart,iend,isize,conf);
+   conf = 2;
+   get_dims(fstart,fend,fsize,conf);
    /* Get dimensions for output array - complex numbers, Z-pencil shape.
       Stride-1 dimension could be X or Z, depending on how the library 
       was compiled (stride1 option) */
@@ -127,7 +142,15 @@ int main(int argc,char **argv)
    nm = isize[0]*isize[1]*isize[2];
    if(nm < fsize[0]*fsize[1]*fsize[2]*2)
      nm = fsize[0]*fsize[1]*fsize[2]*2;
+
+#ifndef SINGLE_PREC
+   A = (double *) malloc(sizeof(double) * nm);
+#else
    A = (float *) malloc(sizeof(float) * nm);
+#endif
+
+   if(A == NULL) 
+     printf("%d: Error allocating array A (%ld)\n",proc_id,nm);
 
    p = A;
    for(z=0;z < isize[2];z++)
@@ -224,7 +247,11 @@ int main(int argc,char **argv)
 
 }
 
+#ifndef SINGLE_PREC
+void mult_array(double *A,long int nar,double f)
+#else
 void mult_array(float *A,long int nar,double f)
+#endif
 {
   long int i;
 
@@ -232,7 +259,11 @@ void mult_array(float *A,long int nar,double f)
     A[i] *= f;
 }
 
+#ifndef SINGLE_PREC
+void print_all(double *A,long int nar,int proc_id,long int Nglob)
+#else
 void print_all(float *A,long int nar,int proc_id,long int Nglob)
+#endif
 {
   int x,y,z,conf,Fstart[3],Fsize[3],Fend[3];
   long int i;
@@ -240,14 +271,12 @@ void print_all(float *A,long int nar,int proc_id,long int Nglob)
   conf = 2;
   get_dims(Fstart,Fend,Fsize,conf);
   Fsize[0] *= 2;
-  Fstart[0] = 1 + (Fstart[0]-1)*2;
-  for(i=0;i < nar;i++)
-    if(fabs(A[i]) > Nglob *1.25e-4) {
+  Fstart[0] = (Fstart[0]-1)*2;
+  for(i=0;i < nar;i+=2)
+    if(fabs(A[i]) + fabs(A[i+1]) > Nglob *1.25e-4) {
       z = i/(Fsize[0]*Fsize[1]);
-      y = i/Fsize[0] - z*Fsize[1];
+      y = i/(Fsize[0]) - z*Fsize[1];
       x = i-z*Fsize[0]*Fsize[1] - y*Fsize[0];
-      printf("(%d,%d,%d) %f\n",x+Fstart[0],y+Fstart[1],z+Fstart[2],A[i]);
+      printf("(%d,%d,%d) %lf %lf\n",x+Fstart[0],y+Fstart[1],z+Fstart[2],A[i],A[i+1]);
     }
 }
-
-  

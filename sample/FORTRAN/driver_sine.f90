@@ -309,8 +309,8 @@
       integer Fstart(3),Fend(3),Fsize(3)
       real(8) Nglob
 
-!      print *,'Nglob =',Nglob
       call get_dims(Fstart,Fend,Fsize,2)
+
       do i=1,Nar
          if(abs(Ar(1,1,i)) .gt. Nglob *1.25e-4) then
             z = (i-1)/(Fsize(1)*Fsize(2))

@@ -333,9 +333,9 @@
       call get_dims(Fstart,Fend,Fsize,2)
       do i=1,Nar*2,2
          if(abs(Ar(1,1,i)) + abs(Ar(1,1,i+1)) .gt. Nglob *1.25e-6) then
-            z = (i-1)/(Fsize(1)*Fsize(2))
-            y = (i-1 - z * Fsize(1)*Fsize(2))/(Fsize(1))
-            x = i-1-z*Fsize(1)*Fsize(2) - y*Fsize(1)
+            z = (i-1)/(Fsize(1)*Fsize(2)*2)
+            y = ((i-1)/2 - z * Fsize(1)*Fsize(2))/(Fsize(1))
+            x = (i-1)/2-z*Fsize(1)*Fsize(2) - y*Fsize(1)
             print *,'(',x+Fstart(1),y+Fstart(2),z+Fstart(3),') ',Ar(1,1,i),Ar(1,1,i+1)
          endif
       enddo

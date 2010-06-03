@@ -75,7 +75,11 @@ int main(int argc,char **argv)
         fscanf(fp,"%d %d %d %d %d\n",&nx,&ny,&nz,&ndim,&n);
         fclose(fp);
      }
+#ifndef SINGLE_PREC
+     printf("Double precision\n (%d %d %d) grid\n %d proc. dimensions\n%d repetitions\n",nx,ny,nz,ndim,n);
+#else
      printf("Single precision\n (%d %d %d) grid\n %d proc. dimensions\n%d repetitions\n",nx,ny,nz,ndim,n);
+#endif
    }
    MPI_Bcast(&nx,1,MPI_INT,0,MPI_COMM_WORLD);
    MPI_Bcast(&ny,1,MPI_INT,0,MPI_COMM_WORLD);
@@ -145,6 +149,16 @@ int main(int argc,char **argv)
    B = (float *) malloc(sizeof(float) * fsize[0]*fsize[1]*fsize[2]*2);
    C = (float *) malloc(sizeof(float) * isize[0]*isize[1]*isize[2]);
 #endif
+
+   if(A == NULL) 
+     printf("%d: Error allocating array A (%ld)\n",proc_id,isize[0]*isize[1]*isize[2]);
+
+   if(B == NULL) 
+     printf("%d: Error allocating array B (%ld)\n",proc_id,fsize[0]*fsize[1]*fsize[2]*2);
+
+   if(C == NULL) 
+     printf("%d: Error allocating array C (%ld)\n",proc_id,isize[0]*isize[1]*isize[2]);
+
 
    p = A;
    for(z=0;z < isize[2];z++)
@@ -263,13 +277,13 @@ void print_all(float *A,long int nar,int proc_id,long int Nglob)
   conf = 2;
   get_dims(Fstart,Fend,Fsize,conf);
   Fsize[0] *= 2;
-  Fstart[0] = 1 + (Fstart[0]-1)*2;
-  for(i=0;i < nar;i++)
-    if(fabs(A[i]) > Nglob *1.25e-4) {
+  Fstart[0] = (Fstart[0]-1)*2;
+  for(i=0;i < nar;i+=2)
+    if(fabs(A[i]) + fabs(A[i+1]) > Nglob *1.25e-4) {
       z = i/(Fsize[0]*Fsize[1]);
-      y = i/Fsize[0] - z*Fsize[1];
+      y = i/(Fsize[0]) - z*Fsize[1];
       x = i-z*Fsize[0]*Fsize[1] - y*Fsize[0];
-      printf("(%d,%d,%d) %f\n",x+Fstart[0],y+Fstart[1],z+Fstart[2],A[i]);
+      printf("(%d,%d,%d) %lf %lf\n",x+Fstart[0],y+Fstart[1],z+Fstart[2],A[i],A[i+1]);
     }
 }
 

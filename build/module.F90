@@ -165,12 +165,12 @@
          isize(3) = kjsize
       else if(conf .eq. 2) then
 #ifdef STRIDE1
-         istart(2) = iistart
-         iend(2) = iiend
-         isize(2) = iisize
-         istart(3) = jjstart
-         iend(3) = jjend
-         isize(3) = jjsize
+         istart(3) = iistart
+         iend(3) = iiend
+         isize(3) = iisize
+         istart(2) = jjstart
+         iend(2) = jjend
+         isize(2) = jjsize
          istart(1) = 1
          iend(1) = NZ_fft
          isize(1) = NZ_fft

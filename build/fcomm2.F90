@@ -7,16 +7,18 @@
 
       implicit none
 
-#ifdef STRIDE1
-      complex(mytype) source(iisize,ny_fft,kjsize)
-      complex(mytype) dest(nz_fft,iisize,jjsize)
-#else
       complex(mytype) source(iisize,ny_fft,kjsize)
       complex(mytype) dest(iisize,jjsize,nz_fft)
-#endif
+
       real(8) t,tc
       integer x,z,y,i,ierr,xs,ys,y2,z2,iy,iz
       integer(8) position,pos1
+
+!	if(taskid .eq. 0) then
+!	  print *,'Entring fcomm2'
+!        endif	
+!	call print_buf(source,iisize,ny_fft,kjsize)
+
 
 ! Pack send buffers for exchanging y and z for all x at once 
 

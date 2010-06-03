@@ -1,6 +1,6 @@
 ! =========================================================
       subroutine p3dfft_setup(dims,nx,ny,nz,overwrite)
-! ========================================================
+!========================================================
 
       implicit none
 
@@ -8,7 +8,7 @@
       integer ierr, dims(2),  cartid(2)
       logical periodic(2),remain_dims(2),overwrite
       integer impid, ippid, jmpid, jppid
-      integer(8) nm,n1,n2,li
+      integer(8) nm,n1,n2
       real(mytype), allocatable :: R(:)
 
       if(nx .le. 0 .or. ny .le. 0 .or. nz .le. 0) then
@@ -37,15 +37,14 @@
       call MPI_COMM_SIZE (MPI_COMM_WORLD,numtasks,ierr)
       call MPI_COMM_RANK (MPI_COMM_WORLD,taskid,ierr)
 
-      if(dims(1) .le. 0 .or. dims(2) .le. 0 .or. &
-           dims(1)*dims(2) .ne. numtasks) then
-         print *,'Invalid processor geometry: ',dims,' for ',numtasks,'tasks'
+      if(dims(1) .le. 0 .or. dims(2) .le. 0 .or.  dims(1)*dims(2) .ne. numtasks) then
+         print *,'Invalid processor geometry: ',dims,' for ',numtasks, 'tasks'
          call abort
       endif
 
 #ifdef STRIDE1      
       if(taskid .eq. 0) then 
-         print *,'Using stride-1 layout, Block sizes (NB1,NB): ',NB1,NB
+         print *,'Using stride-1 layout'
       endif
 #endif
 
@@ -61,8 +60,7 @@
       periodic(1) = .false.
       periodic(2) = .false.
 ! creating cartesian processor grid
-      call MPI_Cart_create(MPI_COMM_WORLD,2,dims,periodic, &
-           .false.,mpi_comm_cart,ierr)
+      call MPI_Cart_create(MPI_COMM_WORLD,2,dims,periodic,.false.,mpi_comm_cart,ierr)
 ! Obtaining process ids with in the cartesian grid
       call MPI_Cart_coords(mpi_comm_cart,taskid,2,cartid,ierr)
 ! process with a linear id of 5 may have cartid of (3,1)
@@ -78,14 +76,12 @@
 ! store processor-grid-informations
       cartid(1) = ipid
       cartid(2) = jpid
+
 !      allocate(proc_id2coords(0:(iproc*jproc)*2-1))
-!      call MPI_Allgather( cartid,        2, MPI_INTEGER, &
-!                          proc_id2coords, 2, MPI_INTEGER, &
-!                          mpi_comm_cart,ierr)
+!      call MPI_Allgather( cartid,        2, MPI_INTEGER, proc_id2coords, 2, MPI_INTEGER,mpi_comm_cart,ierr)
 !      allocate(proc_coords2id(0:iproc-1,0:jproc-1))
 !      do i=0,(iproc*jproc)-1
-!      	proc_coords2id(	proc_id2coords(2*i), &
-!      					proc_id2coords(2*i+1)) = i
+!      	proc_coords2id(	proc_id2coords(2*i),proc_id2coords(2*i+1)) = i
 !      enddo
 
 ! here i is east-west j is north-south
@@ -155,6 +151,55 @@
       jiend = jien(ipid)
       kjend = kjen(jpid)
 
+#ifdef STRIDE1
+#ifdef CACHE_BL
+      CB = CACHE_BL
+#else
+      CB = 32768
+#endif
+
+#ifdef NBL_X
+      NBx = NBL_X
+#else
+      NBx=CB/(4*mytype*Ny)
+#endif
+
+#ifdef NBL_Y1
+      NBy1=NBL_Y1
+#else
+      NBy1 = CB/(4*mytype*iisize)
+#endif
+
+#ifdef NBL_Y2
+      NBy2=NBL_Y2
+#else
+      NBy2 = CB/(4*mytype*Nz)
+#endif
+
+#ifdef NBL_Z
+      NBz=NBL_Z
+#else
+      NBz = CB*numtasks/(2*mytype*Nx*Ny)
+#endif
+
+      if(NBx .eq. 0) then
+         NBx = 1
+      endif
+      if(NBy1 .eq. 0) then
+         NBy1 = 1
+      endif
+      if(NBy2 .eq. 0) then
+         NBy2 = 1
+      endif
+      if(NBz .eq. 0) then
+         NBz = 1
+      endif
+      
+      if(taskid .eq. 0) then
+         print *,'Using loop block sizes ',NBx,NBy1,NBy2,NBz
+      endif  
+
+#endif
 
 #ifdef USE_EVEN
       IfCntMax = iisz(iproc-1)*jisz(iproc-1)*kjsize*mytype*2
@@ -179,6 +224,7 @@
 
       endif
 
+!      print *,taskid,': padd=',padd
 ! Initialize FFTW and allocate buffers for communication
       nm = nxhp * jisize * (kjsize+padd) 
       allocate(buf1(nm),stat=err)
@@ -191,7 +237,12 @@
       endif
       buf1 = 0.0
       R = 0.0
+
+! For FFT libraries that allocate work space implicitly such as through 
+! plans (e.g. FFTW) initialize here
+
       call init_plan(buf1,R,nm)
+
       deallocate(R)
 
 #ifdef USE_EVEN
@@ -204,13 +255,11 @@
       endif
       n1 = max(n1,nm)
       allocate(buf2(n1))
-      buf1 = 0.0
 #else
       allocate(buf2(nm))
 #endif
 
-      allocate(buf(nm))
-      buf = 0.0
+      allocate(buf(nxhp*jisize*(kjsize+padd)))
 
 ! Displacements and buffer counts for mpi_alltoallv
 

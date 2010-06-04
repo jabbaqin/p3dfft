@@ -168,3 +168,9 @@ AC_CONFIG_FILES([Makefile
 
 AC_SUBST(TESTLIBS, $TESTLIBS)
 AC_OUTPUT
+
+# Concatenate config.h to p3dfft.h
+echo "Concatenating configuration header to p3dfft.h"
+cat config.h >> include/p3dfft.h
+
+AC_MSG_NOTICE([Configure complete!])

@@ -4,7 +4,8 @@ AM_FFLAGS = $(FCFLAGS) $(DFLAGS) $(INCLUDES)
 INCLUDES = -I$(top_builddir)/include/
 LDADD = $(top_builddir)/build/libp3dfft.a $(FFTW3_LIB)/libfftw3.a
 
-noinst_PROGRAMS =  test_sine.x test_sine_inplace.x test_rand.x test_spec.x
+fsampledir = $(datadir)/sample/
+fsample_PROGRAMS = test_sine.x test_sine_inplace.x test_rand.x test_spec.x
 
 test_sine_x_SOURCES = driver_sine.f
 

@@ -82,7 +82,11 @@ int main(int argc,char **argv)
         fscanf(fp,"%d %d %d %d %d\n",&nx,&ny,&nz,&ndim,&n);
         fclose(fp);
      }
+#ifndef SINGLE_PREC
+     printf("Double precision\n (%d %d %d) grid\n %d proc. dimensions\n",nx,ny,nz,ndim);
+#else
      printf("Single precision\n (%d %d %d) grid\n %d proc. dimensions\n",nx,ny,nz,ndim);
+#endif
    }
    MPI_Bcast(&nx,1,MPI_INT,0,MPI_COMM_WORLD);
    MPI_Bcast(&ny,1,MPI_INT,0,MPI_COMM_WORLD);
@@ -265,7 +269,11 @@ void compute_spectrum(float *B,int *st,int *sz,int *en,int *ng,float *E,int kmax
     float *el,*p;
 #endif
 
+#ifndef SINGLE_PREC
+    el = malloc(sizeof(double)*(kmax+1));
+#else
     el = malloc(sizeof(float)*(kmax+1));
+#endif
     p =B;
 
     for(ik=0;ik <= kmax;ik++)

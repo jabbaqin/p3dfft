@@ -1920,7 +1920,7 @@ if test "${enable_estimate+set}" = set; then
   enableval="$enable_estimate"
   ok=$enableval
 else
-  ok=yes
+  ok=no
 fi;
 echo "$as_me:$LINENO: result: $ok" >&5
 echo "${ECHO_T}$ok" >&6
@@ -1942,7 +1942,7 @@ if test "${enable_measure+set}" = set; then
   enableval="$enable_measure"
   ok=$enableval
 else
-  ok=no
+  ok=yes
 fi;
 echo "$as_me:$LINENO: result: $ok" >&5
 echo "${ECHO_T}$ok" >&6

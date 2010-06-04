@@ -58,7 +58,7 @@ fi
 
 # check whether to enable estimation
 AC_MSG_CHECKING([whether to enable estimation])
-AC_ARG_ENABLE(estimate, [AC_HELP_STRING([--enable-estimate], [for initialization thoroughness in setting up FFTW calls (this option only goes with --enable-fftw) .])], ok=$enableval, ok=yes)
+AC_ARG_ENABLE(estimate, [AC_HELP_STRING([--enable-estimate], [for initialization thoroughness in setting up FFTW calls (this option only goes with --enable-fftw) .])], ok=$enableval, ok=no)
 AC_MSG_RESULT([$ok])
 if test "$ok" = "yes"; then
         AC_SUBST(DFLAGS, "$DFLAGS -DESTIMATE")
@@ -67,7 +67,7 @@ fi
 
 # check whether to enable the measure algorithm
 AC_MSG_CHECKING([whether to enable the measure algorithm])
-AC_ARG_ENABLE(measure, [AC_HELP_STRING([--enable-measure], [for search-once-for-the-fast-algorithm (takes more time on p3dfft_setup()).])], ok=$enableval, ok=no)
+AC_ARG_ENABLE(measure, [AC_HELP_STRING([--enable-measure], [for search-once-for-the-fast-algorithm (takes more time on p3dfft_setup()).])], ok=$enableval, ok=yes)
 AC_MSG_RESULT([$ok])
 if test "$ok" = "yes"; then
         AC_SUBST(DFLAGS, "$DFLAGS -DMEASURE")

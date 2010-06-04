@@ -28,21 +28,41 @@
 
 double static FORTNAME(t1),FORTNAME(t2),FORTNAME(t3),FORTNAME(t4);
 /* double t1,t2,t3,t4,tp1; */
-void compute_spectrum(float *B,int *st,int *sz,int *en,int *ng,float *E,int kmax,int root);
+#ifndef SINGLE_PREC
+    void compute_spectrum(double *B,int *st,int *sz,int *en,int *ng,double *E,int kmax,int root);
+#else
+    void compute_spectrum(float *B,int *st,int *sz,int *en,int *ng,float *E,int kmax,int root);
+#endif
 
 int main(int argc,char **argv)
 {
+#ifndef SINGLE_PREC
+   double *A,*B, *E,*p1,*p;
+#else
    float *A,*B, *E,*p1,*p;
+#endif
    int i,j,k,x,y,z,nx,ny,nz,proc_id,nproc,dims[2],ndim,nu;
    int istart[3],isize[3],iend[3];
    int fstart[3],fsize[3],fend[3];
    int iproc,jproc,ng[3],kmax,iex,conf,m,n;
    long int Ntot;
+
+#ifndef SINGLE_PREC
+   double pi,twopi,sinyz,cdiff,ccdiff,ans;
+   double *sinx,*siny,*sinz,factor,r;
+#else
    float pi,twopi,sinyz,cdiff,ccdiff,ans;
    float *sinx,*siny,*sinz,factor,r;
+#endif
+
    double rtime1,rtime2,gt1,gt2,gt3,gt4,gtcomm,tcomm;
    FILE *fp;
+
+#ifndef SINGLE_PREC
+   void print_all(double *,long int,int,long int),mult_array(double *,long int,double);
+#else
    void print_all(float *,long int,int,long int),mult_array(float *,long int,double);
+#endif
 
    MPI_Init(&argc,&argv);
    MPI_Comm_size(MPI_COMM_WORLD,&nproc);
@@ -106,9 +126,15 @@ int main(int argc,char **argv)
    conf = 2;
    get_dims(fstart,fend,fsize,conf);
 
+#ifndef SINGLE_PREC
+   sinx = malloc(sizeof(double)*nx);
+   siny = malloc(sizeof(double)*ny);
+   sinz = malloc(sizeof(double)*nz);
+#else
    sinx = malloc(sizeof(float)*nx);
    siny = malloc(sizeof(float)*ny);
    sinz = malloc(sizeof(float)*nz);
+#endif
 
    for(z=0;z < isize[2];z++)
      sinz[z] = sin((z+istart[2]-1)*twopi/nz);
@@ -119,8 +145,13 @@ int main(int argc,char **argv)
 
    /* Allocate arrays */
 
+#ifndef SINGLE_PREC
+   A = (double *) malloc(sizeof(double) * isize[0]*isize[1]*isize[2]);
+   B = (double *) malloc(sizeof(double) * fsize[0]*fsize[1]*fsize[2]*2);
+#else
    A = (float *) malloc(sizeof(float) * isize[0]*isize[1]*isize[2]);
    B = (float *) malloc(sizeof(float) * fsize[0]*fsize[1]*fsize[2]*2);
+#endif
 
    /* Initialize array A */
    p1 = A;
@@ -151,8 +182,14 @@ int main(int argc,char **argv)
    /* normalize */
    mult_array(B,Ntot,factor);
 
+#ifndef SINGLE_PREC
+   kmax = sqrt((double) (nx*nx + ny*ny + nz * nz)) *0.5 +0.5;
+   E = malloc(sizeof(double) * (kmax+1));
+#else
    kmax = sqrt((float) (nx*nx + ny*ny + nz * nz)) *0.5 +0.5;
    E = malloc(sizeof(float) * (kmax+1));
+#endif
+
    ng[0] = nx;	  
    ng[1] = ny;
    ng[2] = nz;
@@ -203,7 +240,11 @@ int main(int argc,char **argv)
 
 }
 
+#ifndef SINGLE_PREC
+void mult_array(double *A,long int nar,double f)
+#else
 void mult_array(float *A,long int nar,double f)
+#endif
 {
   long int i;
 
@@ -211,10 +252,18 @@ void mult_array(float *A,long int nar,double f)
     A[i] *= f;
 }
 
+#ifndef SINGLE_PREC
+void compute_spectrum(double *B,int *st,int *sz,int *en,int *ng,double *E,int kmax,int root)
+#else
 void compute_spectrum(float *B,int *st,int *sz,int *en,int *ng,float *E,int kmax,int root)
+#endif
   {
     int x,y,z,ik,k2,kx,ky,kz;
+#ifndef SINGLE_PREC
+    double *el,*p;
+#else
     float *el,*p;
+#endif
 
     el = malloc(sizeof(float)*(kmax+1));
     p =B;
@@ -240,7 +289,11 @@ void compute_spectrum(float *B,int *st,int *sz,int *en,int *ng,float *E,int kmax
 	  kx = x/2 + (st[0]-1);
     
 	  k2 = kx *kx +ky *ky + kz*kz;
-	  ik = sqrt((float) k2)+0.5;
+#ifndef SINGLE_PREC
+	  ik = sqrt((double) k2)+0.5;
+#else
+          ik = sqrt((float) k2)+0.5;
+#endif
 	  el[ik] += k2 * (*p) * (*p);
 	  p++;
 	}

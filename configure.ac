@@ -165,9 +165,9 @@ if test "$fftwval" == "no" && test "$esslval" == "no"; then
 fi
 
 # check to see if FFTW and ESSL have both been selected
-if test "$fftwval" == "yes" && test "$esslval" == "yes"; then
-        AC_MSG_ERROR([You must only choose either ESSL or FFTW!])
-fi
+# if test "$fftwval" == "yes" && test "$esslval" == "yes"; then
+#        AC_MSG_ERROR([You must only choose either ESSL or FFTW!])
+# fi
 
 # check for fftw3
 AC_MSG_CHECKING([FFTW directory])

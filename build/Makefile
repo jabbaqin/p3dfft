@@ -73,19 +73,19 @@ DIST_SOURCES = $(libp3dfft_a_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} /home/djchen/NEW/p3dfft-f90/missing --run aclocal-1.9
-AMTAR = ${SHELL} /home/djchen/NEW/p3dfft-f90/missing --run tar
-AUTOCONF = ${SHELL} /home/djchen/NEW/p3dfft-f90/missing --run autoconf
-AUTOHEADER = ${SHELL} /home/djchen/NEW/p3dfft-f90/missing --run autoheader
-AUTOMAKE = ${SHELL} /home/djchen/NEW/p3dfft-f90/missing --run automake-1.9
+ACLOCAL = ${SHELL} /home/d4park/svn/branches/p3dfft-premod/missing --run aclocal-1.9
+AMTAR = ${SHELL} /home/d4park/svn/branches/p3dfft-premod/missing --run tar
+AUTOCONF = ${SHELL} /home/d4park/svn/branches/p3dfft-premod/missing --run autoconf
+AUTOHEADER = ${SHELL} /home/d4park/svn/branches/p3dfft-premod/missing --run autoheader
+AUTOMAKE = ${SHELL} /home/d4park/svn/branches/p3dfft-premod/missing --run automake-1.9
 AWK = gawk
 CC = mpicc
-CFLAGS = -fastsse -tp barcelona-64 -DPGI
+CFLAGS = -fastsse -tp barcelona-64
 CPP = mpicc -E
 CPPFLAGS = 
 CYGPATH_W = echo
 DEFS = -DHAVE_CONFIG_H
-DFLAGS =  -DSINGLE_PREC -DESTIMATE -DFFTW
+DFLAGS =  -DPGI -DSINGLE_PREC -DESTIMATE -DFFTW
 ECHO_C = 
 ECHO_N = -n
 ECHO_T = 
@@ -93,9 +93,9 @@ EGREP = grep -E
 EXEEXT = 
 FC = mpif90
 FCFLAGS = -fastsse -tp barcelona-64 -Mextend -byteswapio
-FFTWF = /home/djchen/build/fftw//lib/libfftw3f.a
-FFTW_INC = /home/djchen/build/fftw//include
-FFTW_LIB = /home/djchen/build/fftw//lib
+FFTWF = /home/d4park/local/lib/libfftw3f.a
+FFTW_INC = /home/d4park/local/include
+FFTW_LIB = /home/d4park/local/lib
 INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_SCRIPT = ${INSTALL}
@@ -104,7 +104,7 @@ LDFLAGS = -lmpi_f90 -lmpi_f77 -pgf90libs -lmyriexpress
 LIBOBJS = 
 LIBS = 
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /home/djchen/NEW/p3dfft-f90/missing --run makeinfo
+MAKEINFO = ${SHELL} /home/d4park/svn/branches/p3dfft-premod/missing --run makeinfo
 OBJEXT = o
 PACKAGE = p3dfft
 PACKAGE_BUGREPORT = dmitry@sdsc.edu
@@ -134,7 +134,7 @@ exec_prefix = ${prefix}
 host_alias = 
 includedir = ${prefix}/include
 infodir = ${prefix}/info
-install_sh = /home/djchen/NEW/p3dfft-f90/install-sh
+install_sh = /home/d4park/svn/branches/p3dfft-premod/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localstatedir = ${prefix}/var
@@ -315,7 +315,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LIBRARIES)
+all-am: Makefile $(LIBRARIES) all-local
 installdirs:
 	for dir in "$(DESTDIR)$(libdir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
@@ -391,8 +391,8 @@ ps-am:
 
 uninstall-am: uninstall-info-am uninstall-libLIBRARIES
 
-.PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
-	clean-libLIBRARIES clean-local ctags distclean \
+.PHONY: CTAGS GTAGS all all-am all-local check check-am clean \
+	clean-generic clean-libLIBRARIES clean-local ctags distclean \
 	distclean-compile distclean-generic distclean-tags distdir dvi \
 	dvi-am html html-am info info-am install install-am \
 	install-data install-data-am install-exec install-exec-am \
@@ -403,6 +403,9 @@ uninstall-am: uninstall-info-am uninstall-libLIBRARIES
 	tags uninstall uninstall-am uninstall-info-am \
 	uninstall-libLIBRARIES
 
+
+all-local:
+	-mv -f p3dfft.mod ../include
 
 clean-local:
 	-test -z "*.mod" || rm -f *.mod

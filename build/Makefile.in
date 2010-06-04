@@ -315,7 +315,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LIBRARIES)
+all-am: Makefile $(LIBRARIES) all-local
 installdirs:
 	for dir in "$(DESTDIR)$(libdir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
@@ -391,8 +391,8 @@ ps-am:
 
 uninstall-am: uninstall-info-am uninstall-libLIBRARIES
 
-.PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
-	clean-libLIBRARIES clean-local ctags distclean \
+.PHONY: CTAGS GTAGS all all-am all-local check check-am clean \
+	clean-generic clean-libLIBRARIES clean-local ctags distclean \
 	distclean-compile distclean-generic distclean-tags distdir dvi \
 	dvi-am html html-am info info-am install install-am \
 	install-data install-data-am install-exec install-exec-am \
@@ -403,6 +403,9 @@ uninstall-am: uninstall-info-am uninstall-libLIBRARIES
 	tags uninstall uninstall-am uninstall-info-am \
 	uninstall-libLIBRARIES
 
+
+all-local:
+	-mv -f p3dfft.mod ../include
 
 clean-local:
 	-test -z "*.mod" || rm -f *.mod

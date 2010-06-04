@@ -84,7 +84,7 @@
 /* #undef PATIENT */
 
 /* Define if you want to compile P3DFFT using PGI compiler */
-/* #undef PGI */
+#define PGI 1
 
 /* Define if you want to compile P3DFFT in single precision */
 #define SINGLE_PREC 1

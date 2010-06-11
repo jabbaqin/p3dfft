@@ -39,8 +39,8 @@
       integer(8) Ntot
       real(mytype) factor
       real(mytype),dimension(:),allocatable:: sinx,siny,sinz
-      real(8) rtime1,rtime2,Nglob
-      real(8) gt(4,3),gtcomm(3),tc
+      real(8) rtime1,rtime2,Nglob,prec
+      real(8) gt(12,3),gtcomm(3),tc
       integer ierr,nu,ndim,dims(2),nproc,proc_id
       integer istart(3),iend(3),isize(3)
       integer fstart(3),fend(3),fsize(3)
@@ -212,6 +212,8 @@
 
 ! Forward transform: note - we pass the same array both as 
 ! original (real) and transformed (complex)
+! Call a wrapper routine since the second argument is
+! a real array posing as complex
 
          call ftran_r2c (B,B)
          
@@ -231,6 +233,8 @@
 
 ! Backward transform: note - we pass the same array both as 
 ! original (complex) and transformed (real)
+! Call a wrapper routine since the first argument is
+! a real array posing as complex
 
          call btran_c2r (B,B)       
          rtime1 = rtime1 + MPI_wtime()
@@ -256,8 +260,19 @@
       call MPI_Reduce(cdiff,ccdiff,1,mpireal,MPI_MAX,0, &
         MPI_COMM_WORLD,ierr)
 
-      if (proc_id.eq.0) write (6,*) 'max diff =',ccdiff
-
+      if (proc_id.eq.0) then
+         if(mytype .eq. 8) then
+            prec = 1e-14
+         else
+            prec = 1e-5
+         endif
+         if(ccdiff .gt. prec * Nx*Ny*Nz*0.25) then
+            print *,'Results are incorrect'
+         else
+            print *,'Results are correct'
+         endif
+         write (6,*) 'max diff =',ccdiff
+      endif
 ! Gather timing statistics
 
       timers = timers / dble(n)
@@ -268,13 +283,13 @@
       if (proc_id.eq.0) write(6,*)'proc_id, cpu time per loop', &
          proc_id,rtime2/dble(n)
 
-      call MPI_Reduce(timers,gt(1,1),4,mpi_real8,MPI_SUM,0, &
+      call MPI_Reduce(timers,gt(1,1),12,mpi_real8,MPI_SUM,0, &
         MPI_COMM_WORLD,ierr)
 
-      call MPI_Reduce(timers,gt(1,2),4,mpi_real8,MPI_MAX,0, &
+      call MPI_Reduce(timers,gt(1,2),12,mpi_real8,MPI_MAX,0, &
         MPI_COMM_WORLD,ierr)
 
-      call MPI_Reduce(timers,gt(1,3),4,mpi_real8,MPI_MIN,0, &
+      call MPI_Reduce(timers,gt(1,3),12,mpi_real8,MPI_MIN,0, &
         MPI_COMM_WORLD,ierr)
 
       tc = (timers(1)+timers(2)+timers(3)+timers(4))
@@ -285,11 +300,11 @@
       call MPI_Reduce(tc,gtcomm(3),1,mpi_real8,MPI_MIN,0, &
         MPI_COMM_WORLD,ierr)
 
-      gt(1:4,1) = gt(1:4,1) / dble(nproc)
+      gt(1:12,1) = gt(1:12,1) / dble(nproc)
       gtcomm(1) = gtcomm(1) / dble(nproc)
 
       if(proc_id .eq. 0) then
-         do i=1,4
+         do i=1,12
             print *,'timer',i,' (avg/max/min): ',gt(i,:)
          enddo
          print *,'Total comm (avg/max/min): ',gtcomm

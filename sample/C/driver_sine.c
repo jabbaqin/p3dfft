@@ -30,8 +30,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-double FORTNAME(t1),FORTNAME(t2),FORTNAME(t3),FORTNAME(t4),FORTNAME(tp1);
-/* double t1,t2,t3,t4,tp1; */
+double FORTNAME(t)[12];
 
 int main(int argc,char **argv)
 {
@@ -47,7 +46,7 @@ int main(int argc,char **argv)
    long int Nglob,Ntot;
    double pi,twopi,sinyz;
    double *sinx,*siny,*sinz,factor;
-   double rtime1,rtime2,gt1,gt2,gt3,gt4,gtp1,gtcomm,tcomm;
+   double rtime1,rtime2,gt[12],gtcomm,tcomm;
    double cdiff,ccdiff,ans;
    FILE *fp;
 
@@ -64,7 +63,10 @@ int main(int argc,char **argv)
    pi = atan(1.0)*4.0;
    twopi = 2.0*pi;
 
-   gt1=gt2=gt3=gt4=gtp1=0.0;
+   for(i=0;i<12;i++) {
+     gt[i] = 0.;
+     FORTNAME(t)[i] = 0.;
+   }
 
  
    if(proc_id == 0) {
@@ -223,31 +225,16 @@ int main(int argc,char **argv)
   /* Gather timing statistics */
   MPI_Reduce(&rtime1,&rtime2,1,MPI_DOUBLE,MPI_MAX,0,MPI_COMM_WORLD);
 
-  /*
-  MPI_Reduce(&FORTNAME(t1),&gt1,1,MPI_DOUBLE,MPI_MAX,0,MPI_COMM_WORLD);
-  MPI_Reduce(&FORTNAME(t2),&gt2,1,MPI_DOUBLE,MPI_MAX,0,MPI_COMM_WORLD);
-  MPI_Reduce(&FORTNAME(t3),&gt3,1,MPI_DOUBLE,MPI_MAX,0,MPI_COMM_WORLD);
-  MPI_Reduce(&FORTNAME(t4),&gt4,1,MPI_DOUBLE,MPI_MAX,0,MPI_COMM_WORLD);
-  MPI_Reduce(&FORTNAME(tp1),&gtp1,1,MPI_DOUBLE,MPI_MAX,0,MPI_COMM_WORLD);
-  tcomm = FORTNAME(t1)+FORTNAME(t2)+FORTNAME(t3)+FORTNAME(t4);
-  MPI_Reduce(&tcomm,&gtcomm,1,MPI_DOUBLE,MPI_MAX,0,MPI_COMM_WORLD);
-
-  gt1 = gt1 / ((double) n);
-  gt2 = gt2 / ((double) n);
-  gt3 = gt3 / ((double) n);
-  gt4 = gt4 / ((double) n);
-  gtp1 = gtp1 / ((double) n);
-  gtcomm = gtcomm / ((double) n);
-  */
+  MPI_Reduce(FORTNAME(t),gt,12,MPI_DOUBLE,MPI_MAX,0,MPI_COMM_WORLD);
 
   if(proc_id == 0) {
      printf("Time per loop=%lg\n",rtime2/((double) n));
-     /*
-     printf("Total comm: %g",gtcomm);
-     printf("t1=%lg, t2=%lg, t3=%lg, t4=%lg, tp1=%lg\n",gt1,gt2,gt3,gt4,gtp1);
-     */
-  }
 
+     for(i=0;i<12;i++) {
+       gt[i] = gt[i] / ((double) n);
+       printf("Timer %d: %lf\n",i+1,gt[i]);
+     }
+  }
 
   MPI_Finalize();
 

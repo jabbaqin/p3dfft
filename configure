@@ -2111,7 +2111,7 @@ if test "${enable_essl+set}" = set; then
   enableval="$enable_essl"
   fftwval=$enableval
 else
-  fftwval=yes
+  fftwval=no
 fi;
 echo "$as_me:$LINENO: result: $fftwval" >&5
 echo "${ECHO_T}$fftwval" >&6

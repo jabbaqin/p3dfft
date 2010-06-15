@@ -143,7 +143,7 @@ fi
 
 # check whether to use FFTW
 AC_MSG_CHECKING([whether to use FFTW library])
-AC_ARG_ENABLE(essl, [AC_HELP_STRING([--enable-fftw], [for using the FFTW library (default)])], fftwval=$enableval, fftwval=yes)
+AC_ARG_ENABLE(essl, [AC_HELP_STRING([--enable-fftw], [for using the FFTW library (default)])], fftwval=$enableval, fftwval=no)
 AC_MSG_RESULT([$fftwval])
 if test "$fftwval" = "yes"; then
         AC_SUBST(DFLAGS, "$DFLAGS -DFFTW")

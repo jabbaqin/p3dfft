@@ -13,7 +13,6 @@
       integer(8) position,pos1
       
 !     Pack the data for sending
-!FROYWUEQIEHQWIO
 
 #ifdef USE_EVEN
 

@@ -7,7 +7,7 @@
 
       complex(mytype) A(n1)
       real(mytype) B(n1*2)
-      integer(8) n1
+      integer(i8) n1
 
       
       call init_work(nx_fft,ny_fft,nz_fft)

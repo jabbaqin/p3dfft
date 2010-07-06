@@ -480,12 +480,12 @@ s,@INSTALL_DATA@,${INSTALL} -m 644,;t t
 s,@CYGPATH_W@,echo,;t t
 s,@PACKAGE@,p3dfft,;t t
 s,@VERSION@,2.3.1,;t t
-s,@ACLOCAL@,${SHELL} /home/d4park/svn/trunk/missing --run aclocal-1.9,;t t
-s,@AUTOCONF@,${SHELL} /home/d4park/svn/trunk/missing --run autoconf,;t t
-s,@AUTOMAKE@,${SHELL} /home/d4park/svn/trunk/missing --run automake-1.9,;t t
-s,@AUTOHEADER@,${SHELL} /home/d4park/svn/trunk/missing --run autoheader,;t t
-s,@MAKEINFO@,${SHELL} /home/d4park/svn/trunk/missing --run makeinfo,;t t
-s,@install_sh@,/home/d4park/svn/trunk/install-sh,;t t
+s,@ACLOCAL@,${SHELL} /home/d4park/svn/branches/p3dfft-kind/missing --run aclocal-1.9,;t t
+s,@AUTOCONF@,${SHELL} /home/d4park/svn/branches/p3dfft-kind/missing --run autoconf,;t t
+s,@AUTOMAKE@,${SHELL} /home/d4park/svn/branches/p3dfft-kind/missing --run automake-1.9,;t t
+s,@AUTOHEADER@,${SHELL} /home/d4park/svn/branches/p3dfft-kind/missing --run autoheader,;t t
+s,@MAKEINFO@,${SHELL} /home/d4park/svn/branches/p3dfft-kind/missing --run makeinfo,;t t
+s,@install_sh@,/home/d4park/svn/branches/p3dfft-kind/install-sh,;t t
 s,@STRIP@,,;t t
 s,@ac_ct_STRIP@,,;t t
 s,@INSTALL_STRIP_PROGRAM@,${SHELL} $(install_sh) -c -s,;t t
@@ -493,7 +493,7 @@ s,@mkdir_p@,mkdir -p --,;t t
 s,@AWK@,gawk,;t t
 s,@SET_MAKE@,,;t t
 s,@am__leading_dot@,.,;t t
-s,@AMTAR@,${SHELL} /home/d4park/svn/trunk/missing --run tar,;t t
+s,@AMTAR@,${SHELL} /home/d4park/svn/branches/p3dfft-kind/missing --run tar,;t t
 s,@am__tar@,${AMTAR} chof - "$$tardir",;t t
 s,@am__untar@,${AMTAR} xf -,;t t
 s,@DFLAGS@, -DPGI -DSINGLE_PREC -DMEASURE -DFFTW,;t t

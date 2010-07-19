@@ -30,11 +30,13 @@
 #include <stdlib.h>
 #include <math.h>
 
-double FORTNAME(t1),FORTNAME(t2),FORTNAME(t3),FORTNAME(t4),FORTNAME(tp1);
-/* double t1,t2,t3,t4,tp1; */
 
 int main(int argc,char **argv)
 {
+int debug_wait = 1;
+
+while(debug_wait);
+
 #ifndef SINGLE_PREC
    double *A,*B,*p,*C;
 #else
@@ -43,18 +45,38 @@ int main(int argc,char **argv)
    int i,j,k,x,y,z,nx,ny,nz,proc_id,nproc,dims[2],ndim,nu;
    int istart[3],isize[3],iend[3];
    int fstart[3],fsize[3],fend[3];
-   int iproc,jproc,ng[3],kmax,iex,conf,m,n;
-   long int Nglob,Ntot;
-   double pi,twopi,sinyz;
+   int iproc,jproc,ng[3],kmax,iex,conf,m,n = 0;
+   long int Nglob = 0;
+   long int Ntot = 0;
+   double pi= 0.0;
+   double twopi = 0.0; 
+   double sinyz = 0.0;
    double *sinx,*siny,*sinz,factor;
-   double rtime1,rtime2,gt1,gt2,gt3,gt4,gtp1,gtcomm,tcomm;
+<<<<<<< .mine
+   double rtime1 = 0.0;
+   double rtime2 = 0.0;
+   double gt1 = 0.0;
+   double gt2 = 0.0;
+   double gt3 = 0.0;
+   double gt4 = 0.0;
+   double gtp1 = 0.0;
+   double gtcomm = 0.0;
+   double tcomm = 0.0;
+   double cdiff = 0.0;
+   double ccdiff = 0.0;
+   double ans = 0.0;
+=======
+   double rtime1,rtime2,gt[12],gt1[12],gt2[12],timers[12];
    double cdiff,ccdiff,ans;
+>>>>>>> .r300
    FILE *fp;
 
 #ifndef SINGLE_PREC
    void print_all(double *,long int,int,long int),mult_array(double *,long int,double);
+   void print_all_real(double *,long int, int, long int);
 #else
    void print_all(float *,long int,int,long int),mult_array(float *,long int,double);
+   void print_all_real(float *, long int, int, long int);
 #endif
 
    MPI_Init(&argc,&argv);
@@ -64,9 +86,13 @@ int main(int argc,char **argv)
    pi = atan(1.0)*4.0;
    twopi = 2.0*pi;
 
-   gt1=gt2=gt3=gt4=gtp1=0.0;
+   for(i=0; i< 12; i++) {
+     gt[i]/*=*timers_[i]*/= gt1[i] = 0.0;
+     gt2[i] = 1E10;
+   }
 
- 
+   set_timers();
+
    if(proc_id == 0) {
      if((fp=fopen("stdin", "r"))==NULL){
         printf("Cannot open file. Setting to default nx=ny=nz=128, ndim=2, n=1.\n");
@@ -151,13 +177,13 @@ int main(int argc,char **argv)
 #endif
 
    if(A == NULL) 
-     printf("%d: Error allocating array A (%ld)\n",proc_id,isize[0]*isize[1]*isize[2]);
+     printf("%d: Error allocating array A (%d)\n",proc_id,isize[0]*isize[1]*isize[2]);
 
    if(B == NULL) 
-     printf("%d: Error allocating array B (%ld)\n",proc_id,fsize[0]*fsize[1]*fsize[2]*2);
+     printf("%d: Error allocating array B (%d)\n",proc_id,fsize[0]*fsize[1]*fsize[2]*2);
 
    if(C == NULL) 
-     printf("%d: Error allocating array C (%ld)\n",proc_id,isize[0]*isize[1]*isize[2]);
+     printf("%d: Error allocating array C (%d)\n",proc_id,isize[0]*isize[1]*isize[2]);
 
 
    p = A;
@@ -188,8 +214,6 @@ int main(int argc,char **argv)
      if(proc_id == 0) 
         printf("Result of forward transform\n");
 
-     printf("The value of Nglob is %d\n", Nglob);
-     printf("The value of Ntot is %d\n", Ntot);
      print_all(B,Ntot,proc_id,Nglob);
      /* normalize */
      mult_array(B,Ntot,factor);
@@ -217,8 +241,9 @@ int main(int argc,char **argv)
         }
     }
 
+   if (proc_id == 0) get_timers(timers);
+
    MPI_Reduce(&cdiff,&ccdiff,1,MPI_DOUBLE,MPI_MAX,0,MPI_COMM_WORLD);
-   
 
   if(proc_id == 0)
     printf("max diff =%g\n",ccdiff);
@@ -226,29 +251,16 @@ int main(int argc,char **argv)
   /* Gather timing statistics */
   MPI_Reduce(&rtime1,&rtime2,1,MPI_DOUBLE,MPI_MAX,0,MPI_COMM_WORLD);
 
-  /*
-  MPI_Reduce(&FORTNAME(t1),&gt1,1,MPI_DOUBLE,MPI_MAX,0,MPI_COMM_WORLD);
-  MPI_Reduce(&FORTNAME(t2),&gt2,1,MPI_DOUBLE,MPI_MAX,0,MPI_COMM_WORLD);
-  MPI_Reduce(&FORTNAME(t3),&gt3,1,MPI_DOUBLE,MPI_MAX,0,MPI_COMM_WORLD);
-  MPI_Reduce(&FORTNAME(t4),&gt4,1,MPI_DOUBLE,MPI_MAX,0,MPI_COMM_WORLD);
-  MPI_Reduce(&FORTNAME(tp1),&gtp1,1,MPI_DOUBLE,MPI_MAX,0,MPI_COMM_WORLD);
-  tcomm = FORTNAME(t1)+FORTNAME(t2)+FORTNAME(t3)+FORTNAME(t4);
-  MPI_Reduce(&tcomm,&gtcomm,1,MPI_DOUBLE,MPI_MAX,0,MPI_COMM_WORLD);
-
-  gt1 = gt1 / ((double) n);
-  gt2 = gt2 / ((double) n);
-  gt3 = gt3 / ((double) n);
-  gt4 = gt4 / ((double) n);
-  gtp1 = gtp1 / ((double) n);
-  gtcomm = gtcomm / ((double) n);
-  */
+  MPI_Reduce(&timers,&gt,10,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
+  MPI_Reduce(&timers,&gt1,10,MPI_DOUBLE,MPI_MAX,0,MPI_COMM_WORLD);
+  MPI_Reduce(&timers,&gt2,10,MPI_DOUBLE,MPI_MIN,0,MPI_COMM_WORLD);
 
   if(proc_id == 0) {
      printf("Time per loop=%lg\n",rtime2/((double) n));
-     /*
-     printf("Total comm: %g",gtcomm);
-     printf("t1=%lg, t2=%lg, t3=%lg, t4=%lg, tp1=%lg\n",gt1,gt2,gt3,gt4,gtp1);
-     */
+     for(i=0;i < 10;i++) {
+       gt[i] = gt[i]/ ((double) n);
+       printf("timer[%d] (avg/max/min): %lE %lE %lE\n",i+1,gt[i],gt1[i],gt2[i]);
+     }
   }
 
 
@@ -290,4 +302,28 @@ void print_all(float *A,long int nar,int proc_id,long int Nglob)
     }
 }
 
-  
+#ifndef SINGLE_PREC
+void print_all_real(double *A,long int nar,int proc_id,long int Nglob)
+#else
+void print_all_real(float *A,long int nar,int proc_id,long int Nglob)
+#endif
+{
+  int x,y,z,conf,Fstart[3],Fsize[3],Fend[3];
+  long int i;
+
+  conf = 2;
+  p3dfft_get_dims(Fstart,Fend,Fsize,conf);
+  Fsize[0] *= 2;
+  Fstart[0] = (Fstart[0]-1)*2;
+  for(i=0;i < nar;i+=2)
+    if(fabs(A[i]) + fabs(A[i+1]) > Nglob *1.25e-4) {
+      z = i/(Fsize[0]*Fsize[1]);
+      y = i/(Fsize[0]) - z*Fsize[1];
+      x = i-z*Fsize[0]*Fsize[1] - y*Fsize[0];
+      #ifndef SINGLE_PREC
+      printf("(%d,%d,%d) %.16lg %lf\n",x+Fstart[0],y+Fstart[1],z+Fstart[2],A[i],A[i+1]);
+      #else
+      printf("(%d,%d,%d) %.8lg %lf\n",x+Fstart[0],y+Fstart[1],z+Fstart[2],A[i],A[i+1]);
+      #endif
+    }
+}

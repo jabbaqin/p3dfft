@@ -188,6 +188,8 @@ int main(int argc,char **argv)
      if(proc_id == 0) 
         printf("Result of forward transform\n");
 
+     printf("The value of Nglob is %d\n", Nglob);
+     printf("The value of Ntot is %d\n", Ntot);
      print_all(B,Ntot,proc_id,Nglob);
      /* normalize */
      mult_array(B,Ntot,factor);
@@ -216,6 +218,7 @@ int main(int argc,char **argv)
     }
 
    MPI_Reduce(&cdiff,&ccdiff,1,MPI_DOUBLE,MPI_MAX,0,MPI_COMM_WORLD);
+   
 
   if(proc_id == 0)
     printf("max diff =%g\n",ccdiff);

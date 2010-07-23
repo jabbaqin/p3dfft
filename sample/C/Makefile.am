@@ -1,7 +1,7 @@
 CC = mpicc
-AM_CPPFLAGS = $(DFLAGS) 
+AM_CPPFLAGS = $(DFLAGS) -DPGI
 INCLUDES = -I$(top_builddir)/include/ 
-LDADD = $(top_builddir)/build/libp3dfft.a $(FFTW3_LIB)/libfftw3.a
+LDADD = $(top_builddir)/build/libp3dfft.a $(FFTW3_LIB)/libfftw3.a $(FFTW3_LIB)/libfftw3f.a
 
 noinst_PROGRAMS =  test_sine.x test_sine_inplace.x test_rand.x test_spec.x
 

@@ -2,7 +2,7 @@ F77 = $(FC)
 FC = mpif90
 AM_FFLAGS = $(FCFLAGS) $(DFLAGS) $(INCLUDES) 
 INCLUDES = -I$(top_builddir)/include/
-LDADD = $(top_builddir)/build/libp3dfft.a $(FFTW3_LIB)/libfftw3.a
+LDADD = $(top_builddir)/build/libp3dfft.a $(FFTW3_LIB)/libfftw3.a $(FFTW3_LIB)/libfftw3f.a
 
 fsampledir = $(datadir)/sample/
 fsample_PROGRAMS = test_sine.x test_sine_inplace.x test_rand.x test_spec.x

@@ -1804,7 +1804,7 @@ fi;
 echo "$as_me:$LINENO: result: $ok" >&5
 echo "${ECHO_T}$ok" >&6
 if test "$ok" = "yes"; then
-	DFLAGS="$DFLAGS -DSINGLE_PREC"
+	DFLAGS="$DFLAGS -DSINGLE_PREC -DPGI"
 
 
 cat >>confdefs.h <<\_ACEOF

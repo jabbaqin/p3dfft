@@ -12,7 +12,7 @@ AC_MSG_CHECKING([whether to enable single precision])
 AC_ARG_ENABLE(single, [AC_HELP_STRING([--enable-single], [compile P3DFFT in single precision (default is double precision)])], ok=$enableval, ok=no)
 AC_MSG_RESULT([$ok])
 if test "$ok" = "yes"; then
-	AC_SUBST(DFLAGS, "$DFLAGS -DSINGLE_PREC")
+	AC_SUBST(DFLAGS, "$DFLAGS -DSINGLE_PREC -DPGI")
 	AC_DEFINE(SINGLE_PREC, 1, [Define if you want to compile P3DFFT in single precision])
 fi
 

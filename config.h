@@ -2,7 +2,7 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
 /* arguments passed to configure script */
-#define CONFIGURE_ARGS "'--enable-pgi' '--enable-fftw' '--with-fftw=/opt/fftw/3.2.1/pgi' 'FCFLAGS=-fastsse -tp barcelona-64 -Mextend -byteswapio' 'CFLAGS=-fastsse -tp barcelona-64' 'LDFLAGS=-lmpi_f90 -lmpi_f77 -lmyriexpress'"
+#define CONFIGURE_ARGS "'--enable-intel' '--enable-fftw' '--enable-dstride1' '--with-fftw=/opt/fftw/3.2.1/intel' 'FCFLAGS=-O3 -xW -132 -fpp' 'CFLAGS=-O3 -xW' 'LDFLAGS=-lmpi_f90 -lmpi_f77 -lmyriexpress -limf'"
 
 /* Define if you want to enable C convention for processor dimensions */
 /* #undef DIMS_C */
@@ -87,7 +87,7 @@
 /* #undef PATIENT */
 
 /* Define if you want to compile P3DFFT using PGI compiler */
-#define PGI 1
+/* #undef PGI */
 
 /* Define if you want to compile P3DFFT in single precision */
 /* #undef SINGLE_PREC */

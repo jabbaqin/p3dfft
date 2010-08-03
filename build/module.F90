@@ -46,6 +46,7 @@
       integer, parameter, public :: i8 = SELECTED_INT_KIND(16)
       integer, save,public :: padd,num_thr
       real(r8), save,public :: timers(12)
+      real(r8), save :: timer(12)
 
       integer,save :: NX_fft,NY_fft,NZ_fft,numtasks,iproc,jproc
       integer,save :: ipid,jpid,taskid

@@ -65,7 +65,7 @@
       real(mytype) factor
       real(mytype),dimension(:),allocatable:: sinx,siny,sinz
       real(r8) rtime1,rtime2,Nglob,prec
-      real(r8) gt(10,3),gtcomm(3),tc
+      real(r8) gt(12,3),gtcomm(3),tc
       integer ierr,nu,ndim,dims(2),nproc,proc_id
       integer istart(3),iend(3),isize(3)
       integer fstart(3),fend(3),fsize(3)
@@ -277,13 +277,13 @@
 
       timers = timers / dble(n)
 
-      call MPI_Reduce(timers,gt(1,1),10,mpi_real8,MPI_SUM,0, &
+      call MPI_Reduce(timers,gt(1,1),12,mpi_real8,MPI_SUM,0, &
         MPI_COMM_WORLD,ierr)
 
-      call MPI_Reduce(timers,gt(1,2),10,mpi_real8,MPI_MAX,0, &
+      call MPI_Reduce(timers,gt(1,2),12,mpi_real8,MPI_MAX,0, &
         MPI_COMM_WORLD,ierr)
 
-      call MPI_Reduce(timers,gt(1,3),10,mpi_real8,MPI_MIN,0, &
+      call MPI_Reduce(timers,gt(1,3),12,mpi_real8,MPI_MIN,0, &
         MPI_COMM_WORLD,ierr)
 
       tc = (timers(1)+timers(2)+timers(3)+timers(4))
@@ -294,11 +294,11 @@
       call MPI_Reduce(tc,gtcomm(3),1,mpi_real8,MPI_MIN,0, &
         MPI_COMM_WORLD,ierr)
 
-      gt(1:10,1) = gt(1:10,1) / dble(nproc)
+      gt(1:12,1) = gt(1:12,1) / dble(nproc)
       gtcomm(1) = gtcomm(1) / dble(nproc)
 
       if(proc_id .eq. 0) then
-         do i=1,10
+         do i=1,12
             print *,'timer',i,' (avg/max/min): ',gt(i,:)
          enddo
          print *,'Total comm (avg/max/min): ',gtcomm

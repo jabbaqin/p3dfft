@@ -60,7 +60,7 @@
       real(mytype), dimension(:,:,:),  allocatable :: Beg
       real(mytype),dimension(:),allocatable:: sinx,siny,sinz
       real(mytype),dimension(:),allocatable:: cosx,cosy,cosz
-      real(mytype) pi,twopi,sinyz,diff,cdiff,ccdiff,ans
+      real(mytype) pi,twopi,sinyz,diff,cdiff,ccdiff,ans,tmp
 
       integer(i8) Ntot
       real(mytype) factor
@@ -227,25 +227,43 @@
 ! Check results: we expect four non-zero values
 
       cdiff = 0.0
+      tmp = 0.0
       do z=fstart(3),fend(3)
          do y=fstart(2),fend(2)
             do x=fstart(1),fend(1)
                if(x .eq. Nx) then
                   if(y .eq. 3 .and. z .eq. 4) then
-                     cdiff = max(abs(FIN(x,y,z)+Nglob*0.25d0),cdiff)
+                     tmp = abs(FIN(x,y,z)+Nglob*0.25d0)
+					 if (tmp .gt. cdiff) then
+						 cdiff = tmp
+					 endif
                   else if(y .eq. 3 .and. z .eq. Nz-2) then
-                     cdiff = max(abs(FIN(x,y,z)-Nglob*0.25d0),cdiff)
+                     tmp = abs(FIN(x,y,z)-Nglob*0.25d0)
+					 if (tmp .gt. cdiff) then
+						 cdiff = tmp
+					 endif
                   else if(y .eq. Ny-1 .and. z .eq. 4) then
-                     cdiff = max(abs(FIN(x,y,z)-Nglob*0.25d0),cdiff)
+                     tmp = abs(FIN(x,y,z)-Nglob*0.25d0)
+					 if (tmp .gt. cdiff) then
+						 cdiff = tmp
+					 endif
                   else if(y .eq. Ny-1 .and. z .eq. Nz-2) then
-                     cdiff = max(abs(FIN(x,y,z)+Nglob*0.25d0),cdiff)
+                     tmp = abs(FIN(x,y,z)+Nglob*0.25d0)
+					 if (tmp .gt. cdiff) then
+						 cdiff = tmp
+					 endif
                   else
-                     cdiff = max(abs(FIN(x,y,z)),cdiff)
+                     tmp = abs(FIN(x,y,z))
+					 if (tmp .gt. cdiff) then
+						 cdiff = tmp
+					 endif
                   endif
                else
-                  cdiff = max(abs(FIN(x,y,z)),cdiff)
+                  tmp = abs(FIN(x,y,z))
+				  if (tmp .gt. cdiff) then
+					  cdiff = tmp
+			      endif
                endif
-
             enddo
          enddo
       enddo

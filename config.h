@@ -5,7 +5,7 @@
 /* #undef CC */
 
 /* arguments passed to configure script */
-#define CONFIGURE_ARGS "'--enable-pgi' '--enable-fftw' '--with-fftw=/opt/fftw/3.2.1/pgi' 'FCFLAGS=-fastsse -tp barcelona-64 -Mpreprocess' 'CFLAGS=-fastsse -tp barcelona-64' 'LDFLAGS=-lmpi_f90 -lmpi_f77 -lmyriexpress'"
+#define CONFIGURE_ARGS "'--enable-intel' '--enable-single' '--enable-stride1' '--enable-fftw' '--with-fftw=/usr/apps/math/fftw/fftw-3.1.2/intel10' 'FCFLAGS=-O3 -xW -132 -fpp -vec_report0' 'CFLAGS=-O3 -xW -vec_report0' 'LDFLAGS=-lmpi_f90 -lmpi_f77 -limf'"
 
 /* Define if you want to enable C convention for processor dimensions */
 /* #undef DIMS_C */
@@ -57,7 +57,7 @@
 /* #undef IBM */
 
 /* Define if you want to compile P3DFFT using Intel compiler */
-/* #undef INTEL */
+#define INTEL 1
 
 /* Define if you want to enable the measure algorithm */
 #define MEASURE 1
@@ -93,16 +93,16 @@
 /* #undef PATIENT */
 
 /* Define if you want to compile P3DFFT using PGI compiler */
-#define PGI 1
+/* #undef PGI */
 
 /* Define if you want to compile P3DFFT in single precision */
-/* #undef SINGLE_PREC */
+#define SINGLE_PREC 1
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
 
 /* Define if you want to enable stride-1 data structures */
-/* #undef STRIDE1 */
+#define STRIDE1 1
 
 /* Define if you want to MPI_Alltoall instead of MPI_Alltotallv */
 /* #undef USE_EVEN */

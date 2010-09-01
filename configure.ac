@@ -147,18 +147,6 @@ else
         AC_MSG_RESULT([no])
 fi
 
-# check whether to override default value of NBL_Y
-AC_MSG_CHECKING([whether to override the default value of NBL_Y])
-AC_ARG_ENABLE(nbly, [AC_HELP_STRING([--enable-nbly], [to define loop blocking factor NBL_Y])], nblval=$enableval, nblval="")
-if test "$nblval" != ""; then
-        AC_MSG_RESULT([yes])
-        AC_DEFINE(NBL_Y, $nblval, [Define if you want to override the default value of NBL_Y])
-	eval "ARRAY${N}='-DNBL_Y=$nblval'"
-        N=`expr $N + 1`
-else
-        AC_MSG_RESULT([no])
-fi
-
 # check whether to override default value of NBL_Y1
 AC_MSG_CHECKING([whether to override the default value of NBL_Y1])
 AC_ARG_ENABLE(nbly1, [AC_HELP_STRING([--enable-nbly1], [to define loop blocking factor NBL_Y1])], nblval=$enableval, nblval="")

@@ -64,9 +64,6 @@
 /* Define if you want to override the default value of NBL_X */
 #undef NBL_X
 
-/* Define if you want to override the default value of NBL_Y */
-#undef NBL_Y
-
 /* Define if you want to override the default value of NBL_Y1 */
 #undef NBL_Y1
 

@@ -888,7 +888,6 @@ Optional Features:
                           NBL_X and NBL_Y to experiment, otherwise they are
                           set to default values.
   --enable-nblx           to define loop blocking factor NBL_X
-  --enable-nbly           to define loop blocking factor NBL_Y
   --enable-nbly1          to define loop blocking factor NBL_Y1
   --enable-nbly2          to define loop blocking factor NBL_Y2
   --enable-nblz           to define loop blocking factor NBL_Z
@@ -2107,31 +2106,6 @@ else
 echo "${ECHO_T}no" >&6
 fi
 
-# check whether to override default value of NBL_Y
-echo "$as_me:$LINENO: checking whether to override the default value of NBL_Y" >&5
-echo $ECHO_N "checking whether to override the default value of NBL_Y... $ECHO_C" >&6
-# Check whether --enable-nbly or --disable-nbly was given.
-if test "${enable_nbly+set}" = set; then
-  enableval="$enable_nbly"
-  nblval=$enableval
-else
-  nblval=""
-fi;
-if test "$nblval" != ""; then
-        echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-
-cat >>confdefs.h <<\_ACEOF
-#define NBL_Y $nblval
-_ACEOF
-
-	eval "ARRAY${N}='-DNBL_Y=$nblval'"
-        N=`expr $N + 1`
-else
-        echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
 # check whether to override default value of NBL_Y1
 echo "$as_me:$LINENO: checking whether to override the default value of NBL_Y1" >&5
 echo $ECHO_N "checking whether to override the default value of NBL_Y1... $ECHO_C" >&6
@@ -2441,7 +2415,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:2444:" \
+echo "$as_me:2418:" \
      "checking for Fortran compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5

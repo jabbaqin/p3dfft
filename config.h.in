@@ -67,6 +67,15 @@
 /* Define if you want to override the default value of NBL_Y */
 #undef NBL_Y
 
+/* Define if you want to override the default value of NBL_Y1 */
+#undef NBL_Y1
+
+/* Define if you want to override the default value of NBL_Y2 */
+#undef NBL_Y2
+
+/* Define if you want to override the default value of NBL_Z */
+#undef NBL_Z
+
 /* Define if you want 1D decomposition */
 #undef ONED
 

@@ -153,11 +153,47 @@ AC_ARG_ENABLE(nbly, [AC_HELP_STRING([--enable-nbly], [to define loop blocking fa
 if test "$nblval" != ""; then
         AC_MSG_RESULT([yes])
         AC_DEFINE(NBL_Y, $nblval, [Define if you want to override the default value of NBL_Y])
-	eval "ARRAY${N}='-DNBL_VAL=$nblval'"
+	eval "ARRAY${N}='-DNBL_Y=$nblval'"
         N=`expr $N + 1`
 else
         AC_MSG_RESULT([no])
 fi
+
+# check whether to override default value of NBL_Y1
+AC_MSG_CHECKING([whether to override the default value of NBL_Y1])
+AC_ARG_ENABLE(nbly1, [AC_HELP_STRING([--enable-nbly1], [to define loop blocking factor NBL_Y1])], nblval=$enableval, nblval="")
+if test "$nblval" != ""; then
+        AC_MSG_RESULT([yes])
+        AC_DEFINE(NBL_Y1, $nblval, [Define if you want to override the default value of NBL_Y1])
+        eval "ARRAY${N}='-DNBL_Y1=$nblval'"
+        N=`expr $N + 1`
+else
+        AC_MSG_RESULT([no])
+fi 
+
+# check whether to override default value of NBL_Y2
+AC_MSG_CHECKING([whether to override the default value of NBL_Y2])
+AC_ARG_ENABLE(nbly2, [AC_HELP_STRING([--enable-nbly2], [to define loop blocking factor NBL_Y2])], nblval=$enableval, nblval="")
+if test "$nblval" != ""; then
+        AC_MSG_RESULT([yes])
+        AC_DEFINE(NBL_Y2, $nblval, [Define if you want to override the default value of NBL_Y2])
+        eval "ARRAY${N}='-DNBL_Y2=$nblval'"
+        N=`expr $N + 1`
+else
+        AC_MSG_RESULT([no])
+fi 
+
+# check whether to override default value of NBL_Z
+AC_MSG_CHECKING([whether to override the default value of NBL_Z])
+AC_ARG_ENABLE(nblz, [AC_HELP_STRING([--enable-nblz], [to define loop blocking factor NBL_Z])], nblval=$enableval, nblval="")
+if test "$nblval" != ""; then
+        AC_MSG_RESULT([yes])
+        AC_DEFINE(NBL_Z, $nblval, [Define if you want to override the default value of NBL_Z])
+        eval "ARRAY${N}='-DNBL_Z=$nblval'"
+        N=`expr $N + 1`
+else
+        AC_MSG_RESULT([no])
+fi 
 
 # check whether to use OpenMP
 # AC_MSG_CHECKING([whether to use OpenMP library])

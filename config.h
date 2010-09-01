@@ -5,7 +5,7 @@
 /* #undef CC */
 
 /* arguments passed to configure script */
-#define CONFIGURE_ARGS "'--enable-intel' '--enable-single' '--enable-stride1' '--enable-fftw' '--with-fftw=/usr/apps/math/fftw/fftw-3.1.2/intel10' 'FCFLAGS=-O3 -xW -132 -fpp -vec_report0' 'CFLAGS=-O3 -xW -vec_report0' 'LDFLAGS=-lmpi_f90 -lmpi_f77 -limf'"
+#define CONFIGURE_ARGS "'--enable-pgi' '--enable-fftw' '--with-fftw=/opt/fftw/3.2.1/pgi' 'FCFLAGS=-fastsse -tp barcelona-64 -Mpreprocess' 'CFLAGS=-fastsse -tp barcelona-64' 'LDFLAGS=-lmpi_f90 -lmpi_f77 -lmyriexpress'"
 
 /* Define if you want to enable C convention for processor dimensions */
 /* #undef DIMS_C */
@@ -57,7 +57,7 @@
 /* #undef IBM */
 
 /* Define if you want to compile P3DFFT using Intel compiler */
-#define INTEL 1
+/* #undef INTEL */
 
 /* Define if you want to enable the measure algorithm */
 #define MEASURE 1
@@ -67,6 +67,15 @@
 
 /* Define if you want to override the default value of NBL_Y */
 /* #undef NBL_Y */
+
+/* Define if you want to override the default value of NBL_Y1 */
+/* #undef NBL_Y1 */
+
+/* Define if you want to override the default value of NBL_Y2 */
+/* #undef NBL_Y2 */
+
+/* Define if you want to override the default value of NBL_Z */
+/* #undef NBL_Z */
 
 /* Define if you want 1D decomposition */
 /* #undef ONED */
@@ -93,16 +102,16 @@
 /* #undef PATIENT */
 
 /* Define if you want to compile P3DFFT using PGI compiler */
-/* #undef PGI */
+#define PGI 1
 
 /* Define if you want to compile P3DFFT in single precision */
-#define SINGLE_PREC 1
+/* #undef SINGLE_PREC */
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
 
 /* Define if you want to enable stride-1 data structures */
-#define STRIDE1 1
+/* #undef STRIDE1 */
 
 /* Define if you want to MPI_Alltoall instead of MPI_Alltotallv */
 /* #undef USE_EVEN */

@@ -889,6 +889,9 @@ Optional Features:
                           set to default values.
   --enable-nblx           to define loop blocking factor NBL_X
   --enable-nbly           to define loop blocking factor NBL_Y
+  --enable-nbly1          to define loop blocking factor NBL_Y1
+  --enable-nbly2          to define loop blocking factor NBL_Y2
+  --enable-nblz           to define loop blocking factor NBL_Z
   --enable-fftw           for using the FFTW library
   --enable-essl           for using ESSL (on IBM) in 1D FFTs.
 
@@ -2122,7 +2125,82 @@ cat >>confdefs.h <<\_ACEOF
 #define NBL_Y $nblval
 _ACEOF
 
-	eval "ARRAY${N}='-DNBL_VAL=$nblval'"
+	eval "ARRAY${N}='-DNBL_Y=$nblval'"
+        N=`expr $N + 1`
+else
+        echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+# check whether to override default value of NBL_Y1
+echo "$as_me:$LINENO: checking whether to override the default value of NBL_Y1" >&5
+echo $ECHO_N "checking whether to override the default value of NBL_Y1... $ECHO_C" >&6
+# Check whether --enable-nbly1 or --disable-nbly1 was given.
+if test "${enable_nbly1+set}" = set; then
+  enableval="$enable_nbly1"
+  nblval=$enableval
+else
+  nblval=""
+fi;
+if test "$nblval" != ""; then
+        echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+
+cat >>confdefs.h <<\_ACEOF
+#define NBL_Y1 $nblval
+_ACEOF
+
+        eval "ARRAY${N}='-DNBL_Y1=$nblval'"
+        N=`expr $N + 1`
+else
+        echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+# check whether to override default value of NBL_Y2
+echo "$as_me:$LINENO: checking whether to override the default value of NBL_Y2" >&5
+echo $ECHO_N "checking whether to override the default value of NBL_Y2... $ECHO_C" >&6
+# Check whether --enable-nbly2 or --disable-nbly2 was given.
+if test "${enable_nbly2+set}" = set; then
+  enableval="$enable_nbly2"
+  nblval=$enableval
+else
+  nblval=""
+fi;
+if test "$nblval" != ""; then
+        echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+
+cat >>confdefs.h <<\_ACEOF
+#define NBL_Y2 $nblval
+_ACEOF
+
+        eval "ARRAY${N}='-DNBL_Y2=$nblval'"
+        N=`expr $N + 1`
+else
+        echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+# check whether to override default value of NBL_Z
+echo "$as_me:$LINENO: checking whether to override the default value of NBL_Z" >&5
+echo $ECHO_N "checking whether to override the default value of NBL_Z... $ECHO_C" >&6
+# Check whether --enable-nblz or --disable-nblz was given.
+if test "${enable_nblz+set}" = set; then
+  enableval="$enable_nblz"
+  nblval=$enableval
+else
+  nblval=""
+fi;
+if test "$nblval" != ""; then
+        echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+
+cat >>confdefs.h <<\_ACEOF
+#define NBL_Z $nblval
+_ACEOF
+
+        eval "ARRAY${N}='-DNBL_Z=$nblval'"
         N=`expr $N + 1`
 else
         echo "$as_me:$LINENO: result: no" >&5
@@ -2363,7 +2441,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:2366:" \
+echo "$as_me:2444:" \
      "checking for Fortran compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5

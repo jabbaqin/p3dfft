@@ -50,8 +50,9 @@
 ! For FFT libraries that require explicit allocation of work space,
 ! such as ESSL, initialize here
 
-!	print *,taskid,': Enter ftran'
-
+#ifdef DEBUG
+	print *,taskid,': Enter ftran'
+#endif
       call init_work(nx,ny,nz)
 
 ! FFT transform (R2C) in X for all z and y
@@ -73,7 +74,9 @@
 
       if(iproc .gt. 1) then 
 
-!	print *,taskid,': Calling fcomm1'
+#ifdef DEBUG
+	print *,taskid,': Calling fcomm1'
+#endif
          call fcomm1(buf,buf,timers(1),timers(6))
          
 
@@ -86,7 +89,9 @@
 ! FFT transform (C2C) in Y for all x and z, one Z plane at a time
 
 
-!	print *,taskid,': Transforming in Y'
+#ifdef DEBUG
+	print *,taskid,': Transforming in Y'
+#endif
 
       if(iisize * kjsize .gt. 0) then
 #ifdef STRIDE1
@@ -112,7 +117,9 @@
 #endif
       endif
 
-!	print *,taskid,': Calling fcomm2'
+#ifdef DEBUG
+	print *,taskid,': Calling fcomm2'
+#endif
 
 
 ! Exchange data in columns
@@ -134,8 +141,9 @@
 ! This speeds up FFTW since it is non-stride-1 transform and it is 
 ! faster than done in-place
 
-!	print *,taskid,': Transforming in Z'
-
+#ifdef DEBUG
+	print *,taskid,': Transforming in Z'
+#endif
          if(iisize * jjsize .gt. 0) then
             call init_f_c(XYZg,iisize*jjsize, 1, XYZg,iisize*jjsize, 1,nz,iisize*jjsize)
          

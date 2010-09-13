@@ -36,27 +36,84 @@
 
       
       call init_work(nx_fft,ny_fft,nz_fft)
-      call plan_f_r2c(B,nx_fft,A,nxhp,nx_fft,jisize*kjsize,.false.) 
-      call plan_b_c2r(A,nxhp,B,nx_fft,nx_fft,jisize*kjsize,.false.) 
+
+      if(jisize*kjsize .gt. 0) then
+
+#ifdef DEBUG
+	print *,taskid,': doing plan_f_r2c'
+#endif
+        call plan_f_r2c(B,nx_fft,A,nxhp,nx_fft,jisize*kjsize) 
+
+#ifdef DEBUG
+	print *,taskid,': doing plan_b_c2r'
+#endif
+      call plan_b_c2r(A,nxhp,B,nx_fft,nx_fft,jisize*kjsize) 
+
+     endif
+
 #ifdef STRIDE1
-      call plan_f_c1(A,1,ny_fft,A,1,ny_fft,ny_fft,iisize*kjsize,.false.)
-      call plan_b_c1(A,1,ny_fft,A,1,ny_fft,ny_fft,iisize*kjsize,.false.)
-         call plan_f_c2(A,1,nz_fft, &
-           A,1,nz_fft,nz_fft,jjsize,.false.)
+
+     if(iisize*kjsize .gt. 0) then 
+     
+#ifdef DEBUG
+	print *,taskid, ': doing plan_f_c1'
+#endif
+      call plan_f_c1(A,1,ny_fft,A,1,ny_fft,ny_fft,iisize*kjsize)
+#ifdef DEBUG
+	print *,taskid,': doing plan_b_c1'
+#endif
+      call plan_b_c1(A,1,ny_fft,A,1,ny_fft,ny_fft,iisize*kjsize)
+
+     endif	
+
+     if(jjsize .gt. 0) then
+#ifdef DEBUG
+	print *,taskid,': doing plan_f_c2'
+#endif
+        call plan_f_c2(A,1,nz_fft, A,1,nz_fft,nz_fft,jjsize)
+#ifdef DEBUG
+	print *,taskid,': doing plan_b_c2'
+#endif
       if(OW) then
-         call plan_b_c2(A,1,nz_fft,A,1,nz_fft,nz_fft,jjsize,.false.)
+         call plan_b_c2(A,1,nz_fft,A,1,nz_fft,nz_fft,jjsize)
       else
-         call plan_b_c2(A,1,nz_fft,B,1,nz_fft,nz_fft,jjsize,.false.)
+         call plan_b_c2(A,1,nz_fft,B,1,nz_fft,nz_fft,jjsize)
       endif
+
+     endif
 #else
-      call plan_f_c1(A,iisize,1,A,iisize,1,ny_fft,iisize,.false.)
-      call plan_b_c1(A,iisize,1,A,iisize,1,ny_fft,iisize,.false.)
-      call plan_f_c2(A,iisize*jjsize, 1, A,iisize*jjsize, 1,nz_fft,iisize*jjsize,.false.)
-      if(OW) then
-         call plan_b_c2(A,iisize*jjsize, 1, A,iisize*jjsize, 1,nz_fft,iisize*jjsize,.false.)
-      else
-         call plan_b_c2(A,iisize*jjsize, 1, B,iisize*jjsize, 1,nz_fft,iisize*jjsize,.false.)
-      endif
+     if(iisize .gt. 0) then
+#ifdef DEBUG
+      print *,taskid,': doing plan_f_c1'
+#endif
+      call plan_f_c1(A,iisize,1,A,iisize,1,ny_fft,iisize)
+#ifdef DEBUG
+      print *,taskid,': doing plan_b_c1'
+#endif
+      call plan_b_c1(A,iisize,1,A,iisize,1,ny_fft,iisize)
+
+       if(jjsize .gt. 0) then
+
+#ifdef DEBUG
+          print *,taskid,': doing plan_f_c2'
+#endif
+          call plan_f_c2(A,iisize*jjsize, 1, A,iisize*jjsize, 1,nz_fft,iisize*jjsize)
+#ifdef DEBUG
+          print *,taskid,': doing plan_b_c2'
+#endif
+         if(OW) then
+            call plan_b_c2(A,iisize*jjsize, 1, A,iisize*jjsize, 1,nz_fft,iisize*jjsize)
+         else
+            call plan_b_c2(A,iisize*jjsize, 1, B,iisize*jjsize, 1,nz_fft,iisize*jjsize)
+         endif
+
+       endif
+     endif
+#endif
+
+
+#ifdef DEBUG
+    print *,taskid,': Finished init_plan'
 #endif
 
       return

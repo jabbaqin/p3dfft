@@ -35,17 +35,12 @@
 
 ! Assume stride12
       complex(mytype) source(ny_fft,iisize,kjsize)
-!      complex(mytype) buf(nz_fft*iisize*jjsize)
       complex(mytype) dest(nz_fft,jjsize,iisize)
 
       real(r8) t,tc
       integer x,z,y,i,ierr,xs,ys,y2,z2,iy,iz,ix,x2,n,sz,l
       integer(i8) position,pos1,pos0
 
-!	if(taskid .eq. 0) then
-!	  print *,'Entring fcomm2_trans'
-!        endif	
-!	call print_buf(source,ny_fft,iisize,kjsize)
 
 ! Pack send buffers for exchanging y and z for all x at once 
 
@@ -77,6 +72,9 @@
       call mpi_alltoall(buf1,KfCntMax, mpi_byte, buf2,KfCntMax, mpi_byte,mpi_comm_col,ierr)
 
       t = MPI_Wtime() + t
+
+     if(jjsize .gt. 0) then
+
       tc = - MPI_Wtime() + tc
 
       do x=1,iisize
@@ -113,10 +111,15 @@
 
       tc = tc + MPI_Wtime()
 
+     endif
+
 #else
       call mpi_alltoallv(buf1,KfSndCnts, KfSndStrt,mpi_byte,buf2,KfRcvCnts, KfRcvStrt,mpi_byte,mpi_comm_col,ierr)
 
       t = MPI_Wtime() + t
+
+     if(jjsize .gt. 0) then
+
       tc = -MPI_Wtime() + tc
 
       do x=1,iisize
@@ -148,7 +151,8 @@
 
       enddo
       tc = tc + MPI_Wtime()
-         
+    endif	         
+
 #endif
 
       return

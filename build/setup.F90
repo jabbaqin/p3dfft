@@ -204,7 +204,7 @@
 #ifdef NBL_Z
       NBz=NBL_Z
 #else
-      NBz = CB*numtasks/(2*mytype*Nx*Ny)
+      NBz = CB*(numtasks/(2*mytype*Nx*Ny))
 #endif
 
       if(NBx .eq. 0) then
@@ -252,23 +252,25 @@
 !      print *,taskid,': padd=',padd
 ! Initialize FFTW and allocate buffers for communication
       nm = nxhp * jisize * (kjsize+padd) 
-      allocate(buf1(nm),stat=err)
-      if(err .ne. 0) then
-         print *,'p3dfft_setup: Error allocating buf1 (',nm
-      endif
-      allocate(R(nm*2),stat=err)
-      if(err .ne. 0) then
-         print *,'p3dfft_setup: Error allocating R (',nm*2
-      endif
-      buf1 = 0.0
-      R = 0.0
+      if(nm .gt. 0) then       
+        allocate(buf1(nm),stat=err)
+        if(err .ne. 0) then
+           print *,'p3dfft_setup: Error allocating buf1 (',nm
+        endif
+        allocate(R(nm*2),stat=err)
+        if(err .ne. 0) then
+           print *,'p3dfft_setup: Error allocating R (',nm*2
+        endif
+        buf1 = 0.0
+        R = 0.0
 
 ! For FFT libraries that allocate work space implicitly such as through 
 ! plans (e.g. FFTW) initialize here
 
-      call init_plan(buf1,R,nm)
+        call init_plan(buf1,R,nm)
 
-      deallocate(R)
+        deallocate(R)
+     endif
 
 #ifdef USE_EVEN
       n1 = IfCntMax * iproc /(mytype*2)
@@ -279,12 +281,19 @@
          allocate(buf1(n1))
       endif
       n1 = max(n1,nm)
-      allocate(buf2(n1))
+      if(n1 .gt. 0) then
+         allocate(buf2(n1))
+      endif	
 #else
-      allocate(buf2(nm))
+      if(nm .gt. 0) then
+         allocate(buf2(nm))
+      endif	
 #endif
 
-      allocate(buf(nxhp*jisize*(kjsize+padd)))
+      if(nm .gt. 0) then
+         allocate(buf(nm))
+      endif	
+
 
 ! Displacements and buffer counts for mpi_alltoallv
 

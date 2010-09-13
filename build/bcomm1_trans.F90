@@ -45,10 +45,13 @@
 
 !     Pack the data for sending
 
+
       tc = tc - MPI_Wtime()
 
 #ifdef USE_EVEN
 ! Use MPI_Alltoall
+
+     if(jjsize .gt. 0) then
 
       if(OW) then
 
@@ -117,6 +120,8 @@
          enddo
       endif
 
+     endif
+
       tc = tc + MPI_Wtime()
       t = t - MPI_Wtime() 
       call mpi_alltoall(buf1,KfCntMax, mpi_byte, buf2,KfCntMax,mpi_byte,mpi_comm_col,ierr)
@@ -125,6 +130,8 @@
          
 #else
 ! Use MPI_Alltoallv
+
+     if(jjsize .gt. 0) then
 
       if(OW) then
          do x=1,iisize
@@ -183,6 +190,8 @@
             enddo
 
       endif
+
+     endif
          
       tc = tc + MPI_Wtime()
       t = t - MPI_Wtime() 

@@ -38,9 +38,14 @@
 #define FORTNAME(NAME) NAME##_
 
 #elif defined GCC
-
+#if __GNUC__ == 4 && __GNUC_MINOR__ == 1
 #define FORT_MOD_NAME(NAME) __p3dfft__##NAME
 #define FORTNAME(NAME) NAME##_
+
+#elif __GNUC__ == 4 && __GNUC_MINOR == 4
+#define FORT_MOD_NAME(NAME) __p3dfft_MOD__##NAME
+#define FORTNAME(NAME) NAME##_
+#endif
 
 #else
 

@@ -5,7 +5,7 @@
 /* #undef CC */
 
 /* arguments passed to configure script */
-#define CONFIGURE_ARGS "'--enable-pgi' '--enable-fftw' '--with-fftw=/opt/fftw/3.2.1/pgi' 'FCFLAGS=-fastsse -tp barcelona-64 -Mpreprocess' 'CFLAGS=-fastsse -tp barcelona-64' 'LDFLAGS=-lmpi_f90 -lmpi_f77 -lmyriexpress'"
+#define CONFIGURE_ARGS "'--enable-gcc' '--enable-fftw' '--with-fftw=/opt/fftw/3.2.1/gnu' 'LDFLAGS=-lmpi_f90 -lmpi_f77'"
 
 /* Define if you want to enable C convention for processor dimensions */
 /* #undef DIMS_C */
@@ -20,7 +20,7 @@
 #define FFTW 1
 
 /* Define if you want to compile P3DFFT using GCC compiler */
-/* #undef GCC */
+#define GCC 1
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H 1
@@ -99,7 +99,7 @@
 /* #undef PATIENT */
 
 /* Define if you want to compile P3DFFT using PGI compiler */
-#define PGI 1
+/* #undef PGI */
 
 /* Define if you want to compile P3DFFT in single precision */
 /* #undef SINGLE_PREC */

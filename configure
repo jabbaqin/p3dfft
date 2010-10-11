@@ -860,7 +860,7 @@ Optional Features:
   --enable-ibm            compile P3DFFT using IBM compiler
   --enable-intel          compile P3DFFT using Intel compiler
   --enable-pgi            compile P3DFFT using PGI compiler
-  --enable-gcc            compile P3DFFT using GCC compiler
+  --enable-gnu            compile P3DFFT using GNU compiler
   --enable-single         compile P3DFFT in single precision (default is
                           double precision)
   --enable-oned           for 1D decomposition (default is 2D but it can be
@@ -1883,12 +1883,12 @@ _ACEOF
         N=`expr $N + 1`
 fi
 
-# check whether to compile using GCC
-echo "$as_me:$LINENO: checking whether to use GCC compiler" >&5
-echo $ECHO_N "checking whether to use GCC compiler... $ECHO_C" >&6
-# Check whether --enable-gcc or --disable-gcc was given.
-if test "${enable_gcc+set}" = set; then
-  enableval="$enable_gcc"
+# check whether to compile using GNU
+echo "$as_me:$LINENO: checking whether to use GNU compiler" >&5
+echo $ECHO_N "checking whether to use GNU compiler... $ECHO_C" >&6
+# Check whether --enable-gnu or --disable-gnu was given.
+if test "${enable_gnu+set}" = set; then
+  enableval="$enable_gnu"
   ok=$enableval
 else
   ok=no
@@ -1898,7 +1898,7 @@ echo "${ECHO_T}$ok" >&6
 if test "$ok" = "yes"; then
 
 cat >>confdefs.h <<\_ACEOF
-#define GCC 1
+#define GNU 1
 _ACEOF
 
 	eval "ARRAY${N}='-DGCC'"

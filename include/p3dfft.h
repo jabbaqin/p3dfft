@@ -37,7 +37,7 @@
 #define FORT_MOD_NAME(NAME) p3dfft_##NAME##_
 #define FORTNAME(NAME) NAME##_
 
-#elif defined GCC
+#elif defined GNU
 #include "gnu.h"
 
 #else

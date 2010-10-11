@@ -45,12 +45,12 @@ if test "$ok" = "yes"; then
         N=`expr $N + 1`
 fi
 
-# check whether to compile using GCC
-AC_MSG_CHECKING([whether to use GCC compiler])
-AC_ARG_ENABLE(gcc, [AC_HELP_STRING([--enable-gcc], [compile P3DFFT using GCC compiler])], ok=$enableval, ok=no)
+# check whether to compile using GNU
+AC_MSG_CHECKING([whether to use GNU compiler])
+AC_ARG_ENABLE(gnu, [AC_HELP_STRING([--enable-gnu], [compile P3DFFT using GNU compiler])], ok=$enableval, ok=no)
 AC_MSG_RESULT([$ok])
 if test "$ok" = "yes"; then
-        AC_DEFINE(GCC, 1, [Define if you want to compile P3DFFT using GCC compiler])
+        AC_DEFINE(GNU, 1, [Define if you want to compile P3DFFT using GNU compiler])
 	eval "ARRAY${N}='-DGCC'"
         N=`expr $N + 1`
 fi

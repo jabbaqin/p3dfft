@@ -18,8 +18,8 @@
 /* Define if you want to use the FFTW library */
 #undef FFTW
 
-/* Define if you want to compile P3DFFT using GCC compiler */
-#undef GCC
+/* Define if you want to compile P3DFFT using GNU compiler */
+#undef GNU
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H

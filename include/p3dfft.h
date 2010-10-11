@@ -38,7 +38,7 @@
 #define FORTNAME(NAME) NAME##_
 
 #elif defined GCC
-#include "gcc.h"
+#include "gnu.h"
 
 #else
 

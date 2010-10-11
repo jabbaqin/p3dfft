@@ -5,7 +5,7 @@
 /* #undef CC */
 
 /* arguments passed to configure script */
-#define CONFIGURE_ARGS "'--enable-gcc' '--enable-fftw' '--with-fftw=/opt/fftw/3.2.1/gnu' 'LDFLAGS=-lmpi_f90 -lmpi_f77'"
+#define CONFIGURE_ARGS "'--enable-gcc' '--enable-fftw' '--enable-stride1' '--with-fftw=/opt/fftw/3.2.2.1' 'FC=ftn' 'FCFLAGS=-O3' 'CC=cc' 'CFLAGS=-O3' '--enable-useeven'"
 
 /* Define if you want to enable C convention for processor dimensions */
 /* #undef DIMS_C */
@@ -108,10 +108,10 @@
 #define STDC_HEADERS 1
 
 /* Define if you want to enable stride-1 data structures */
-/* #undef STRIDE1 */
+#define STRIDE1 1
 
 /* Define if you want to MPI_Alltoall instead of MPI_Alltotallv */
-/* #undef USE_EVEN */
+#define USE_EVEN 1
 
 /* Version number of package */
 #define VERSION "2.4"

@@ -39,12 +39,12 @@
 
 #elif defined GCC
 #define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
-#if GCC_VERSION == 40102
+#if GCC_VERSION <= 40102
 #define FORT_MOD_NAME(NAME) __p3dfft__##NAME
 #define FORTNAME(NAME) NAME##_
 
-#elif GCC_VERSION == 40404
-#define FORT_MOD_NAME(NAME) __p3dfft_MOD__##NAME
+#elif GCC_VERSION >= 40404
+#define FORT_MOD_NAME(NAME) __p3dfft_MOD_##NAME
 #define FORTNAME(NAME) NAME##_
 #endif
 

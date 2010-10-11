@@ -51,7 +51,7 @@ AC_ARG_ENABLE(gnu, [AC_HELP_STRING([--enable-gnu], [compile P3DFFT using GNU com
 AC_MSG_RESULT([$ok])
 if test "$ok" = "yes"; then
         AC_DEFINE(GNU, 1, [Define if you want to compile P3DFFT using GNU compiler])
-	eval "ARRAY${N}='-DGCC'"
+	eval "ARRAY${N}='-DGNU'"
         N=`expr $N + 1`
 fi
 

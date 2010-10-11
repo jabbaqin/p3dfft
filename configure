@@ -1901,7 +1901,7 @@ cat >>confdefs.h <<\_ACEOF
 #define GNU 1
 _ACEOF
 
-	eval "ARRAY${N}='-DGCC'"
+	eval "ARRAY${N}='-DGNU'"
         N=`expr $N + 1`
 fi
 

@@ -25,9 +25,12 @@
 
       module fft_spec
 
+      integer, parameter, public :: r8 = KIND(1.0d0)
+      integer, parameter, public :: i8 = SELECTED_INT_KIND(18)
+
 #ifdef FFTW
       include "fftw3.f"
-      integer(SELECTED_INT_KIND(16)) plan1_frc,plan1_bcr,plan1_fc,plan2_fc,plan1_bc,plan2_bc
+      integer(i8) plan1_frc,plan1_bcr,plan1_fc,plan2_fc,plan1_bc,plan2_bc
 !      integer(i8) plan1,plan2,plan3      
       integer fftw_flag,NULL
 #ifdef ESTIMATE
@@ -42,8 +45,8 @@
 
 #ifdef ESSL
       integer :: cnaux,rnaux1,rnaux2
-      real(SELECTED_REAL_KIND(8)),save,allocatable :: caux1(:),caux2(:),raux1(:),raux2(:)
-      real(SELECTED_REAL_KIND(8)),save :: raux3(1)
+      real(r8),save,allocatable :: caux1(:),caux2(:),raux1(:),raux2(:)
+      real(r8),save :: raux3(1)
 #endif         
       
       end module

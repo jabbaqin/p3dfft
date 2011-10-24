@@ -71,6 +71,7 @@
       integer fstart(3),fend(3),fsize(3)
       integer iproc,jproc
       logical iex
+	integer memsize(3)
 
       call MPI_INIT (ierr)
       call MPI_COMM_SIZE (MPI_COMM_WORLD,nproc,ierr)
@@ -142,7 +143,7 @@
          print *,'Using processor grid ',iproc,' x ',jproc
       endif
 
-      call p3dfft_setup (dims,nx,ny,nz,.true.)
+      call p3dfft_setup (dims,nx,ny,nz,.true.,memsize)
       call p3dfft_get_dims(istart,iend,isize,1)
       call p3dfft_get_dims(fstart,fend,fsize,2)
 
@@ -202,7 +203,7 @@
          call MPI_Barrier(MPI_COMM_WORLD,ierr)
 ! Forward transform
          rtime1 = rtime1 - MPI_wtime()
-         call p3dfft_ftran_r2c (BEG,AEND)
+         call p3dfft_ftran_r2c (BEG,AEND,'fft')
          
          rtime1 = rtime1 + MPI_wtime()
 
@@ -223,7 +224,7 @@
          call MPI_Barrier(MPI_COMM_WORLD,ierr)
 ! Backward transform
          rtime1 = rtime1 - MPI_wtime()
-         call p3dfft_btran_c2r (AEND,FIN)       
+         call p3dfft_btran_c2r (AEND,FIN,'tff')       
          rtime1 = rtime1 + MPI_wtime()
 
 !         if(proc_id .eq. 0) then

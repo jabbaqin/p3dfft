@@ -71,6 +71,7 @@
       integer fstart(3),fend(3),fsize(3)
       integer iproc,jproc,add
       logical iex
+	integer memsize(3)
 
 ! Initialize MPI
 
@@ -144,7 +145,7 @@
       endif
 
 ! Set up work structures for P3DFFT
-      call p3dfft_setup (dims,nx,ny,nz,.true.)
+      call p3dfft_setup (dims,nx,ny,nz,.true.,memsize)
 
 ! Get dimensions for the original array of real numbers, X-pencils
       call p3dfft_get_dims(istart,iend,isize,1)
@@ -238,7 +239,7 @@
 ! Forward transform: note - we pass the same array both as 
 ! original (real) and transformed (complex)
 
-         call ftran_r2c (B,B)
+         call ftran_r2c (B,B,'fft')
          
          rtime1 = rtime1 + MPI_wtime()
 
@@ -257,7 +258,7 @@
 ! Backward transform: note - we pass the same array both as 
 ! original (complex) and transformed (real)
 
-         call btran_c2r (B,B)       
+         call btran_c2r (B,B,'tff')       
          rtime1 = rtime1 + MPI_wtime()
          
       end do

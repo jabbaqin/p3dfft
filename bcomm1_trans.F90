@@ -27,7 +27,7 @@
 ! Transpose back Z to Y pencils
 ! Assumes stride1 data structure
 
-      subroutine bcomm1_trans (source,buf3,dest,t,tc)
+      subroutine bcomm1_trans (source,buf3,dest,op,t,tc)
 !========================================================
 
       use fft_spec
@@ -41,6 +41,7 @@
       real(r8) t,tc
       integer x,y,z,i,ierr,xs,ys,iy,y2,z2,ix,x2,n,iz
       integer(i8) position,pos1,pos0
+      character(len=3) op
 
 
 !     Pack the data for sending
@@ -56,8 +57,20 @@
       if(OW) then
 
          do x=1,iisize
-             call exec_b_c2(source(1,1,x),1,nz_fft,source(1,1,x),1,nz_fft,nz_fft,jjsize)
-            
+		if(op(1:1) == 't') then
+                   call exec_b_c2(source(1,1,x), 1,nz_fft, &
+				  source(1,1,x), 1,nz_fft,nz_fft,jjsize)
+ 		else if(op(1:1) == 'c') then	
+                   call exec_ctrans_r2(source(1,1,x), 2,2*nz_fft, & 
+				  source, 2,2*nz_fft,nz_fft,jjsize)
+ 		else if(op(1:1) == 's') then	
+                   call exec_strans_r2(source(1,1,x), 2,2*nz_fft, & 
+				  source, 2,2*nz_fft,nz_fft,jjsize)
+		else
+		   print *,taskid,'Unknown transform type: ',op(1:1)
+		   call abort
+		endif
+
             do i=0,jproc-1
                
                pos0 = i * KfCntMax / (mytype*2) + (x-1)*jjsize 
@@ -89,7 +102,19 @@
       else
 
          do x=1,iisize
-            call exec_b_c2(source(1,1,x),1,nz_fft,buf3,1,nz_fft,nz_fft,jjsize)
+		if(op(1:1) == 't') then
+                   call exec_b_c2(source(1,1,x), 1,nz_fft, &
+				  buf3, 1,nz_fft,nz_fft,jjsize)
+ 		else if(op(1:1) == 'c') then	
+                   call exec_ctrans_r2(source(1,1,x), 2,2*nz_fft, & 
+				  buf3, 2,2*nz_fft,nz_fft,jjsize)
+ 		else if(op(1:1) == 's') then	
+                   call exec_strans_r2(source(1,1,x), 2,2*nz_fft, & 
+				  buf3, 2,2*nz_fft,nz_fft,jjsize)
+		else
+		   print *,taskid,'Unknown transform type: ',op(1:1)
+		   call abort
+		endif
          
             do i=0,jproc-1
             
@@ -135,7 +160,19 @@
 
       if(OW) then
          do x=1,iisize
-            call exec_b_c2(source(1,1,x),1,nz_fft,source(1,1,x),1,nz_fft,nz_fft,jjsize)
+   		if(op(1:1) == 't') then
+                   call exec_b_c2(source(1,1,x), 1,nz_fft, &
+				  source(1,1,x), 1,nz_fft,nz_fft,jjsize)
+ 		else if(op(1:1) == 'c') then	
+                   call exec_ctrans_r2(source(1,1,x), 2,2*nz_fft, & 
+				  source, 2,2*nz_fft,nz_fft,jjsize)
+ 		else if(op(1:1) == 's') then	
+                   call exec_strans_r2(source(1,1,x), 2,2*nz_fft, & 
+				  source, 2,2*nz_fft,nz_fft,jjsize)
+		else
+		   print *,taskid,'Unknown transform type: ',op(1:1)
+		   call abort
+		endif
             
             pos0 = (x-1)*jjsize
             do z=1,nz_fft,NBz
@@ -163,7 +200,19 @@
          else
 
             do x=1,iisize
-               call exec_b_c2(source(1,1,x),1,nz_fft,buf3,1,nz_fft,nz_fft,jjsize)
+		if(op(1:1) == 't') then
+                   call exec_b_c2(source(1,1,x), 1,nz_fft, &
+				  buf3, 1,nz_fft,nz_fft,jjsize)
+ 		else if(op(1:1) == 'c') then	
+                   call exec_ctrans_r2(source(1,1,x), 2,2*nz_fft, & 
+				  buf3, 2,2*nz_fft,nz_fft,jjsize)
+ 		else if(op(1:1) == 's') then	
+                   call exec_strans_r2(source(1,1,x), 2,2*nz_fft, & 
+				  buf3, 2,2*nz_fft,nz_fft,jjsize)
+		else
+		   print *,taskid,'Unknown transform type: ',op(1:1)
+		   call abort
+		endif
             
                pos0 = (x-1)*jjsize 
 

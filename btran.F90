@@ -22,7 +22,7 @@
 !
 !
 !----------------------------------------------------------------------------
-      subroutine p3dfft_btran_c2r (XYZg,XgYZ)
+      subroutine p3dfft_btran_c2r (XYZg,XgYZ,op)
 !========================================================
 
       use fft_spec
@@ -37,6 +37,7 @@
 
       integer x,y,z,i,k,nx,ny,nz
       integer(i8) Nl
+      character(len=3) op
 
       if(.not. mpi_set) then
          print *,'P3DFFT error: call setup before other routines'
@@ -61,27 +62,67 @@
 
 #ifdef STRIDE1
          call init_b_c(buf, 1,nz, buf, 1, nz,nz,jjsize)
-         call bcomm1_trans(XYZg,buf2,buf,timers(3),timers(9))
+         call bcomm1_trans(XYZg,buf2,buf,op,timers(3),timers(9))
 #else
 
          if(OW) then
 
             if(iisize*jjsize .gt. 0) then
-               call init_b_c(XYZg, iisize*jjsize, 1, XYZg, iisize*jjsize, 1,nz,iisize*jjsize)
+		if(op(1:1) == 't') then
+                   call init_b_c(XYZg, iisize*jjsize, 1, &
+                                 XYZg, iisize*jjsize, 1,nz,iisize*jjsize)
 
-               timers(9) = timers(9) - MPI_Wtime()
-               call exec_b_c2(XYZg, iisize*jjsize,1, XYZg, iisize*jjsize, 1,nz,iisize*jjsize)
-               timers(9) = timers(9) + MPI_Wtime()
+                   timers(9) = timers(9) - MPI_Wtime()
+                   call exec_b_c2(XYZg, iisize*jjsize,1, XYZg, & 
+				iisize*jjsize, 1,nz,iisize*jjsize)
+                   timers(9) = timers(9) + MPI_Wtime()
+ 		else if(op(1:1) == 'c') then	
+	           call init_ctrans_r2 (XYZg, 2*iisize*jjsize, 1, & 
+					XYZg, 2*iisize*jjsize, 1, &
+					nz, 2*iisize*jjsize)
+                   call exec_ctrans_r2 (XYZg, 2*iisize*jjsize, 1, &
+ 					XYZg, 2*iisize*jjsize, 1, &
+					nz, 2*iisize*jjsize)
+ 		else if(op(1:1) == 's') then	
+	           call init_strans_r2 (XYZg, 2*iisize*jjsize, 1, &
+					XYZg, 2*iisize*jjsize, 1, &
+					nz, 2*iisize*jjsize)
+                   call exec_strans_r2 (XYZg, 2*iisize*jjsize, 1, &
+ 					XYZg, 2*iisize*jjsize, 1, &
+					nz, 2*iisize*jjsize)
+		else
+		   print *,taskid,'Unknown transform type: ',op(1:1)
+		endif
             endif
             call bcomm1(XYZg,buf,timers(3),timers(9))
    
          else
             if(iisize*jjsize .gt. 0) then
-               call init_b_c(buf, iisize*jjsize, 1, buf, iisize*jjsize, 1,nz,iisize*jjsize)
+		if(op(1:1) == 't') then
+                   call init_b_c(XYZg, iisize*jjsize, 1, &
+				 buf, iisize*jjsize, 1,nz,iisize*jjsize)
             
-               timers(9) = timers(9) - MPI_Wtime()
-               call exec_b_c2(XYZg, iisize*jjsize,1, buf, iisize*jjsize, 1,nz,iisize*jjsize)
-               timers(9) = timers(9) + MPI_Wtime()
+                   timers(9) = timers(9) - MPI_Wtime()
+    	           call exec_b_c2(XYZg, iisize*jjsize,1, buf, iisize*jjsize, 1,nz,iisize*jjsize)
+                   timers(9) = timers(9) + MPI_Wtime()
+		else if(op(1:1) == 'c') then
+	           call init_ctrans_r2 (XYZg, 2*iisize*jjsize, 1, &
+					buf, 2*iisize*jjsize, 1, &
+					nz, 2*iisize*jjsize)
+                   call exec_ctrans_r2 (XYZg, 2*iisize*jjsize, 1, & 
+ 					buf, 2*iisize*jjsize, 1, &
+					nz, 2*iisize*jjsize)
+		else if(op(1:1) == 's') then
+	           call init_strans_r2 (XYZg, 2*iisize*jjsize, 1, &
+					buf, 2*iisize*jjsize, 1, &
+					nz, 2*iisize*jjsize)
+                   call exec_strans_r2 (XYZg, 2*iisize*jjsize, 1, & 
+ 					buf, 2*iisize*jjsize, 1, &
+					nz, 2*iisize*jjsize)
+		else
+		   print *,taskid,'Unknown transform type: ',op(1:1)
+		endif
+
                call bcomm1(buf,buf,timers(3),timers(9))
             endif
          endif
@@ -94,16 +135,59 @@
             timers(9) = timers(9) - MPI_Wtime()
 
 #ifdef STRIDE1
-         call reorder_trans_b1(XYZg,buf,buf2)
+         call reorder_trans_b1(XYZg,buf,buf2,op)
 #else
          if(OW) then   
             Nl = iisize*jjsize*nz
-            call init_b_c(XYZg, iisize*jjsize, 1,XYZg, iisize*jjsize, 1,nz,iisize*jjsize)
-            call exec_b_c2(XYZg, iisize*jjsize, 1,XYZg, iisize*jjsize, 1,nz,iisize*jjsize)
+
+  	    if(op(1:1) == 't') then
+               call init_b_c(XYZg, iisize*jjsize, 1, &
+			     XYZg, iisize*jjsize, 1,nz,iisize*jjsize)
+               call exec_b_c2(XYZg, iisize*jjsize, 1, &
+			      XYZg, iisize*jjsize, 1,nz,iisize*jjsize)
+   	    else if(op(1:1) == 'c') then
+	       call init_ctrans_r2 (XYZg, 2*iisize*jjsize, 1, &
+			            XYZg, 2*iisize*jjsize, 1, &
+				    nz, 2*iisize*jjsize)
+               call exec_ctrans_r2 (XYZg, 2*iisize*jjsize, 1, &
+ 				    XYZg, 2*iisize*jjsize, 1, &
+				    nz, 2*iisize*jjsize)
+     	    else if(op(1:1) == 's') then
+	       call init_strans_r2 (XYZg, 2*iisize*jjsize, 1, &
+		    	            XYZg, 2*iisize*jjsize, 1, & 
+			            nz, 2*iisize*jjsize)
+               call exec_strans_r2 (XYZg, 2*iisize*jjsize, 1, &
+				    XYZg, 2*iisize*jjsize, 1, &
+				    nz, 2*iisize*jjsize)
+	    else
+		print *,taskid,'Unknown transform type: ',op(1:1)
+	    endif
             call ar_copy(XYZg,buf,Nl)
+
          else
-            call init_b_c(XYZg, iisize*jjsize, 1, buf, iisize*jjsize, 1,nz,iisize*jjsize)
-            call exec_b_c2(XYZg, iisize*jjsize, 1, buf, iisize*jjsize, 1,nz,iisize*jjsize)
+  	    if(op(1:1) == 't') then
+               call init_b_c(XYZg, iisize*jjsize, 1,  &
+			     buf, iisize*jjsize, 1,nz,iisize*jjsize)
+               call exec_b_c2(XYZg, iisize*jjsize, 1, &
+			      buf, iisize*jjsize, 1,nz,iisize*jjsize)
+   	    else if(op(1:1) == 'c') then
+	       call init_ctrans_r2 (XYZg, 2*iisize*jjsize, 1, &
+			            buf, 2*iisize*jjsize, 1, &
+				    nz, 2*iisize*jjsize)
+               call exec_ctrans_r2 (XYZg, 2*iisize*jjsize, 1, & 
+ 				    buf, 2*iisize*jjsize, 1, &
+				    nz, 2*iisize*jjsize)
+     	    else if(op(1:1) == 's') then
+	       call init_strans_r2 (XYZg, 2*iisize*jjsize, 1, &
+		    	            buf, 2*iisize*jjsize, 1, &
+			            nz, 2*iisize*jjsize)
+               call exec_strans_r2 (XYZg, 2*iisize*jjsize, 1, & 
+				    buf, 2*iisize*jjsize, 1, &
+				    nz, 2*iisize*jjsize)
+	    else
+		print *,taskid,'Unknown transform type: ',op(1:1)
+	    endif
+
          endif
 #endif
 
@@ -179,3 +263,4 @@
 
       return
       end subroutine
+

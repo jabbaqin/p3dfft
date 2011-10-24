@@ -27,7 +27,7 @@
 ! Transpose Y and Z pencils
 ! Assume Stride1 data structure
 
-      subroutine fcomm2_trans(source,dest,t,tc)
+      subroutine fcomm2_trans(source,dest,op,t,tc)
 !========================================================
 
       use fft_spec
@@ -40,6 +40,7 @@
       real(r8) t,tc
       integer x,z,y,i,ierr,xs,ys,y2,z2,iy,iz,ix,x2,n,sz,l
       integer(i8) position,pos1,pos0
+      character(len=3) op
 
 
 ! Pack send buffers for exchanging y and z for all x at once 
@@ -105,8 +106,19 @@
            enddo 
          enddo
 
-
-         call exec_f_c2(dest(1,1,x),1,nz_fft,dest(1,1,x),1,nz_fft, nz_fft,jjsize)
+	if(op(3:3) == 't') then
+             call exec_f_c2(dest(1,1,x), 1,nz_fft, &
+			  dest(1,1,x), 1,nz_fft,nz_fft,jjsize)
+	else if(op(3:3) == 'c') then	
+             call exec_ctrans_r2(dest(1,1,x), 2,2*nz_fft, &
+			  dest(1,1,x), 2,2*nz_fft,nz_fft,jjsize)
+	else if(op(3:3) == 's') then	
+             call exec_strans_r2(dest(1,1,x), 2,2*nz_fft, &
+		  dest(1,1,x), 2,2*nz_fft,nz_fft,jjsize)
+ 	else
+	   print *,taskid,'Unknown transform type: ',op(3:3)
+	   call abort
+	endif
       enddo
 
       tc = tc + MPI_Wtime()
@@ -147,7 +159,19 @@
             pos0 = pos0 + iisize*jjsize*NBz
          enddo
 
-         call exec_f_c2(dest(1,1,x),1,nz_fft,dest(1,1,x),1,nz_fft,nz_fft,jjsize)
+	if(op(3:3) == 't') then
+             call exec_f_c2(dest(1,1,x), 1,nz_fft, &
+			  dest(1,1,x), 1,nz_fft,nz_fft,jjsize)
+	else if(op(3:3) == 'c') then	
+             call exec_ctrans_r2(dest(1,1,x), 2,2*nz_fft, &
+			  dest(1,1,x), 2,2*nz_fft,nz_fft,jjsize)
+	else if(op(3:3) == 's') then	
+             call exec_strans_r2(dest(1,1,x), 2,2*nz_fft, &
+		  dest(1,1,x), 2,2*nz_fft,nz_fft,jjsize)
+ 	else
+	   print *,taskid,'Unknown transform type: ',op(3:3)
+	   call abort
+	endif
 
       enddo
       tc = tc + MPI_Wtime()

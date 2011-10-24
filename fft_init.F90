@@ -420,3 +420,122 @@
 
       return
       end
+
+! --------------------------------------
+!
+!  init_ctrans_r2(..)
+!  cosinus transform
+! --------------------------------------
+subroutine init_ctrans_r2 (X, stride_x1, stride_x2, Y, stride_y1, stride_y2, N, m)
+    use p3dfft
+    use fft_spec
+    implicit none
+ 
+    integer :: N, m, stride_x1, stride_x2, stride_y1, stride_y2, fflag
+    real (mytype) :: X (N*m), Y (N*m)
+    integer :: nm2
+ 
+#ifdef ESSL
+    nm2 = (N-1) * 2
+#ifndef SINGLE_PREC
+    call dcosf (1, X, stride_x1, stride_x2, &
+                   Y, stride_y1, stride_y2, &
+                   nm2, m, 2.0d0, caux1, cnaux, caux2, cnaux)
+#else
+    call scosf (1, X, stride_x1, stride_x2, &
+                   Y, stride_y1, stride_y2, &
+                   nm2, m, 2.0, caux1, cnaux, caux2, cnaux)
+#endif
+ 
+#endif
+ 
+    return
+end
+
+! --------------------------------------
+!
+!  plan_ctrans_r2(..)
+!
+! --------------------------------------
+subroutine plan_ctrans_r2 (X, stride_x1, stride_x2, Y, stride_y1, stride_y2, N, m)
+    use p3dfft
+    use fft_spec
+    implicit none
+ 
+    integer :: stride_x1, stride_x2, stride_y1, stride_y2, N, m
+    real (mytype) :: X (N*m), Y (N*m)
+ 
+#ifdef FFTW
+ 
+#ifndef SINGLE_PREC
+    call dfftw_plan_many_r2r (plan_ctrans, 1, N, m, &
+                              X, NULL, stride_x1, stride_x2, &
+                              Y, NULL, stride_y1, stride_y2, FFTW_REDFT00, fftw_flag)
+#else
+    call sfftw_plan_many_r2r (plan_ctrans, 1, N, m, &
+                              X, NULL, stride_x1, stride_x2, &
+                              Y, NULL, stride_y1, stride_y2, FFTW_REDFT00, fftw_flag)
+#endif
+#endif
+    return
+end
+
+! --------------------------------------
+!
+!  init_strans_r2(..)
+!  sinus transform
+! --------------------------------------
+subroutine init_strans_r2 (X, stride_x1, stride_x2, Y, stride_y1, stride_y2, N, m)
+    use p3dfft
+    use fft_spec
+    implicit none
+ 
+    integer :: N, m, stride_x1, stride_x2, stride_y1, stride_y2, fflag
+    real (mytype) :: X (N*m), Y (N*m)
+    integer :: nm2
+ 
+#ifdef ESSL
+    nm2 = (N-1) * 2
+#ifndef SINGLE_PREC
+    call dsinf (1, X, stride_x1, stride_x2, &
+                   Y, stride_y1, stride_y2, &
+                   nm2, m, 2.0d0, caux1, cnaux, caux2, cnaux)
+#else
+    call ssinf (1, X, stride_x1, stride_x2, &
+                   Y, stride_y1, stride_y2, &
+                   nm2, m, 2.0, caux1, cnaux, caux2, cnaux)
+#endif
+ 
+#endif
+ 
+    return
+end
+
+! --------------------------------------
+!
+!  plan_strans_r2(..)
+!
+! --------------------------------------
+subroutine plan_strans_r2 (X, stride_x1, stride_x2, Y, stride_y1, stride_y2, N, m)
+    use p3dfft
+    use fft_spec
+    implicit none
+ 
+    integer :: stride_x1, stride_x2, stride_y1, stride_y2, N, m
+    real (mytype) :: X (N*m), Y (N*m)
+ 
+#ifdef FFTW
+ 
+#ifndef SINGLE_PREC
+!! ccccccc http://www.fftw.org/doc/1d-Real_002dodd-DFTs-_0028DSTs_0029.html
+    call dfftw_plan_many_r2r (plan_strans, 1, N, m, &
+                              X, NULL, stride_x1, stride_x2, &
+                              Y, NULL, stride_y1, stride_y2, FFTW_RODFT00, fftw_flag)
+#else
+    call sfftw_plan_many_r2r (plan_strans, 1, N, m, &
+                              X, NULL, stride_x1, stride_x2, &
+                              Y, NULL, stride_y1, stride_y2, FFTW_RODFT00, fftw_flag)
+#endif
+#endif
+    return
+end

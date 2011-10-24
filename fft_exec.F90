@@ -262,3 +262,98 @@
       return
       end
 
+! --------------------------------------
+!
+!  exec_ctrans_r2(..)
+!  cosinus transform
+! --------------------------------------
+subroutine exec_ctrans_r2 (X, stride_x1, stride_x2, Y, stride_y1, stride_y2, N, m)
+    use fft_spec
+    use p3dfft
+    implicit none
+ 
+    integer :: stride_x1, stride_x2, stride_y1, stride_y2, N, m
+    real (mytype) :: X (N*m), Y (N*m)
+    integer :: nm2
+ 
+#ifdef FFTW
+ 
+#ifndef SINGLE_PREC
+    call dfftw_execute_r2r (plan_ctrans, X, Y)
+    call dfftw_execute_r2r (plan_ctrans, X(2), Y(2))
+#else
+    call sfftw_execute_r2r (plan_ctrans, X, Y)
+    call sfftw_execute_r2r (plan_ctrans, X(2), Y(2))
+#endif
+#elif defined ESSL
+    nm2 = (N-1) * 2
+ 
+#ifndef SINGLE_PREC
+    call dcosf (0, X, stride_x1, stride_x2, &
+                   Y, stride_y1, stride_y2, &
+                   nm2, m, 2.0d0, caux1, cnaux, caux2, cnaux)
+    call dcosf (0, X(2), stride_x1, stride_x2, &
+                   Y(2), stride_y1, stride_y2, &
+                   nm2, m, 2.0d0, caux1, cnaux, caux2, cnaux)
+#else
+    call scosf (0, X, stride_x1, stride_x2, &
+                   Y, stride_y1, stride_y2, &
+                   nm2, m, 2.0, caux1, cnaux, caux2, cnaux)
+    call scosf (0, X(2), stride_x1, stride_x2, &
+                   Y(2), stride_y1, stride_y2, &
+                   nm2, m, 2.0, caux1, cnaux, caux2, cnaux)
+#endif
+ 
+#else
+    Error: undefined FFT library
+#endif
+    return
+end
+
+! --------------------------------------
+!
+!  exec_strans_r2(..)
+!  sinus transform
+! --------------------------------------
+subroutine exec_strans_r2 (X, stride_x1, stride_x2, Y, stride_y1, stride_y2, N, m)
+    use fft_spec
+    use p3dfft
+    implicit none
+ 
+    integer :: stride_x1, stride_x2, stride_y1, stride_y2, N, m
+    real (mytype) :: X (N*m), Y (N*m)
+    integer :: nm2
+ 
+#ifdef FFTW
+ 
+#ifndef SINGLE_PREC
+    call dfftw_execute_r2r (plan_strans, X, Y)
+    call dfftw_execute_r2r (plan_strans, X(2), Y(2))
+#else
+    call sfftw_execute_r2r (plan_strans, X, Y)
+    call sfftw_execute_r2r (plan_strans, X(2), Y(2))
+#endif
+#elif defined ESSL
+    nm2 = (N-1) * 2
+ 
+#ifndef SINGLE_PREC
+    call dsinf (0, X, stride_x1, stride_x2, &
+                   Y, stride_y1, stride_y2, &
+                   nm2, m, 2.0d0, caux1, cnaux, caux2, cnaux)
+    call dsinf (0, X(2), stride_x1, stride_x2, &
+                   Y(2), stride_y1, stride_y2, &
+                   nm2, m, 2.0d0, caux1, cnaux, caux2, cnaux)
+#else
+    call ssinf (0, X, stride_x1, stride_x2, &
+                   Y, stride_y1, stride_y2, &
+                   nm2, m, 2.0, caux1, cnaux, caux2, cnaux)
+    call ssinf (0, X(2), stride_x1, stride_x2, &
+                   Y(2), stride_y1, stride_y2, &
+                   nm2, m, 2.0, caux1, cnaux, caux2, cnaux)
+#endif
+ 
+#else
+    Error: undefined FFT library
+#endif
+    return
+end

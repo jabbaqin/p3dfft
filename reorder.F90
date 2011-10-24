@@ -26,20 +26,34 @@
 ! This routine is called only when jproc=1, and only when stride1 is used
 ! transform backward in Z and transpose array in memory 
 
-      subroutine reorder_trans_b1(A,B,C)
+      subroutine reorder_trans_b1(A,B,C,op)
 
       use fft_spec
 
       complex(mytype) B(ny_fft,iisize,nz_fft)
       complex(mytype) A(nz_fft,ny_fft,iisize)
       complex(mytype) C(nz_fft,ny_fft)
-      integer x,y,z,iy,iz,y2,z2
+      integer x,y,z,iy,iz,y2,z2,ierr
+      character(len=3) op
 
       if(OW) then
 
          do x=1,iisize
 
-            call exec_b_c2(A(1,1,x),1,nz_fft,A(1,1,x),1,nz_fft, nz_fft,ny_fft)            
+		if(op(1:1) == 't') then
+                   call exec_b_c2(A(1,1,x), 1,nz_fft, &
+				  A(1,1,x), 1,nz_fft,nz_fft,ny_fft)
+ 		else if(op(1:1) == 'c') then	
+                   call exec_ctrans_r2(A(1,1,x), 2,2*nz_fft, & 
+				  A(1,1,x), 2,2*nz_fft,nz_fft,ny_fft)
+ 		else if(op(1:1) == 's') then	
+                   call exec_strans_r2(A(1,1,x), 2,2*nz_fft, & 
+				  A(1,1,x), 2,2*nz_fft,nz_fft,ny_fft)
+		else
+		   print *,taskid,'Unknown transform type: ',op(1:1)
+		   call MPI_abort(MPI_COMM_WORLD,ierr)
+		endif
+
             do y=1,ny_fft,NBy2
                y2 = min(y+NBy2-1,ny_fft)
    	       do z=1,nz_fft,NBz
@@ -58,7 +72,19 @@
 
          do x=1,iisize
 
-            call exec_b_c2(A(1,1,x),1,nz_fft,C,1,nz_fft, nz_fft,ny_fft)            
+		if(op(1:1) == 't') then
+                   call exec_b_c2(A(1,1,x), 1,nz_fft, &
+				  C, 1,nz_fft,nz_fft,ny_fft)
+ 		else if(op(1:1) == 'c') then	
+                   call exec_ctrans_r2(A(1,1,x), 2,2*nz_fft, & 
+				  C(1,1), 2,2*nz_fft,nz_fft,ny_fft)
+ 		else if(op(1:1) == 's') then	
+                   call exec_strans_r2(A(1,1,x), 2,2*nz_fft, & 
+				  C(1,1), 2,2*nz_fft,nz_fft,ny_fft)
+		else
+		   print *,taskid,'Unknown transform type: ',op(1:1)
+		   call MPI_abort(MPI_COMM_WORLD,ierr)
+		endif
             do y=1,ny_fft,NBy2
                y2 = min(y+NBy2-1,ny_fft)
    	       do z=1,nz_fft,NBz
@@ -159,14 +185,15 @@
 ! This routine is called only when jproc=1, and only when stride1 is used
 ! Transpose array in memory and transform forward in Z
 
-      subroutine reorder_trans_f2(A,B)
+      subroutine reorder_trans_f2(A,B,op)
 
       use fft_spec
       implicit none
 
       complex(mytype) A(ny_fft,iisize,nz_fft)
       complex(mytype) B(nz_fft,ny_fft,iisize)
-      integer x,y,z,iy,iz,y2,z2
+      integer x,y,z,iy,iz,y2,z2,ierr
+      character(len=3) op
 
 
       do x=1,iisize
@@ -184,7 +211,19 @@
                enddo
            enddo 
 
-         call exec_f_c2(B(1,1,x),1,nz_fft,B(1,1,x),1,nz_fft, nz_fft,ny_fft)
+	if(op(3:3) == 't') then
+             call exec_f_c2(B(1,1,x), 1,nz_fft, &
+			  B(1,1,x), 1,nz_fft,nz_fft,ny_fft)
+	else if(op(3:3) == 'c') then	
+                   call exec_ctrans_r2(B(1,1,x), 2,2*nz_fft, & 
+				  B(1,1,x), 2,2*nz_fft,nz_fft,ny_fft)
+ 	else if(op(3:3) == 's') then	
+                   call exec_strans_r2(B(1,1,x), 2,2*nz_fft, & 
+				  B(1,1,x), 2,2*nz_fft,nz_fft,ny_fft)
+ 	else
+	   print *,taskid,'Unknown transform type: ',op(3:3)
+	   call MPI_abort(MPI_COMM_WORLD,ierr)
+	endif
       enddo
 
       return

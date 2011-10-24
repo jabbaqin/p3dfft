@@ -80,6 +80,12 @@
          call plan_b_c2(A,1,nz_fft,B,1,nz_fft,nz_fft,jjsize)
       endif
 
+!cccccccccccccccccccccc added chebyshev cccccccccccccccccccccccccccccccc
+    call plan_ctrans_r2 (A, 2,2*nz_fft, &
+                         A, 2,2*nz_fft, NZ_fft, jjsize)
+    call plan_strans_r2 (A, 2,2*nz_fft, &
+                         A, 2,2*nz_fft, NZ_fft, jjsize)
+!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      endif
 #else
      if(iisize .gt. 0) then
@@ -108,6 +114,13 @@
          endif
 
        endif
+
+!cccccccccccccccccccccc added chebyshev cccccccccccccccccccccccccccccccc
+    call plan_ctrans_r2 (A, 2*iisize*jjsize, 1, &
+                         B, 2 * iisize * jjsize, 1, NZ_fft, 2 * iisize * jjsize)
+    call plan_strans_r2 (A, 2*iisize*jjsize, 1, &
+                         B, 2 * iisize * jjsize, 1, NZ_fft, 2 * iisize * jjsize)
+!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      endif
 #endif
 

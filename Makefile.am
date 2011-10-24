@@ -1,16 +1,16 @@
-EXTRA_DIST = NEWS README AUTHORS ChangeLog P3DFFT_USER_GUIDE_2.4.pdf \
-		build/bcomm1.F90 build/bcomm1_trans.F90 build/bcomm2.F90 \
-		build/btran.F90 build/fcomm1.F90 build/fcomm2.F90 \
-		build/fcomm2_trans.F90 build/ftran.F90 build/ghost_cell.F90 \
-		build/init_plan.F90 build/reorder.F90 build/setup.F90 
+AM_FCFLAGS = $(FDFLAGS) 
+INCLUDES = $(FFTW_INC)
+LDADD = $(FFTW_LIB)
 
-include_HEADERS = include/p3dfft.h 
+lib_LIBRARIES = libp3dfft.a
 
-SUBDIRS = \
-	build \
-	sample
+libp3dfft_a_SOURCES = fft_spec.F90 module.F90 fft_init.F90 fft_exec.F90 wrap.F90 ghosts.F90
 
-all-local: 
-	echo $(SUCCESS)
+module.o: setup.F90 init_plan.F90 ftran.F90 btran.F90 reorder.F90 fcomm1.F90 \
+fcomm2_trans.F90 bcomm1_trans.F90 fcomm2.F90 bcomm1.F90 bcomm2.F90 ghosts.F90
+
+all-local:
+	-@[ -e "p3dfft.mod" ] && mv -f p3dfft.mod ../include
+
 clean-local:
-	-test -z "include/p3dfft.mod" || rm -f include/p3dfft.mod
+	-test -z "*.mod" || rm -f *.mod

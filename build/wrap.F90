@@ -23,7 +23,7 @@
 !
 !----------------------------------------------------------------------------
 
-      subroutine ftran_r2c(IN,OUT)
+      subroutine ftran_r2c(IN,OUT,op)
       
       use p3dfft
 
@@ -32,13 +32,14 @@
 !      real(mytype) IN(nx_fft,jistart:jiend,kjstart:kjend)
 !      complex(mytype) OUT(iistart:iiend,jjstart:jjend,nz_fft)
 !      logical flg_inplace
+      character(len=3) op
 
-      call p3dfft_ftran_r2c(IN,OUT)
+      call p3dfft_ftran_r2c(IN,OUT,op)
 
       return
       end
 
-      subroutine btran_c2r(IN,OUT)
+      subroutine btran_c2r(IN,OUT,op)
       
       use p3dfft
 
@@ -47,8 +48,9 @@
 !      real(mytype) OUT(nx_fft,jistart:jiend,kjstart:kjend)
 !      complex(mytype) IN(iistart:iiend,jjstart:jjend,nz_fft)
 !      logical flg_inplace
+      character(len=3) op
 
-      call p3dfft_btran_c2r(IN,OUT)
+      call p3dfft_btran_c2r(IN,OUT,op)
 
       return
       end

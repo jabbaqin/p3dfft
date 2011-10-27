@@ -6,7 +6,6 @@
 !
 !    Copyright (C) 2006-2010 Dmitry Pekurovsky
 !    Copyright (C) 2006-2010 University of California
-!    Copyright (C) 2010-2011 Jens Henrik Goebbert
 !
 !    This program is free software: you can redistribute it and/or modify
 !    it under the terms of the GNU General Public License as published by
@@ -36,7 +35,7 @@
       complex(mytype), TARGET :: XYZg(iistart:iiend,jjstart:jjend,nz_fft)
 #endif
 
-      integer x,y,z,i,k,nx,ny,nz,ierr
+      integer x,y,z,i,k,nx,ny,nz
       integer(i8) Nl
       character(len=3) op
 
@@ -62,8 +61,8 @@
       if(jproc .gt. 1) then
 
 #ifdef STRIDE1
-         call init_b_c(buf, 1,nz, XYZg, 1, nz,nz,jjsize)
-         call bcomm1_trans(XYZg,XYZg,buf,op,timers(3),timers(9))
+         call init_b_c(buf, 1,nz, buf, 1, nz,nz,jjsize)
+         call bcomm1_trans(XYZg,buf2,buf,op,timers(3),timers(9))
 #else
 
          if(OW) then
@@ -91,9 +90,8 @@
                    call exec_strans_r2 (XYZg, 2*iisize*jjsize, 1, &
  					XYZg, 2*iisize*jjsize, 1, &
 					nz, 2*iisize*jjsize)
-	        else if(op(1:1) /= 'n' .and. op(1:1) /= '0') then
+		else
 		   print *,taskid,'Unknown transform type: ',op(1:1)
-		   call MPI_abort(MPI_COMM_WORLD,ierr)
 		endif
             endif
             call bcomm1(XYZg,buf,timers(3),timers(9))
@@ -121,16 +119,11 @@
                    call exec_strans_r2 (XYZg, 2*iisize*jjsize, 1, & 
  					buf, 2*iisize*jjsize, 1, &
 					nz, 2*iisize*jjsize)
-	        else if(op(1:1) /= 'n' .and. op(1:1) /= '0') then
+		else
 		   print *,taskid,'Unknown transform type: ',op(1:1)
-		   call MPI_abort(MPI_COMM_WORLD,ierr)
 		endif
 
-		if(op(1:1) == 'n' .or. op(1:1) == '0') then
-                    call bcomm1(XYZg,buf,timers(3),timers(9))
-		else
-                    call bcomm1(buf,buf,timers(3),timers(9))
-		endif
+               call bcomm1(buf,buf,timers(3),timers(9))
             endif
          endif
 
@@ -142,10 +135,10 @@
             timers(9) = timers(9) - MPI_Wtime()
 
 #ifdef STRIDE1
-         call reorder_trans_b1(XYZg,XYZg,buf2,op)
+         call reorder_trans_b1(XYZg,buf,buf2,op)
 #else
-         Nl = iisize*jjsize*nz
          if(OW) then   
+            Nl = iisize*jjsize*nz
 
   	    if(op(1:1) == 't') then
                call init_b_c(XYZg, iisize*jjsize, 1, &
@@ -166,9 +159,8 @@
                call exec_strans_r2 (XYZg, 2*iisize*jjsize, 1, &
 				    XYZg, 2*iisize*jjsize, 1, &
 				    nz, 2*iisize*jjsize)
-	    else if(op(1:1) /= 'n' .and. op(1:1) /= '0') then
+	    else
 		print *,taskid,'Unknown transform type: ',op(1:1)
-   	        call MPI_abort(MPI_COMM_WORLD,ierr)
 	    endif
             call ar_copy(XYZg,buf,Nl)
 
@@ -191,14 +183,11 @@
 			            nz, 2*iisize*jjsize)
                call exec_strans_r2 (XYZg, 2*iisize*jjsize, 1, & 
 				    buf, 2*iisize*jjsize, 1, &
-				    nz, 2*iisize*jjsize) 
-            else if(op(1:1) /= 'n' .and. op(1:1) /= '0') then
+				    nz, 2*iisize*jjsize)
+	    else
 		print *,taskid,'Unknown transform type: ',op(1:1)
-	        call MPI_abort(MPI_COMM_WORLD,ierr)
 	    endif
-   	    if(op(1:1) == 'n' .or. op(1:1) == '0') then
-                call ar_copy(XYZg,buf,Nl)
-	    endif
+
          endif
 #endif
 
@@ -216,11 +205,11 @@
       if(iisize * kjsize .gt. 0) then
 
 #ifdef STRIDE1
-         call init_b_c(XYZg,1,ny,buf,1,ny,ny,iisize*kjsize)
+         call init_b_c(buf,1,ny,buf,1,ny,ny,iisize*kjsize)
 
          timers(10) = timers(10) - MPI_Wtime()
 
-         call exec_b_c1(XYZg,1,ny,buf,1,ny,ny,iisize*kjsize)
+         call exec_b_c1(buf,1,ny,buf,1,ny,ny,iisize*kjsize)
 
          timers(10) = timers(10) + MPI_Wtime()
 

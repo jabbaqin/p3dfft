@@ -6,7 +6,6 @@
 !
 !    Copyright (C) 2006-2010 Dmitry Pekurovsky
 !    Copyright (C) 2006-2010 University of California
-!    Copyright (C) 2010-2011 Jens Henrik Goebbert
 !
 !    This program is free software: you can redistribute it and/or modify
 !    it under the terms of the GNU General Public License as published by
@@ -36,7 +35,7 @@
 #else
       complex(mytype), TARGET :: XYZg(iistart:iiend,jjstart:jjend,nz_fft)
 #endif
-      integer x,y,z,i,nx,ny,nz,ierr
+      integer x,y,z,i,err,nx,ny,nz,ithr,OMP_GET_THREAD_NUM,ierr,id
       integer(i8) Nl
       character(len=3) op
       
@@ -97,11 +96,11 @@
 
       if(iisize * kjsize .gt. 0) then
 #ifdef STRIDE1
-         call init_f_c(buf,1,ny,XYZg,1,ny,ny,iisize*kjsize)
+         call init_f_c(buf,1,ny,buf,1,ny,ny,iisize*kjsize)
 
          timers(7) = timers(7) - MPI_Wtime()
 
-         call exec_f_c1(buf,1,ny,XYZg,1,ny,ny,iisize*kjsize)
+         call exec_f_c1(buf,1,ny,buf,1,ny,ny,iisize*kjsize)
          timers(7) = timers(7) + MPI_Wtime()
 
 
@@ -129,8 +128,8 @@
 
 #ifdef STRIDE1
 ! For stride1 option combine second transpose with transform in Z
-         call init_f_c(buf,1,nz, XYZg,1,nz,nz,jjsize,op)
-         call fcomm2_trans(XYZg,XYZg,buf,op,timers(2),timers(8))
+         call init_f_c(buf,1,nz, buf,1,nz,nz,jjsize,op)
+         call fcomm2_trans(buf,XYZg,op,timers(2),timers(8))
 #else
 
 ! FFT Transform (C2C) in Z for all x and y
@@ -167,7 +166,7 @@
               timers(8) = timers(8) - MPI_Wtime()
               call exec_strans_r2(XYZg,2*iisize*jjsize, 1,XYZg,2*iisize*jjsize, 1,nz,2*iisize*jjsize)
               timers(8) = timers(8) + MPI_Wtime()
-	    else if(op(3:3) /= 'n' .and. op(3:3) /= '0') then
+	    else
 		print *,'Unknown transform type: ',op(3:3)
 		call MPI_Abort(MPI_COMM_WORLD,ierr)
             endif
@@ -179,7 +178,7 @@
          timers(8) = timers(8) - MPI_Wtime()	
 
 #ifdef STRIDE1
-         call reorder_trans_f2(XYZg,XYZg,buf,op)
+         call reorder_trans_f2(buf,XYZg,op)
 #else
          Nl = iisize*jjsize*nz
          call ar_copy(buf,XYZg,Nl)
@@ -203,7 +202,7 @@
               timers(8) = timers(8) - MPI_Wtime()
               call exec_strans_r2(XYZg,2*iisize*jjsize, 1,XYZg,2*iisize*jjsize, 1,nz,2*iisize*jjsize)
               timers(8) = timers(8) + MPI_Wtime()
-	    else if(op(3:3) /= 'n' .and. op(3:3) /= '0') then
+	    else
 		print *,'Unknown transform type: ',op(3:3)
 		call MPI_Abort(MPI_COMM_WORLD,ierr)
             endif
@@ -231,13 +230,12 @@
       	complex(mytype), dimension(nz_fft, &
                                 jjsize,&
                                 iisize), target	::	out
-      	complex(mytype) Old, New, Tmp
 #else
       	complex(mytype), dimension(iisize, &
                                 jjsize,    &
                                 nz_fft), target	::	out
-      	complex(mytype),dimension(:,:),pointer :: ptrOld, ptrNew, ptrTmp
 #endif
+      	complex(mytype) Old, New, Tmp
       	real(mytype) :: Lfactor,Lz
 	integer k,nz,i,j
 
@@ -302,36 +300,3 @@
 	return
 	end subroutine p3dfft_cheby
 
-! --------------------------------------
-!
-!  p3dfft_ftran_r2c_1d(..)
-!
-! --------------------------------------
-subroutine p3dfft_ftran_r2c_1d (rXgYZ, cXgYZ)
-  use fft_spec
-  implicit none
-
-  real (mytype), target :: rXgYZ (NX_fft, jistart:jiend, kjstart:kjend)
-  real (mytype), target :: cXgYZ (NX_fft+2, jistart:jiend, kjstart:kjend)
-
-!      complex(mytype), allocatable :: XYgZ(:,:,:)
-  integer x, y, z, i, err, nx, ny, nz
-
-  if ( .not. mpi_set) then
-    print *, 'P3DFFT error: call setup before other routines'
-    return
-  end if
-
-  nx = NX_fft
-  ny = NY_fft
-  nz = NZ_fft
-
-!
-! FFT transform (R2C) in X for all z and y
-!
-  if (jisize*kjsize > 0) then
-    call init_f_r2c (rXgYZ, nx, cXgYZ, nxhp, nx, jisize*kjsize)
-    call exec_f_r2c (rXgYZ, nx, cXgYZ, nxhp, nx, jisize*kjsize)
-  end if
-
-end subroutine p3dfft_ftran_r2c_1d

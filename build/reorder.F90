@@ -6,6 +6,7 @@
 !
 !    Copyright (C) 2006-2010 Dmitry Pekurovsky
 !    Copyright (C) 2006-2010 University of California
+!    Copyright (C) 2010-2011 Jens Henrik Goebbert
 !
 !    This program is free software: you can redistribute it and/or modify
 !    it under the terms of the GNU General Public License as published by
@@ -26,20 +27,19 @@
 ! This routine is called only when jproc=1, and only when stride1 is used
 ! transform backward in Z and transpose array in memory 
 
-      subroutine reorder_trans_b1(A,B,C)
+      subroutine reorder_trans_b1(A,B,C,op)
 
       use fft_spec
 
       complex(mytype) B(ny_fft,iisize,nz_fft)
       complex(mytype) A(nz_fft,ny_fft,iisize)
       complex(mytype) C(nz_fft,ny_fft)
-      integer x,y,z,iy,iz,y2,z2
+      integer x,y,z,iy,iz,y2,z2,ierr
+      character(len=3) op
 
-      if(OW) then
+      if(op(1:1) == '0' .or. op(1:1) == 'n') then
 
          do x=1,iisize
-
-            call exec_b_c2(A(1,1,x),1,nz_fft,A(1,1,x),1,nz_fft, nz_fft,ny_fft)            
             do y=1,ny_fft,NBy2
                y2 = min(y+NBy2-1,ny_fft)
    	       do z=1,nz_fft,NBz
@@ -49,29 +49,40 @@
 			   B(iy,x,iz) = A(iz,iy,x)
                         enddo
                      enddo
-                  enddo
-             enddo 
-
-          enddo
-
-	else
-
-         do x=1,iisize
-
-            call exec_b_c2(A(1,1,x),1,nz_fft,C,1,nz_fft, nz_fft,ny_fft)            
-            do y=1,ny_fft,NBy2
-               y2 = min(y+NBy2-1,ny_fft)
-   	       do z=1,nz_fft,NBz
-	          z2 = min(z+NBz-1,nz_fft)
-                    do iy=y,y2
-                        do iz=z,z2
-			   B(iy,x,iz) = C(iz,iy)
-                        enddo
-                     enddo
                 enddo
               enddo 
           enddo
-      endif
+
+	else
+           do x=1,iisize
+
+	      if(op(1:1) == 't') then
+                 call exec_b_c2(A(1,1,x), 1,nz_fft, &
+				  C, 1,nz_fft,nz_fft,ny_fft)
+ 	      else if(op(1:1) == 'c') then	
+                 call exec_ctrans_r2(A(1,1,x), 2,2*nz_fft, & 
+				  C(1,1), 2,2*nz_fft,nz_fft,ny_fft)
+ 	      else if(op(1:1) == 's') then	
+                 call exec_strans_r2(A(1,1,x), 2,2*nz_fft, & 
+				  C(1,1), 2,2*nz_fft,nz_fft,ny_fft)
+              else 
+	         print *,taskid,'Unknown transform type: ',op(1:1)
+	         call MPI_abort(MPI_COMM_WORLD,ierr)
+	      endif
+
+              do y=1,ny_fft,NBy2
+                 y2 = min(y+NBy2-1,ny_fft)
+     	         do z=1,nz_fft,NBz
+	            z2 = min(z+NBz-1,nz_fft)
+                       do iy=y,y2
+                          do iz=z,z2
+			     B(iy,x,iz) = C(iz,iy)
+                          enddo
+                       enddo
+                  enddo
+              enddo 
+          enddo
+     endif
 
       return
       end subroutine
@@ -159,33 +170,68 @@
 ! This routine is called only when jproc=1, and only when stride1 is used
 ! Transpose array in memory and transform forward in Z
 
-      subroutine reorder_trans_f2(A,B)
+      subroutine reorder_trans_f2(A,B,C,op)
 
       use fft_spec
       implicit none
 
       complex(mytype) A(ny_fft,iisize,nz_fft)
       complex(mytype) B(nz_fft,ny_fft,iisize)
-      integer x,y,z,iy,iz,y2,z2
+      complex(mytype) C(nz_fft,ny_fft)
+      integer x,y,z,iy,iz,y2,z2,ierr
+      character(len=3) op
 
-
-      do x=1,iisize
-         do z=1,nz_fft,NBz
-	    z2 = min(z+NBz-1,nz_fft)
+      if(op(3:3) == '0' .or. op(3:3) == 'n') then
+	
+         do x=1,iisize
+            do z=1,nz_fft,NBz
+	       z2 = min(z+NBz-1,nz_fft)
             
-            do y=1,ny_fft,NBy2
-               y2 = min(y+NBy2-1,ny_fft)
+               do y=1,ny_fft,NBy2
+                  y2 = min(y+NBy2-1,ny_fft)
 
-                  do iz=z,z2
-                     do iy=y,y2
-			B(iz,iy,x) = A(iy,x,iz)
+                     do iz=z,z2
+                        do iy=y,y2
+			   B(iz,iy,x) = A(iy,x,iz)
+                        enddo
                      enddo
                   enddo
-               enddo
-           enddo 
+              enddo 
+	   enddo
 
-         call exec_f_c2(B(1,1,x),1,nz_fft,B(1,1,x),1,nz_fft, nz_fft,ny_fft)
-      enddo
+	else
+
+           do x=1,iisize
+              do z=1,nz_fft,NBz
+	         z2 = min(z+NBz-1,nz_fft)
+            
+                 do y=1,ny_fft,NBy2
+                    y2 = min(y+NBy2-1,ny_fft)
+
+                    do iz=z,z2
+                        do iy=y,y2
+			   C(iz,iy) = A(iy,x,iz)
+                        enddo
+                     enddo
+                  enddo
+              enddo 
+
+   	      if(op(3:3) == 't') then
+                 call exec_f_c2(C, 1,nz_fft, &
+			  B(1,1,x), 1,nz_fft,nz_fft,ny_fft)
+	      else if(op(3:3) == 'c') then	
+                   call exec_ctrans_r2(C, 2,2*nz_fft, & 
+				  B(1,1,x), 2,2*nz_fft,nz_fft,ny_fft)
+ 	      else if(op(3:3) == 's') then	
+                   call exec_strans_r2(C, 2,2*nz_fft, & 
+				  B(1,1,x), 2,2*nz_fft,nz_fft,ny_fft)
+              else 
+	        print *,taskid,'Unknown transform type: ',op(3:3)
+	        call MPI_abort(MPI_COMM_WORLD,ierr)
+	      endif
+         enddo
+
+      endif
 
       return
       end subroutine

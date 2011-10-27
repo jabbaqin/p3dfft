@@ -6,6 +6,7 @@
 !
 !    Copyright (C) 2006-2010 Dmitry Pekurovsky
 !    Copyright (C) 2006-2010 University of California
+!    Copyright (C) 2010-2011 Jens Henrik Goebbert
 !
 !    This program is free software: you can redistribute it and/or modify
 !    it under the terms of the GNU General Public License as published by
@@ -24,7 +25,7 @@
 !----------------------------------------------------------------------------
 
 ! =========================================================
-      subroutine p3dfft_setup(dims,nx,ny,nz,overwrite)
+      subroutine p3dfft_setup(dims,nx,ny,nz,overwrite,memsize)
 !========================================================
 
       implicit none
@@ -35,6 +36,10 @@
       integer impid, ippid, jmpid, jppid
       integer(i8) nm,n1,n2
       real(mytype), allocatable :: R(:)
+      integer, intent (out) :: memsize (3)
+
+      integer my_start (3), my_end (3), my_size (3)
+      integer my_proc_dims (2, 9)
 
       if(nx .le. 0 .or. ny .le. 0 .or. nz .le. 0) then
          print *,'Invalid dimensions :',nx,ny,nz
@@ -99,15 +104,15 @@
 #endif
 
 ! store processor-grid-informations
-      cartid(1) = ipid
-      cartid(2) = jpid
-
-!      allocate(proc_id2coords(0:(iproc*jproc)*2-1))
-!      call MPI_Allgather( cartid,        2, MPI_INTEGER, proc_id2coords, 2, MPI_INTEGER,mpi_comm_cart,ierr)
-!      allocate(proc_coords2id(0:iproc-1,0:jproc-1))
-!      do i=0,(iproc*jproc)-1
-!      	proc_coords2id(	proc_id2coords(2*i),proc_id2coords(2*i+1)) = i
-!      enddo
+    cartid (1) = ipid
+    cartid (2) = jpid
+    allocate (proc_id2coords(0:(iproc*jproc)*2-1))
+    call MPI_Allgather (cartid, 2, MPI_INTEGER, proc_id2coords, 2, MPI_INTEGER, mpi_comm_cart, ierr)
+    allocate (proc_coords2id(0:iproc-1, 0:jproc-1))
+    do i = 0, (iproc*jproc) - 1
+      proc_coords2id (proc_id2coords(2*i), &
+                      proc_id2coords(2*i+1)) = i
+    end do
 
 ! here i is east-west j is north-south
 ! impid is west neighbour ippid is east neighbour and so on
@@ -176,6 +181,37 @@
       jiend = jien(ipid)
       kjend = kjen(jpid)
 
+    allocate (iiist(0:iproc-1))
+    allocate (iiisz(0:iproc-1))
+    allocate (iiien(0:iproc-1))
+    allocate (ijst(0:jproc-1))
+    allocate (ijsz(0:jproc-1))
+    allocate (ijen(0:jproc-1))
+    call MapDataToProc (nx, iproc, iiist, iiien, iiisz)
+    call MapDataToProc (nx, jproc, ijst, ijen, ijsz)
+    iiistart = iiist (ipid)
+    iiisize = iiisz (ipid)
+    iiiend = iiien (ipid)
+    ijstart = ijst (jpid)
+    ijsize = ijsz (jpid)
+    ijend = ijen (jpid)
+
+#ifdef USE_EVEN
+
+      IfCntMax = iisz(iproc-1)*jisz(iproc-1)*kjsize*mytype*2
+      KfCntMax = iisize * jjsz(jproc-1) * kjsz(jproc-1)*mytype*2
+      if(mod(ny,jproc) .ne. 0 .or. mod(nz,jproc) .ne. 0) then 
+         KfCntUneven = .true.
+      else
+         KfCntUneven = .false.
+      endif
+    IiCntMax = iiisz (iproc-1) * jisize * kjsize * mytype
+    IJCntMax = ijsz (iproc-1) * jisize * kjsize * mytype
+    JICntMax = jisz (iproc-1) * iiisize * kjsize * mytype
+    KjCntMax = kjsz (iproc-1) * jisize * ijsize * mytype
+#endif
+
+
 #ifdef STRIDE1
 #ifdef CACHE_BL
       CB = CACHE_BL
@@ -226,15 +262,6 @@
 
 #endif
 
-#ifdef USE_EVEN
-      IfCntMax = iisz(iproc-1)*jisz(iproc-1)*kjsize*mytype*2
-      KfCntMax = iisize * jjsz(jproc-1) * kjsz(jproc-1)*mytype*2
-      if(mod(ny,jproc) .ne. 0 .or. mod(nz,jproc) .ne. 0) then 
-         KfCntUneven = .true.
-      else
-         KfCntUneven = .false.
-      endif
-#endif
 
 ! We may need to pad arrays due to uneven size
       padd = max(iisize*jjsize*nz_fft,iisize*ny_fft*kjsize) - nxhp*jisize*kjsize
@@ -257,6 +284,10 @@
         if(err .ne. 0) then
            print *,'p3dfft_setup: Error allocating buf1 (',nm
         endif
+        allocate(buf2(nm),stat=err)
+        if(err .ne. 0) then
+           print *,'p3dfft_setup: Error allocating buf2 (',nm
+        endif
         allocate(R(nm*2),stat=err)
         if(err .ne. 0) then
            print *,'p3dfft_setup: Error allocating R (',nm*2
@@ -267,7 +298,7 @@
 ! For FFT libraries that allocate work space implicitly such as through 
 ! plans (e.g. FFTW) initialize here
 
-        call init_plan(buf1,R,nm)
+        call init_plan(buf1,R,buf2,nm)
 
         deallocate(R)
      endif
@@ -279,20 +310,18 @@
       if(n1 .gt. nm) then
          deallocate(buf1)
          allocate(buf1(n1))
-      endif
-      n1 = max(n1,nm)
-      if(n1 .gt. 0) then
+         deallocate(buf2)
          allocate(buf2(n1))
-      endif	
-#else
-      if(nm .gt. 0) then
-         allocate(buf2(nm))
-      endif	
+      endif
 #endif
 
-      if(nm .gt. 0) then
-         allocate(buf(nm))
-      endif	
+!     preallocate memory for FFT-Transforms
+    allocate (buf(nxhp*jisize*(kjsize+padd)), stat=err)
+!     initialize buf to avoid "floating point invalid" errors in debug mode
+    buf = 0.d0
+    if (err /= 0) then
+      print *, 'Error ', err, ' allocating array XYgZ'
+    end if
 
 
 ! Displacements and buffer counts for mpi_alltoallv
@@ -357,6 +386,73 @@
          KrRcvStrt(i) = (iist(i) -1) * jisize*kjsize*mytype*2
          KrRcvCnts(i) = jisize*iisz(i)*kjsize*mytype*2
       enddo
+
+! Displacements and buffer counts for mpi_alltoallv in transpose-functions(..)
+    allocate (IiStrt(0:iproc-1))
+    allocate (IiCnts(0:iproc-1))
+    allocate (JiStrt(0:iproc-1))
+    allocate (JiCnts(0:iproc-1))
+
+    allocate (IjStrt(0:jproc-1))
+    allocate (IjCnts(0:jproc-1))
+    allocate (KjStrt(0:jproc-1))
+    allocate (KjCnts(0:jproc-1))
+
+!   start pointers and size for the x<->y transpose
+    do i = 0, iproc - 1
+!        x->y
+      IiStrt (i) = (iiist(i)-1) * jisize * kjsize * mytype
+      IiCnts (i) = iiisz (i) * jisize * kjsize * mytype
+
+      JiStrt (i) = (jist(i)-1) * iiisize * kjsize * mytype
+      JiCnts (i) = jisz (i) * iiisize * kjsize * mytype
+    end do
+
+!   start pointers and size for the x<->z transpose
+    do i = 0, jproc - 1
+!        x->z
+      IjStrt (i) = (ijst(i)-1) * jisize * kjsize * mytype
+      IjCnts (i) = ijsz (i) * jisize * kjsize * mytype
+
+      KjStrt (i) = (kjst(i)-1) * jisize * ijsize * mytype
+      KjCnts (i) = kjsz (i) * jisize * ijsize * mytype
+    end do
+
+!   create proc_dims = send information of each pencil-dimensions to all procs
+    call p3dfft_get_dims (my_start, my_end, my_size, 1)
+    my_proc_dims (1, 1) = my_start (1)
+    my_proc_dims (1, 2) = my_start (2)
+    my_proc_dims (1, 3) = my_start (3)
+    my_proc_dims (1, 4) = my_end (1)
+    my_proc_dims (1, 5) = my_end (2)
+    my_proc_dims (1, 6) = my_end (3)
+    my_proc_dims (1, 7) = my_size (1)
+    my_proc_dims (1, 8) = my_size (2)
+    my_proc_dims (1, 9) = my_size (3)
+    call p3dfft_get_dims (my_start, my_end, my_size, 2)
+    my_proc_dims (2, 1) = my_start (1)
+    my_proc_dims (2, 2) = my_start (2)
+    my_proc_dims (2, 3) = my_start (3)
+    my_proc_dims (2, 4) = my_end (1)
+    my_proc_dims (2, 5) = my_end (2)
+    my_proc_dims (2, 6) = my_end (3)
+    my_proc_dims (2, 7) = my_size (1)
+    my_proc_dims (2, 8) = my_size (2)
+    my_proc_dims (2, 9) = my_size (3)
+    allocate (proc_dims(2, 9, 0:(iproc*jproc)-1))
+    call MPI_Allgather (my_proc_dims, 2*9, MPI_INTEGER,proc_dims, 2 * 9, MPI_INTEGER,mpi_comm_cart, ierr)
+
+    allocate (proc_parts((iproc*jproc), 7))
+    proc_parts = - 1
+
+!     calc max. needed memory (attention: cast to integer8 included)
+    memsize (1) = 2 * nxhp
+    memsize (2) = jisize
+    memsize (3) = kjsize + padd
+
+    maxisize = memsize (1)
+    maxjsize = memsize (2)
+    maxksize = memsize (3)
 
       end subroutine p3dfft_setup
 

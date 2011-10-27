@@ -6,6 +6,7 @@
 !
 !    Copyright (C) 2006-2010 Dmitry Pekurovsky
 !    Copyright (C) 2006-2010 University of California
+!    Copyright (C) 2010-2011 Jens Henrik Goebbert
 !
 !    This program is free software: you can redistribute it and/or modify
 !    it under the terms of the GNU General Public License as published by
@@ -25,13 +26,13 @@
 
 !========================================================
 
-      subroutine init_plan(A,B,n2)
+      subroutine init_plan(A,B,C,n2)
 
       use fft_spec
       implicit none
 
       integer(i8) n2
-      complex(mytype) A(n2)
+      complex(mytype) A(n2),C(n2)
       real(mytype) B(n2*2)
 
       
@@ -58,11 +59,11 @@
 #ifdef DEBUG
 	print *,taskid, ': doing plan_f_c1'
 #endif
-      call plan_f_c1(A,1,ny_fft,A,1,ny_fft,ny_fft,iisize*kjsize)
+      call plan_f_c1(A,1,ny_fft,C,1,ny_fft,ny_fft,iisize*kjsize)
 #ifdef DEBUG
 	print *,taskid,': doing plan_b_c1'
 #endif
-      call plan_b_c1(A,1,ny_fft,A,1,ny_fft,ny_fft,iisize*kjsize)
+      call plan_b_c1(A,1,ny_fft,C,1,ny_fft,ny_fft,iisize*kjsize)
 
      endif	
 
@@ -70,16 +71,18 @@
 #ifdef DEBUG
 	print *,taskid,': doing plan_f_c2'
 #endif
-        call plan_f_c2(A,1,nz_fft, A,1,nz_fft,nz_fft,jjsize)
+        call plan_f_c2(A,1,nz_fft, C,1,nz_fft,nz_fft,jjsize)
 #ifdef DEBUG
 	print *,taskid,': doing plan_b_c2'
 #endif
-      if(OW) then
-         call plan_b_c2(A,1,nz_fft,A,1,nz_fft,nz_fft,jjsize)
-      else
-         call plan_b_c2(A,1,nz_fft,B,1,nz_fft,nz_fft,jjsize)
-      endif
+       call plan_b_c2(A,1,nz_fft,C,1,nz_fft,nz_fft,jjsize)
 
+!cccccccccccccccccccccc added chebyshev cccccccccccccccccccccccccccccccc
+    call plan_ctrans_r2 (A, 2,2*nz_fft, &
+                         C, 2,2*nz_fft, NZ_fft, jjsize)
+    call plan_strans_r2 (A, 2,2*nz_fft, &
+                         C, 2,2*nz_fft, NZ_fft, jjsize)
+!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      endif
 #else
      if(iisize .gt. 0) then
@@ -108,6 +111,13 @@
          endif
 
        endif
+
+!cccccccccccccccccccccc added chebyshev cccccccccccccccccccccccccccccccc
+    call plan_ctrans_r2 (A, 2*iisize*jjsize, 1, &
+                         A, 2 * iisize * jjsize, 1, NZ_fft, 2 * iisize * jjsize)
+    call plan_strans_r2 (A, 2*iisize*jjsize, 1, &
+                         A, 2 * iisize * jjsize, 1, NZ_fft, 2 * iisize * jjsize)
+!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      endif
 #endif
 

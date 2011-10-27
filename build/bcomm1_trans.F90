@@ -6,6 +6,7 @@
 !
 !    Copyright (C) 2006-2010 Dmitry Pekurovsky
 !    Copyright (C) 2006-2010 University of California
+!    Copyright (C) 2010-2011 Jens Henrik Goebbert
 !
 !    This program is free software: you can redistribute it and/or modify
 !    it under the terms of the GNU General Public License as published by
@@ -27,7 +28,7 @@
 ! Transpose back Z to Y pencils
 ! Assumes stride1 data structure
 
-      subroutine bcomm1_trans (source,buf3,dest,t,tc)
+      subroutine bcomm1_trans (source,dest,buf3,op,t,tc)
 !========================================================
 
       use fft_spec
@@ -41,6 +42,7 @@
       real(r8) t,tc
       integer x,y,z,i,ierr,xs,ys,iy,y2,z2,ix,x2,n,iz
       integer(i8) position,pos1,pos0
+      character(len=3) op
 
 
 !     Pack the data for sending
@@ -53,18 +55,15 @@
 
      if(jjsize .gt. 0) then
 
-      if(OW) then
-
+      if(op(1:1) == '0' .or. op(1:1) == 'n') then
          do x=1,iisize
-             call exec_b_c2(source(1,1,x),1,nz_fft,source(1,1,x),1,nz_fft,nz_fft,jjsize)
-            
             do i=0,jproc-1
-               
+            
                pos0 = i * KfCntMax / (mytype*2) + (x-1)*jjsize 
 
                do z=kjst(i),kjen(i),NBz
                   z2 = min(z+NBz-1,kjen(i))
-                  
+
                   do y=1,jjsize,NBy2
                      y2 = min(y+NBy2-1,jjsize)
                      
@@ -80,16 +79,27 @@
                         pos1 = pos1 + iisize * jjsize
                      enddo
                   enddo
-                  pos0 = pos0 + iisize*jjsize*Nbz
+                  pos0 = pos0 + iisize*jjsize*NBz
                enddo
-               
+
             enddo
          enddo
-         
-      else
 
+      else
          do x=1,iisize
-            call exec_b_c2(source(1,1,x),1,nz_fft,buf3,1,nz_fft,nz_fft,jjsize)
+		if(op(1:1) == 't') then
+                   call exec_b_c2(source(1,1,x), 1,nz_fft, &
+				  buf3, 1,nz_fft,nz_fft,jjsize)
+ 		else if(op(1:1) == 'c') then	
+                   call exec_ctrans_r2(source(1,1,x), 2,2*nz_fft, & 
+				  buf3, 2,2*nz_fft,nz_fft,jjsize)
+ 		else if(op(1:1) == 's') then	
+                   call exec_strans_r2(source(1,1,x), 2,2*nz_fft, & 
+				  buf3, 2,2*nz_fft,nz_fft,jjsize)
+		else
+		   print *,taskid,'Unknown transform type: ',op(1:1)
+		   call MPI_abort(MPI_COMM_WORLD,ierr)
+		endif
          
             do i=0,jproc-1
             
@@ -118,8 +128,8 @@
 
             enddo
          enddo
-      endif
 
+	endif
      endif
 
       tc = tc + MPI_Wtime()
@@ -133,42 +143,52 @@
 
      if(jjsize .gt. 0) then
 
-      if(OW) then
+      if(op(1:1) == '0' .or. op(1:1) == 'n') then
          do x=1,iisize
-            call exec_b_c2(source(1,1,x),1,nz_fft,source(1,1,x),1,nz_fft,nz_fft,jjsize)
-            
-            pos0 = (x-1)*jjsize
-            do z=1,nz_fft,NBz
-               z2 = min(z+NBz-1,nz_fft)
+           pos0 = (x-1)*jjsize 
+
+             do z=1,nz_fft,NBz
+                z2 = min(z+NBz,nz_fft)
                
-               do y=1,jjsize,NBy2
-                  y2 = min(y+NBy2-1,jjsize)
+                  do y=1,jjsize,NBy2
+                     y2 = min(y+NBy2-1,jjsize)
                   
-                  pos1 = pos0 + y
+                     pos1 = pos0 + y
                   
-                  do iz=z,z2
-                     position = pos1
-                     do iy=y,y2
-                        buf1(position) = source(iz,iy,x)
-                        position = position +1
+                     do iz=z,z2
+                        position = pos1
+                        do iy=y,y2
+                           buf1(position) = source(iz,iy,x)
+                           position = position +1
+                        enddo
+                        pos1 = pos1 + iisize * jjsize
                      enddo
-                     pos1 = pos1 + iisize * jjsize
                   enddo
+                  pos0 = pos0 + iisize*jjsize*NBz
                enddo
-               pos0 = pos0 + iisize*jjsize*NBz
+            
             enddo
+
+      else
+        do x=1,iisize
+ 	   if(op(1:1) == 't') then
+              call exec_b_c2(source(1,1,x), 1,nz_fft, &
+		  buf3, 1,nz_fft,nz_fft,jjsize)
+ 	   else if(op(1:1) == 'c') then	
+              call exec_ctrans_r2(source(1,1,x), 2,2*nz_fft, & 
+				  buf3, 2,2*nz_fft,nz_fft,jjsize)
+    	   else if(op(1:1) == 's') then	
+              call exec_strans_r2(source(1,1,x), 2,2*nz_fft, & 
+				  buf3, 2,2*nz_fft,nz_fft,jjsize)
+ 	   else
+	      print *,taskid,'Unknown transform type: ',op(1:1)
+  	      call MPI_abort(MPI_COMM_WORLD,ierr)
+	   endif
             
-         enddo
+           pos0 = (x-1)*jjsize 
 
-         else
-
-            do x=1,iisize
-               call exec_b_c2(source(1,1,x),1,nz_fft,buf3,1,nz_fft,nz_fft,jjsize)
-            
-               pos0 = (x-1)*jjsize 
-
-               do z=1,nz_fft,NBz
-                  z2 = min(z+NBz,nz_fft)
+             do z=1,nz_fft,NBz
+                z2 = min(z+NBz,nz_fft)
                
                   do y=1,jjsize,NBy2
                      y2 = min(y+NBy2-1,jjsize)
@@ -188,9 +208,7 @@
                enddo
             
             enddo
-
-      endif
-
+	endif
      endif
          
       tc = tc + MPI_Wtime()

@@ -67,6 +67,7 @@
       integer iproc,jproc,ng(3),kmax,k
       real(mytype), allocatable :: E(:)
       logical iex
+	integer memsize(3)
 
       call MPI_INIT (ierr)
       call MPI_COMM_SIZE (MPI_COMM_WORLD,nproc,ierr)
@@ -138,7 +139,7 @@
 
 ! Initialize P3DFFT
 
-      call p3dfft_setup (dims,nx,ny,nz,.false.)
+      call p3dfft_setup (dims,nx,ny,nz,.false.,memsize)
 
 ! Get dimensions for initial and outcoming arrays
 
@@ -185,7 +186,7 @@
       rtime1 = - MPI_wtime()
 
 ! Do forward Fourier transform
-      call p3dfft_ftran_r2c (BEG,AEND)
+      call p3dfft_ftran_r2c (BEG,AEND,'fft')
          
       rtime1 = rtime1 + MPI_wtime()
 

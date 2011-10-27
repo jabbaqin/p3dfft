@@ -60,6 +60,7 @@
       real(mytype), dimension(:,:,:),  allocatable :: BEG,C
       complex(mytype), dimension(:,:,:),  allocatable :: AEND
       real(mytype) pi,twopi,sinyz,diff,cdiff,ccdiff,ans
+      integer memsize(3)
 
       integer(i8) Ntot
       real(mytype) factor
@@ -145,7 +146,7 @@
       endif
 
 ! Set up work structures for P3DFFT
-      call p3dfft_setup (dims,nx,ny,nz,.true.)
+      call p3dfft_setup (dims,nx,ny,nz,.true.,memsize)
 
 ! Get dimensions for the original array of real numbers, X-pencils
       call p3dfft_get_dims(istart,iend,isize,1)
@@ -222,7 +223,7 @@
          call MPI_Barrier(MPI_COMM_WORLD,ierr)
          rtime1 = rtime1 - MPI_wtime()
 ! Forward transform
-         call p3dfft_ftran_r2c (BEG,AEND)
+         call p3dfft_ftran_r2c (BEG,AEND,'fft')
          
          rtime1 = rtime1 + MPI_wtime()
          
@@ -238,7 +239,7 @@
          call MPI_Barrier(MPI_COMM_WORLD,ierr)
          rtime1 = rtime1 - MPI_wtime()
 ! Backward transform     
-         call p3dfft_btran_c2r (AEND,C)       
+         call p3dfft_btran_c2r (AEND,C,'tff')       
          rtime1 = rtime1 + MPI_wtime()
          
       end do

@@ -91,10 +91,10 @@
                    call exec_b_c2(source(1,1,x), 1,nz_fft, &
 				  buf3, 1,nz_fft,nz_fft,jjsize)
  		else if(op(1:1) == 'c') then	
-                   call exec_ctrans_r2(source(1,1,x), 2,2*nz_fft, & 
+                   call exec_ctrans_r2_complex(source(1,1,x), 2,2*nz_fft, & 
 				  buf3, 2,2*nz_fft,nz_fft,jjsize)
  		else if(op(1:1) == 's') then	
-                   call exec_strans_r2(source(1,1,x), 2,2*nz_fft, & 
+                   call exec_strans_r2_complex(source(1,1,x), 2,2*nz_fft, & 
 				  buf3, 2,2*nz_fft,nz_fft,jjsize)
 		else
 		   print *,taskid,'Unknown transform type: ',op(1:1)
@@ -175,10 +175,10 @@
               call exec_b_c2(source(1,1,x), 1,nz_fft, &
 		  buf3, 1,nz_fft,nz_fft,jjsize)
  	   else if(op(1:1) == 'c') then	
-              call exec_ctrans_r2(source(1,1,x), 2,2*nz_fft, & 
+              call exec_ctrans_r2_complex(source(1,1,x), 2,2*nz_fft, & 
 				  buf3, 2,2*nz_fft,nz_fft,jjsize)
     	   else if(op(1:1) == 's') then	
-              call exec_strans_r2(source(1,1,x), 2,2*nz_fft, & 
+              call exec_strans_r2_complex(source(1,1,x), 2,2*nz_fft, & 
 				  buf3, 2,2*nz_fft,nz_fft,jjsize)
  	   else
 	      print *,taskid,'Unknown transform type: ',op(1:1)

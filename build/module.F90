@@ -95,6 +95,7 @@
 #ifdef USE_EVEN
     integer * 8, save :: IfCntMax, KfCntMax
     integer * 8, save :: IJCntMax, JICntMax
+    integer * 8, save :: IJCntMax, JICntMax
     integer * 8, save :: IKCntMax, KICntMax
     integer * 8, save :: IiCntMax, KjCntMax
     logical KfCntUneven

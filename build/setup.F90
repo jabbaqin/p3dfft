@@ -36,7 +36,7 @@
       integer impid, ippid, jmpid, jppid
       integer(i8) nm,n1,n2
       real(mytype), allocatable :: R(:)
-      integer, intent (out) :: memsize (3)
+      integer, optional, intent (out) :: memsize (3)
 
       integer my_start (3), my_end (3), my_size (3)
       integer my_proc_dims (2, 9)
@@ -439,6 +439,7 @@
     my_proc_dims (2, 7) = my_size (1)
     my_proc_dims (2, 8) = my_size (2)
     my_proc_dims (2, 9) = my_size (3)
+
     allocate (proc_dims(2, 9, 0:(iproc*jproc)-1))
     call MPI_Allgather (my_proc_dims, 2*9, MPI_INTEGER,proc_dims, 2 * 9, MPI_INTEGER,mpi_comm_cart, ierr)
 
@@ -446,13 +447,15 @@
     proc_parts = - 1
 
 !     calc max. needed memory (attention: cast to integer8 included)
-    memsize (1) = 2 * nxhp
-    memsize (2) = jisize
-    memsize (3) = kjsize + padd
+	maxisize = 2 * nxhp
+	maxjsize = jisize
+	maxksize = kjsize + padd
 
-    maxisize = memsize (1)
-    maxjsize = memsize (2)
-    maxksize = memsize (3)
+	if(present(memsize)) then
+	  memsize(1) = maxisize
+	  memsize(2) = maxjsize
+	  memsize(3) = maxksize
+	endif
 
       end subroutine p3dfft_setup
 

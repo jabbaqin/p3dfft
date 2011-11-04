@@ -71,7 +71,7 @@
       integer fstart(3),fend(3),fsize(3)
       integer iproc,jproc,add
       logical iex
-	integer memsize(3)
+      integer memsize(3),tmp1(3),tmp2(3)
 
 ! Initialize MPI
 
@@ -145,7 +145,7 @@
       endif
 
 ! Set up work structures for P3DFFT
-      call p3dfft_setup (dims,nx,ny,nz,.true.,memsize)
+      call p3dfft_setup (dims,nx,ny,nz,.true.)
 
 ! Get dimensions for the original array of real numbers, X-pencils
       call p3dfft_get_dims(istart,iend,isize,1)
@@ -155,6 +155,20 @@
 !   dimension could be either X or Z)
 ! 
       call p3dfft_get_dims(fstart,fend,fsize,2)
+
+
+! Since we are allocating the same array for input and output, 
+! we need to make sure it has enough space. This is achieved
+! by calling get_dims with option 3. 
+
+      call p3dfft_get_dims(tmp1,tmp2,memsize,3)
+
+      allocate (B(istart(1):istart+memsize(1)-1,istart(2):istart(2)+memsize(2)-1,istart(3):istart(3)+memsize(3)-1), stat=ierr)
+
+      if(ierr .ne. 0) then
+         print *,'Error ',ierr,' allocating array B'
+      endif
+
 
 ! Initialize the array to be transformed
 !
@@ -171,37 +185,6 @@
       do x=istart(1),iend(1)
          sinx(x)=sin((x-1)*twopi/nx)
       enddo
-
-! Now allocate the main array, used both for input and output
-! Since the input and output sizes may be different, 
-! we need to allocate the larger of the two. 
-! This is achieved in this example by extending the third dimension 
-! of the input array so it's large enough to contain the output,
-! while at the same time has the correct shape to begin with. 
-! Factor of 2 accounts for complex storage of the output
-
-       add = (fsize(1)*fsize(2)*fsize(3)*2 +0.5 - isize(1)*isize(2)*isize(3))
-      if(add .le. 0) then
-         add = 0
-      else
-         if(mod(add,isize(1)*isize(2)) .eq. 0) then
-            add = add / (isize(1)*isize(2))
-         else
-            add = add / (isize(1)*isize(2)) +1
-         endif
-      endif
-
-      if(add .ne. 0) then
-!         print *,'additional space: ',add
-      endif
-!      print *,'Allocating B (',isize,istart,iend
-
-      allocate (B(istart(1):iend(1),istart(2):iend(2),istart(3):iend(3)+add), stat=ierr)
-      if(ierr .ne. 0) then
-         print *,'Error ',ierr,' allocating array B'
-      endif
-
-! Initialize the array with 3D sine wave
 
       do z=istart(3),iend(3)
          do y=istart(2),iend(2)

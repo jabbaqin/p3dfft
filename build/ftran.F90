@@ -147,7 +147,7 @@
 	print *,taskid,': Transforming in Z'
 #endif
          if(iisize * jjsize .gt. 0) then
-	    if(op(3:3) == 't') then
+	    if(op(3:3) == 't' .or. op(3:3) == 'f') then
                call init_f_c(XYZg,iisize*jjsize, 1, XYZg,iisize*jjsize, 1,nz,iisize*jjsize)
          
               timers(8) = timers(8) - MPI_Wtime()
@@ -183,7 +183,7 @@
 #else
          Nl = iisize*jjsize*nz
          call ar_copy(buf,XYZg,Nl)
-	    if(op(3:3) == 't') then
+	    if(op(3:3) == 't' .or. op(3:3) == 'f') then
                call init_f_c(XYZg,iisize*jjsize, 1, XYZg,iisize*jjsize, 1,nz,iisize*jjsize)
          
               timers(8) = timers(8) - MPI_Wtime()

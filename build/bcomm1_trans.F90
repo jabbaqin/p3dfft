@@ -87,7 +87,7 @@
 
       else
          do x=1,iisize
-		if(op(1:1) == 't') then
+		if(op(1:1) == 't' .or. op(1:1) == 'f') then
                    call exec_b_c2(source(1,1,x), 1,nz_fft, &
 				  buf3, 1,nz_fft,nz_fft,jjsize)
  		else if(op(1:1) == 'c') then	
@@ -171,7 +171,7 @@
 
       else
         do x=1,iisize
- 	   if(op(1:1) == 't') then
+ 	   if(op(1:1) == 't' .or. op(1:1) == 'f') then
               call exec_b_c2(source(1,1,x), 1,nz_fft, &
 		  buf3, 1,nz_fft,nz_fft,jjsize)
  	   else if(op(1:1) == 'c') then	

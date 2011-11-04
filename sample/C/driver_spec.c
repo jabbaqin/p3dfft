@@ -73,6 +73,7 @@ int main(int argc,char **argv)
    int fstart[3],fsize[3],fend[3];
    int iproc,jproc,ng[3],kmax,iex,conf,m,n;
    long int Ntot;
+   unsigned char op_f[3]="fft";
 
 #ifndef SINGLE_PREC
    double pi,twopi,sinyz,cdiff,ccdiff,ans;
@@ -84,6 +85,7 @@ int main(int argc,char **argv)
 
    double rtime1,rtime2,gt[12],gt1[12],gt2[12],timers[12];
    FILE *fp;
+   int memsize[3];
 
 #ifndef SINGLE_PREC
    void print_all(double *,long int,int,long int),mult_array(double *,long int,double);
@@ -155,7 +157,7 @@ int main(int argc,char **argv)
       printf("Using processor grid %d x %d\n",dims[0],dims[1]);
 
    /* Initialize P3DFFT */
-   p3dfft_setup(dims,nx,ny,nz,1);
+   p3dfft_setup(dims,nx,ny,nz,1,memsize);
    /* Get dimensions for input and output arrays */
    conf = 1;
    p3dfft_get_dims(istart,iend,isize,conf);
@@ -213,7 +215,7 @@ int main(int argc,char **argv)
    MPI_Barrier(MPI_COMM_WORLD);
    /* Compute forward Fourier transform on A, store results in B */
    rtime1 = - MPI_Wtime();
-   p3dfft_ftran_r2c(A,B);
+   p3dfft_ftran_r2c(A,B,op_f);
    rtime1 = rtime1 + MPI_Wtime();
 
    /* normalize */

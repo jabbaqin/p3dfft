@@ -108,7 +108,7 @@
            enddo 
          enddo
 
-	if(op(3:3) == 't') then
+	if(op(3:3) == 't' .or. op(3:3) == 'f') then
              call exec_f_c2(buf3, 1,nz_fft, &
 			  dest(1,1,x), 1,nz_fft,nz_fft,jjsize)
 	else if(op(3:3) == 'c') then	
@@ -190,7 +190,7 @@
             pos0 = pos0 + iisize*jjsize*NBz
          enddo
 
-	if(op(3:3) == 't') then
+	if(op(3:3) == 't' .or. op(3:3) == 'f') then
              call exec_f_c2(buf3, 1,nz_fft, &
 			  dest(1,1,x), 1,nz_fft,nz_fft,jjsize)
 	else if(op(3:3) == 'c') then	

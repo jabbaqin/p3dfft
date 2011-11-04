@@ -69,7 +69,7 @@
          if(OW) then
 
             if(iisize*jjsize .gt. 0) then
-		if(op(1:1) == 't') then
+		if(op(1:1) == 't' .or. op(1:1) == 'f') then
                    call init_b_c(XYZg, iisize*jjsize, 1, &
                                  XYZg, iisize*jjsize, 1,nz,iisize*jjsize)
 
@@ -100,7 +100,7 @@
    
          else
             if(iisize*jjsize .gt. 0) then
-		if(op(1:1) == 't') then
+		if(op(1:1) == 't' .or. op(1:1) == 'f') then
                    call init_b_c(XYZg, iisize*jjsize, 1, &
 				 buf, iisize*jjsize, 1,nz,iisize*jjsize)
             
@@ -147,7 +147,7 @@
          Nl = iisize*jjsize*nz
          if(OW) then   
 
-  	    if(op(1:1) == 't') then
+  	    if(op(1:1) == 't' .or. op(1:1) == 'f') then
                call init_b_c(XYZg, iisize*jjsize, 1, &
 			     XYZg, iisize*jjsize, 1,nz,iisize*jjsize)
                call exec_b_c2(XYZg, iisize*jjsize, 1, &
@@ -173,7 +173,7 @@
             call ar_copy(XYZg,buf,Nl)
 
          else
-  	    if(op(1:1) == 't') then
+  	    if(op(1:1) == 't' .or. op(1:1) == 'f') then
                call init_b_c(XYZg, iisize*jjsize, 1,  &
 			     buf, iisize*jjsize, 1,nz,iisize*jjsize)
                call exec_b_c2(XYZg, iisize*jjsize, 1, &

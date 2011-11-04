@@ -56,7 +56,7 @@
 	else
            do x=1,iisize
 
-	      if(op(1:1) == 't') then
+	      if(op(1:1) == 't' .or. op(1:1) == 'f') then
                  call exec_b_c2(A(1,1,x), 1,nz_fft, &
 				  C, 1,nz_fft,nz_fft,ny_fft)
  	      else if(op(1:1) == 'c') then	
@@ -216,7 +216,7 @@
                   enddo
               enddo 
 
-   	      if(op(3:3) == 't') then
+   	      if(op(3:3) == 't' .or. op(3:3) == 'f') then
                  call exec_f_c2(C, 1,nz_fft, &
 			  B(1,1,x), 1,nz_fft,nz_fft,ny_fft)
 	      else if(op(3:3) == 'c') then	

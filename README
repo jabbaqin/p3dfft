@@ -1,9 +1,11 @@
 
 P3DFFT - Highly scalable parallel 3D Fast Fourier Transforms library
 
-Version 2.4
+Version 2.5
 
-Copyright (C) 2006-2010 Dmitry Pekurovsky
+Copyright (C) 2006-2011 Dmitry Pekurovsky
+Copyright (C) 2006-2011 University of California
+Copyright (C) 2010-2011 Jens Henrik Goebbert
 San Diego Supercomputer Center/UC SanDiego
 
 ------------

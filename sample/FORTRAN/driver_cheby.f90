@@ -206,7 +206,7 @@
                               fstart(3):fend(3)), target	::	cmem
       	real(mytype), intent(in) :: coordX(nx), coordY(ny), coordZ(nz)
 
-      	double precision  :: delta
+      	double precision  :: delta,prec
       	double precision  :: maxdelta1, maxdelta01
       	integer            :: i,j,k,ierr
 
@@ -259,7 +259,17 @@
       	call MPI_reduce(maxdelta1,maxdelta01,1,MPI_DOUBLE_PRECISION,MPI_MAX,0,MPI_COMM_WORLD,ierr)
       	if(proc_id .eq. 0) then
            write(*,*) '  FFT(chebyshev) partial3D error in Z : ',maxdelta01
-      	endif
+         if(mytype .eq. 8) then
+            prec = 1e-14
+         else
+            prec = 1e-5
+         endif
+         if(maxdelta01 .gt. prec * Nx * Ny * Nz*0.25) then
+            print *,'Results are incorrect'
+         else
+            print *,'Results are correct'
+         endif
+      endif
 
       return
       end subroutine cheby_test

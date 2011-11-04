@@ -79,6 +79,8 @@ int main(int argc,char **argv)
    float cdiff,ccdiff,prec;
 #endif
    FILE *fp;
+   unsigned char op_f[3]="fft", op_b[3]="tff";
+   int memsize[3];
 
 #ifndef SINGLE_PREC
    void print_all(double *,int,long int),mult_array(double *,long int,double);
@@ -152,7 +154,7 @@ int main(int argc,char **argv)
       printf("Using processor grid %d x %d\n",dims[0],dims[1]);
 
    /* Initialize P3DFFT */
-   p3dfft_setup(dims,nx,ny,nz,1);
+   p3dfft_setup(dims,nx,ny,nz,1,memsize);
    /* Get dimensions for input array - complex numbers, Z-pencil shape.
       Stride-1 dimension could be X or Z, depending on how the library 
       was compiled (stride1 option).
@@ -203,7 +205,7 @@ int main(int argc,char **argv)
      /* Compute backward transform on A, store results in B */
      MPI_Barrier(MPI_COMM_WORLD);
      rtime1 = rtime1 - MPI_Wtime();
-     p3dfft_btran_c2r(A,B);
+     p3dfft_btran_c2r(A,B,op_b);
      rtime1 = rtime1 + MPI_Wtime();
 
      if(proc_id == 0) 

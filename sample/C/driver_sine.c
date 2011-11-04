@@ -49,6 +49,8 @@ int main(int argc,char **argv)
    double tcomm,gtcomm[3];
    double cdiff,ccdiff,ans,prec;
    FILE *fp;
+   unsigned char op_f[3]="fft", op_b[3]="tff";
+   int memsize[3];
 
 #ifndef SINGLE_PREC
    void print_all(double *,long int,int,long int),mult_array(double *,long int,double);
@@ -120,28 +122,21 @@ int main(int argc,char **argv)
       printf("Using processor grid %d x %d\n",dims[0],dims[1]);
 
    /* Initialize P3DFFT */
-   p3dfft_setup(dims,nx,ny,nz,1);
+   p3dfft_setup(dims,nx,ny,nz,1,memsize);
    /* Get dimensions for input array - real numbers, X-pencil shape.
       Note that we are following the Fortran ordering, i.e. 
       the dimension  with stride-1 is X. */
+   printf("Calling get_dims 1\n");
    conf = 1;
    p3dfft_get_dims(istart,iend,isize,conf);
    /* Get dimensions for output array - complex numbers, Z-pencil shape.
       Stride-1 dimension could be X or Z, depending on how the library 
       was compiled (stride1 option) */
+   printf("Calling get_dims 2\n");
    conf = 2;
    p3dfft_get_dims(fstart,fend,fsize,conf);
 
-   sinx = malloc(sizeof(double)*nx);
-   siny = malloc(sizeof(double)*ny);
-   sinz = malloc(sizeof(double)*nz);
-
-   for(z=0;z < isize[2];z++)
-     sinz[z] = sin((z+istart[2]-1)*twopi/nz);
-   for(y=0;y < isize[1];y++)
-     siny[y] = sin((y+istart[1]-1)*twopi/ny);
-   for(x=0;x < isize[0];x++)
-     sinx[x] = sin((x+istart[0]-1)*twopi/nx);
+   printf("Allocating\n");
 
    /* Allocate and Initialize */
 #ifndef SINGLE_PREC
@@ -163,6 +158,18 @@ int main(int argc,char **argv)
    if(C == NULL) 
      printf("%d: Error allocating array C (%d)\n",proc_id,isize[0]*isize[1]*isize[2]);
 
+   printf("Initializing\n");
+
+   sinx = malloc(sizeof(double)*nx);
+   siny = malloc(sizeof(double)*ny);
+   sinz = malloc(sizeof(double)*nz);
+
+   for(z=0;z < isize[2];z++)
+     sinz[z] = sin((z+istart[2]-1)*twopi/nz);
+   for(y=0;y < isize[1];y++)
+     siny[y] = sin((y+istart[1]-1)*twopi/ny);
+   for(x=0;x < isize[0];x++)
+     sinx[x] = sin((x+istart[0]-1)*twopi/nx);
 
    p = A;
    for(z=0;z < isize[2];z++)
@@ -181,12 +188,12 @@ int main(int argc,char **argv)
    rtime1 = 0.0;
    for(m=0;m < n;m++) {
 
-     MPI_Barrier(MPI_COMM_WORLD);
-     rtime1 = rtime1 - MPI_Wtime();
      if(proc_id == 0) 
         printf("Iteration %d\n",m);
+     MPI_Barrier(MPI_COMM_WORLD);
+     rtime1 = rtime1 - MPI_Wtime();
      /* compute forward Fourier transform on A, store results in B */
-     p3dfft_ftran_r2c(A,B);
+     p3dfft_ftran_r2c(A,B,op_f);
      rtime1 = rtime1 + MPI_Wtime();
 
      if(proc_id == 0) 
@@ -199,7 +206,7 @@ int main(int argc,char **argv)
      /* Compute backward transform on B, store results in C */
      MPI_Barrier(MPI_COMM_WORLD);
      rtime1 = rtime1 - MPI_Wtime();
-     p3dfft_btran_c2r(B,C);
+     p3dfft_btran_c2r(B,C,op_b);
      rtime1 = rtime1 + MPI_Wtime();
 
    } 

@@ -78,6 +78,8 @@ int main(int argc,char **argv)
    double *sinx,*siny,*sinz,factor,r;
    double rtime1,rtime2,gt[12],gt1[12],gt2[12],timers[12];
    FILE *fp;
+   unsigned char op_f[3]="fft", op_b[3]="tff";
+   int memsize[3];
 
 #ifndef SINGLE_PREC
    void print_all(double *,long int,int,long int),mult_array(double *,long int,double);
@@ -150,7 +152,7 @@ int main(int argc,char **argv)
       printf("Using processor grid %d x %d\n",dims[0],dims[1]);
 
    /* Initialize P3DFFT */
-   p3dfft_setup(dims,nx,ny,nz,0);
+   p3dfft_setup(dims,nx,ny,nz,0,memsize);
    /* Get dimensions for input array - real numbers, X-pencil shape.
       Note that we are following the Fortran ordering, i.e. 
       the dimension  with stride-1 is X. */
@@ -207,7 +209,7 @@ int main(int argc,char **argv)
      MPI_Barrier(MPI_COMM_WORLD);
      /* Forward transform */
      rtime1 = rtime1 - MPI_Wtime();
-     p3dfft_ftran_r2c(A,B);
+     p3dfft_ftran_r2c(A,B,op_f);
      rtime1 = rtime1 + MPI_Wtime();
 
      if(proc_id == 0)
@@ -220,7 +222,7 @@ int main(int argc,char **argv)
      MPI_Barrier(MPI_COMM_WORLD);
      /* Backward transform */
      rtime1 = rtime1 - MPI_Wtime();
-     p3dfft_btran_c2r(B,C);
+     p3dfft_btran_c2r(B,C,op_b);
      rtime1 = rtime1 + MPI_Wtime();
 
    }

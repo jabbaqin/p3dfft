@@ -4,8 +4,8 @@
 !
 !    Software Framework for Scalable Fourier Transforms in Three Dimensions
 !
-!    Copyright (C) 2006-2013 Dmitry Pekurovsky
-!    Copyright (C) 2006-2013 University of California
+!    Copyright (C) 2006-2010 Dmitry Pekurovsky
+!    Copyright (C) 2006-2010 University of California
 !    Copyright (C) 2010-2011 Jens Henrik Goebbert
 !
 !    This program is free software: you can redistribute it and/or modify
@@ -25,16 +25,17 @@
 !----------------------------------------------------------------------------
 
 ! =========================================================
-      subroutine p3dfft_setup(dims,nx,ny,nz,mpi_comm_in,nxcut,nycut,nzcut,overwrite,memsize)
+      subroutine p3dfft_setup(dims,nx,ny,nz,mpi_comm_in,nxcut,nycut,nzcut,overwrite,memsize) BIND(C,NAME='p3dfft_setup')
 !========================================================
 
+      use iso_c_binding
       implicit none
 
       integer i,j,k,nx,ny,nz,err,mpi_comm_in
       integer ierr, dims(2),  cartid(2)
       logical periodic(2),remain_dims(2)
       integer impid, ippid, jmpid, jppid
-      integer(i8) nm,n1,n2,pad1
+      integer(i8) n1,n2,pad1
       real(mytype), allocatable :: R(:)
       integer, optional, intent (out) :: memsize (3)
       integer, optional, intent (in) :: nxcut,nycut,nzcut
@@ -308,9 +309,10 @@
 
       endif
 
-      print *,taskid,': padd=',padd
+!      print *,taskid,': padd=',padd
 ! Initialize FFTW and allocate buffers for communication
       nm = nxhp * jisize * (kjsize+padd) 
+      nv_preset = 1
       if(nm .gt. 0) then       
         allocate(buf1(nm),stat=err)
         if(err .ne. 0) then
@@ -333,6 +335,11 @@
         call init_plan(buf1,R,buf2,nm)
 
         deallocate(R)
+        allocate(buf(nm),stat=err)
+        if(err .ne. 0) then
+           print *,'p3dfft_setup: Error allocating buf (',nm
+        endif
+
 
      endif
 
@@ -347,14 +354,6 @@
          allocate(buf2(n1))
       endif
 #endif
-
-!     preallocate memory for FFT-Transforms
-    allocate (buf(nxhp*jisize*(kjsize+padd)), stat=err)
-!     initialize buf to avoid "floating point invalid" errors in debug mode
-    buf = 0.d0
-    if (err /= 0) then
-      print *, 'Error ', err, ' allocating array buf'
-    end if
 
 !#ifdef USE_EVEN
 !       

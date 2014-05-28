@@ -4,8 +4,8 @@
 !
 !    Software Framework for Scalable Fourier Transforms in Three Dimensions
 !
-!    Copyright (C) 2006-2013 Dmitry Pekurovsky
-!    Copyright (C) 2006-2013 University of California
+!    Copyright (C) 2006-2010 Dmitry Pekurovsky
+!    Copyright (C) 2006-2010 University of California
 !    Copyright (C) 2010-2011 Jens Henrik Goebbert
 !
 !    This program is free software: you can redistribute it and/or modify
@@ -53,7 +53,7 @@
       real(r8), save :: timer(12)
        integer, public :: real_size,complex_size
 
-      integer,save :: NX_fft,NY_fft,NZ_fft,nxh,nxhp
+      integer,save :: NX_fft,NY_fft,NZ_fft,nxh,nxhp,nv_preset
       integer,save :: nxc,nyc,nzc,nxhc,nxhpc,nyh,nzh,nyhc,nzhc,nyhcp,nzhcp	
       integer,save :: ipid,jpid,taskid,numtasks,iproc,jproc
       integer,save :: iistart,iiend,iisize,jjstart,jjsize,jjend
@@ -99,6 +99,7 @@
     integer * 8, save :: IiCntMax, KjCntMax
     logical KfCntUneven
 #endif
+    integer*8 :: nm
 
 #ifdef STRIDE1
       integer CB,NBx,NBy1,NBy2,NBz
@@ -122,7 +123,9 @@
  
     public :: p3dfft_get_dims, p3dfft_get_mpi_info, p3dfft_setup, &
 		p3dfft_ftran_r2c, p3dfft_btran_c2r, p3dfft_cheby, &
-              p3dfft_clean, print_buf, &
+!		ftran_r2c,btran_c2r, &
+		p3dfft_ftran_r2c_many, p3dfft_btran_c2r_many, p3dfft_cheby_many, &
+              p3dfft_clean, print_buf, print_buf_real, &
               proc_id2coords, proc_coords2id, &
               proc_dims, proc_parts, get_proc_parts, &
               rtran_x2y, rtran_y2x, rtran_x2z, rtran_z2x, &
@@ -148,12 +151,20 @@
 #include "bcomm1.F90"
 #endif
 #include "bcomm2.F90"
+!#include "wrap.F90"
 !#include "ghost_cell.F90"
 
 !=====================================================
 ! Return array dimensions for either real-space (conf=1) or wavenumber-space(conf=2)
 ! 
-      subroutine p3dfft_get_dims(istart,iend,isize,conf)
+      subroutine p3dfft_get_dims_w(istart,iend,isize,conf) BIND(C,NAME='p3dfft_get_dims')
+      integer istart(3),iend(3),isize(3),conf
+
+      call p3dfft_get_dims(istart,iend,isize,conf) 
+
+      end subroutine
+
+      subroutine p3dfft_get_dims(istart,iend,isize,conf) 
 !=====================================================
 
       integer istart(3),iend(3),isize(3),conf
@@ -228,7 +239,13 @@
     end subroutine 	
 
 !========================================================
-      subroutine p3dfft_clean
+      subroutine p3dfft_clean_w() BIND(C,NAME='p3dfft_clean')
+
+      call p3dfft_clean
+
+      end subroutine 
+
+      subroutine p3dfft_clean() 
 
 !!--------------------------------------------------------------
 ! Clean-up routines for FFTW
@@ -325,6 +342,20 @@
       end subroutine
 
 !========================================================
+      subroutine ar_copy_many(A,dim_a,B,dim_b,nar,nv)
+
+      integer(i8) nar,i
+      integer dim_a,dim_b,nv,j
+      complex(mytype) A(dim_a,nv),B(dim_b,nv)
+
+      do j=1,nv
+         call ar_copy(A(1,j),B(1,j),nar)
+      enddo
+      
+      return
+      end subroutine
+
+
       subroutine ar_copy(A,B,nar)
 
       integer(i8) nar,i
@@ -332,6 +363,19 @@
 
       do i=1,nar
          B(i,1,1)=A(i,1,1)
+      enddo
+
+      return
+      end subroutine
+
+      subroutine seg_zero_z_many(A,xdim,ydim,z1,z2,zdim,dim,nv)
+
+      implicit none
+      integer x,y,z,xdim,ydim,zdim,z1,z2,nv,j,dim
+      complex(mytype) A(dim,nv)
+
+      do j=1,nv
+         call seg_zero_z(A(1,j),xdim,ydim,z1,z2,zdim)
       enddo
 
       return
@@ -354,6 +398,32 @@
       return
       end subroutine seg_zero_z
 
+    subroutine seg_copy_z_f_many(in,out,x1,x2,y1,y2,z1,z2,shift_z,xdim,ydim,zdim,dim,nv)
+
+    implicit none
+    integer x1,x2,y1,y2,z1,z2,xdim,ydim,zdim,shift_z,x,y,z,nv,j,dim
+    complex(mytype) in(xdim,ydim,zdim,nv), out(dim,nv)
+
+    do j=1,nv
+      call seg_copy_z(in(1,1,1,j),out(1,j),x1,x2,y1,y2,z1,z2,shift_z,xdim,ydim,zdim)    
+    enddo
+
+    return
+    end subroutine
+
+    subroutine seg_copy_z_b_many(in,out,x1,x2,y1,y2,z1,z2,shift_z,xdim,ydim,zdim,dim,nv)
+
+    implicit none
+    integer x1,x2,y1,y2,z1,z2,xdim,ydim,zdim,shift_z,x,y,z,nv,j,dim
+    complex(mytype) out(xdim,ydim,zdim,nv), in(dim,nv)
+
+    do j=1,nv
+      call seg_copy_z(in(1,j),out(1,1,1,j),x1,x2,y1,y2,z1,z2,shift_z,xdim,ydim,zdim)    
+    enddo
+
+    return
+    end subroutine
+
     subroutine seg_copy_z(in,out,x1,x2,y1,y2,z1,z2,shift_z,xdim,ydim,zdim)
 
     implicit none
@@ -374,6 +444,22 @@
 
 
 !========================================================
+
+      subroutine get_timers_w(timer) BIND(C,name='get_timers')
+
+      real(r8) timer(12)
+
+      call get_timers(timer)
+
+      return
+      end subroutine
+
+      subroutine set_timers_w() BIND(C,name='set_timers')
+
+      call set_timers
+
+      return
+      end subroutine
 
       subroutine get_timers(timer)
          real(r8) timer(12)
@@ -399,6 +485,23 @@
       subroutine print_buf(A,lx,ly,lz)
 
       complex(mytype) A(lx,ly,lz)
+      integer lx,ly,lz,i,j,k
+      
+      do k=1,lz
+         do j=1,ly
+            do i=1,lx
+               if(abs(A(i,j,k)) .gt. 0.0000005) then
+                  print *,taskid,': (',i,j,k,') =',A(i,j,k)
+               endif
+            enddo
+         enddo
+      enddo
+
+      end subroutine
+!========================================================
+      subroutine print_buf_real(A,lx,ly,lz)
+
+      real(mytype) A(lx,ly,lz)
       integer lx,ly,lz,i,j,k
       
       do k=1,lz

@@ -32,10 +32,14 @@
 ! for a normalization factor. It can be used both as a correctness
 ! test and for timing the library functions. 
 !
+! This is a test program for MULTIVARIABLE routines of P3DFFT, 
+! such as ftran_r2c_many, btran_c2r_many etc
+!
 ! The program expects 'stdin' file in the working directory, with 
-! a single line of numbers : Nx,Ny,Nz,Ndim,Nrep. Here Nx,Ny,Nz
+! a single line of numbers : Nx,Ny,Nz,Ndim,Nv,Nrep. Here Nx,Ny,Nz
 ! are box dimensions, Ndim is the dimentionality of processor grid
-! (1 or 2), and Nrep is the number of repititions. Optionally
+! (1 or 2), and Nrep is the number of repititions. Nv is the 
+! number of variables. Optionally
 ! a file named 'dims' can also be provided to guide in the choice 
 ! of processor geometry in case of 2D decomposition. It should contain 
 ! two numbers in a line, with their product equal to the total number
@@ -57,20 +61,19 @@
       integer fstatus
       logical flg_inplace
 
-      real(mytype), dimension(:,:,:),  allocatable :: BEG,C
-      complex(mytype), dimension(:,:,:),  allocatable :: AEND
+      real(mytype), dimension(:,:,:,:),  allocatable :: BEG,C
+      complex(mytype), dimension(:,:,:,:),  allocatable :: AEND
       real(mytype) pi,twopi,sinyz,diff,cdiff,ccdiff,ans
-      integer memsize(3)
 
       integer(i8) Ntot
       real(mytype) factor
-      real(mytype),dimension(:),allocatable:: sinx,siny,sinz
+      real(mytype),dimension(:,:),allocatable:: sinx,siny,sinz
       real(i8) rtime1,rtime2,Nglob,prec
       real(i8) gt(12,3),gtcomm(3),tc
-      integer ierr,nu,ndim,dims(2),nproc,proc_id
+      integer ierr,nu,ndim,dims(2),nproc,proc_id,j,nv
       integer istart(3),iend(3),isize(3)
       integer fstart(3),fend(3),fsize(3)
-      integer iproc,jproc
+      integer iproc,jproc,nxc,nyc,nzc
       logical iex
 
       call MPI_INIT (ierr)
@@ -94,10 +97,10 @@
          endif 
          ndim = 2
 
-        read (3,*) nx, ny, nz, ndim,n
-	print *,'P3DFFT test, 3D wave input, empty transform in Z'
+        read (3,*) nx, ny, nz, ndim,nv,n
+	print *,'P3DFFT test, 3D wave input, multivariable version'
         write (*,*) "procs=",nproc," nx=",nx, &
-                " ny=", ny," nz=", nz,"ndim=",ndim," repeat=", n
+                " ny=", ny," nz=", nz,"ndim=",ndim,"n var.=",nv," repeat=", n
         if(mytype .eq. 4) then
            print *,'Single precision version'
         else if(mytype .eq. 8) then
@@ -105,11 +108,14 @@
         endif
        endif
 
+! nv is the nnumber of variables (for multivariable transforms)
+
       call MPI_Bcast(nx,1, MPI_INTEGER,0,mpi_comm_world,ierr)
       call MPI_Bcast(ny,1, MPI_INTEGER,0,mpi_comm_world,ierr)
       call MPI_Bcast(nz,1, MPI_INTEGER,0,mpi_comm_world,ierr)
-      call MPI_Bcast(n,1, MPI_INTEGER,0,mpi_comm_world,ierr)
       call MPI_Bcast(ndim,1, MPI_INTEGER,0,mpi_comm_world,ierr)
+      call MPI_Bcast(nv,1, MPI_INTEGER,0,mpi_comm_world,ierr)
+      call MPI_Bcast(n,1, MPI_INTEGER,0,mpi_comm_world,ierr)
 
 !    nproc is devided into a iproc x jproc stencle
 !
@@ -146,8 +152,12 @@
          print *,'Using processor grid ',iproc,' x ',jproc
       endif
 
+      nxc = nx
+      nyc = ny
+      nzc = nz
+
 ! Set up work structures for P3DFFT
-      call p3dfft_setup (dims,nx,ny,nz,MPI_COMM_WORLD)
+      call p3dfft_setup (dims,nx,ny,nz,MPI_COMM_WORLD,nxc,nyc,nzc)
 
 ! Get dimensions for the original array of real numbers, X-pencils
       call p3dfft_get_dims(istart,iend,isize,1)
@@ -160,42 +170,46 @@
 !
 ! Initialize the array to be transformed
 !
-      allocate (sinx(nx))
-      allocate (siny(ny))
-      allocate (sinz(nz))
+      allocate (sinx(nx,nv))
+      allocate (siny(ny,nv))
+      allocate (sinz(nz,nv))
 
-      do z=istart(3),iend(3)
-         sinz(z)=sin((z-1)*twopi/nz)
-      enddo
-      do y=istart(2),iend(2)
-         siny(y)=sin((y-1)*twopi/ny)
-      enddo
-      do x=istart(1),iend(1)
-         sinx(x)=sin((x-1)*twopi/nx)
-      enddo
 
 !      print *,'Allocating BEG (',isize,istart,iend
-      allocate (BEG(istart(1):iend(1),istart(2):iend(2),istart(3):iend(3)), stat=ierr)
+      allocate (BEG(istart(1):iend(1),istart(2):iend(2),istart(3):iend(3),nv), stat=ierr)
       if(ierr .ne. 0) then
          print *,'Error ',ierr,' allocating array BEG'
       endif
 !      print *,'Allocating AEND (',fsize,fstart,fend
-      allocate (AEND(fstart(1):fend(1),fstart(2):fend(2),fstart(3):fend(3)), stat=ierr)
+      allocate (AEND(fstart(1):fend(1),fstart(2):fend(2),fstart(3):fend(3),nv), stat=ierr)
       if(ierr .ne. 0) then
          print *,'Error ',ierr,' allocating array AEND'
       endif
-      allocate (C(istart(1):iend(1),istart(2):iend(2),istart(3):iend(3)), stat=ierr)
+      allocate (C(istart(1):iend(1),istart(2):iend(2),istart(3):iend(3),nv), stat=ierr)
       if(ierr .ne. 0) then
          print *,'Error ',ierr,' allocating array C'
       endif
 
-! Initialize with 3D sine wave
+! Initialize with 3D sine wave, with wavelength dependent on var. number j
 
-      do z=istart(3),iend(3)
+      do j=1,nv
+
+         do z=istart(3),iend(3)
+            sinz(z,j)=sin(j*(z-1)*twopi/nz)
+         enddo
          do y=istart(2),iend(2)
-            sinyz=siny(y)*sinz(z)
-            do x=istart(1),iend(1)
-               BEG(x,y,z)=sinx(x)*sinyz 
+            siny(y,j)=sin(j*(y-1)*twopi/ny)
+         enddo
+         do x=istart(1),iend(1)
+            sinx(x,j)=sin(j*(x-1)*twopi/nx)
+         enddo
+         
+         do z=istart(3),iend(3)
+            do y=istart(2),iend(2)
+               sinyz=siny(y,j)*sinz(z,j)
+               do x=istart(1),iend(1)
+                  BEG(x,y,z,j)=sinx(x,j)*sinyz 
+               enddo
             enddo
          enddo
       enddo
@@ -206,10 +220,19 @@
 ! then transform back to physical space
 ! (XiYjZg to XgYiZj)
 !
+
+! Do a few transforms to "warm up" the network
+         call p3dfft_ftran_r2c_many (BEG,isize(1)*isize(2)*isize(3),AEND, &
+              fsize(1)*fsize(2)*fsize(3),nv,'fft')
+         call p3dfft_ftran_r2c_many (BEG,isize(1)*isize(2)*isize(3),AEND, &
+	      fsize(1)*fsize(2)*fsize(3),nv,'fft')
+
+
 ! Repeat n times
 
       Ntot = fsize(1)*fsize(2)*fsize(3)
       Nglob = nx * ny 
+      Nglob = Nglob * nz
       factor = 1.0d0/Nglob
 
       rtime1 = 0.0               
@@ -223,23 +246,26 @@
          call MPI_Barrier(MPI_COMM_WORLD,ierr)
          rtime1 = rtime1 - MPI_wtime()
 ! Forward transform
-         call p3dfft_ftran_r2c (BEG,AEND,'ffn')
+         call p3dfft_ftran_r2c_many (BEG,isize(1)*isize(2)*isize(3),AEND, &
+                            fsize(1)*fsize(2)*fsize(3),nv,'fft')
          
          rtime1 = rtime1 + MPI_wtime()
          
-         if(proc_id .eq. 0) then
-            print *,'Result of forward transform:'
-         endif
-         call print_all(AEND,Ntot,proc_id,Nglob)
-         
-! normalize
-         call mult_array(AEND, Ntot,factor)
+         do j=1,nv
+            if(proc_id .eq. 0) then
+               print *,'Result of forward transform, var.',j
+            endif
+            call print_all(AEND(fstart(1),fstart(2),fstart(3),j),Ntot, &
+                 proc_id,Nglob)
+            call mult_array(AEND(fstart(1),fstart(2),fstart(3),j), Ntot,factor)
+	 enddo
     
 ! Barrier for correct timing
          call MPI_Barrier(MPI_COMM_WORLD,ierr)
          rtime1 = rtime1 - MPI_wtime()
 ! Backward transform     
-         call p3dfft_btran_c2r (AEND,C,'nff')       
+         call p3dfft_btran_c2r_many (AEND,fsize(1)*fsize(2)*fsize(3),C, &
+                 isize(1)*isize(2)*isize(3),nv,'tff')       
          rtime1 = rtime1 + MPI_wtime()
          
       end do
@@ -248,34 +274,36 @@
       call p3dfft_clean
 
 ! Check results
-      cdiff=0.0d0
-      do 20 z=istart(3),iend(3)
-         do 20 y=istart(2),iend(2)
-            sinyz=siny(y)*sinz(z)
-            do 20 x=istart(1),iend(1)
-            ans=sinx(x)*sinyz
-            if(cdiff .lt. abs(C(x,y,z)-ans)) then
-               cdiff = abs(C(x,y,z)-ans)
-!               print *,'x,y,z,cdiff=',x,y,z,cdiff
-            endif
- 20   continue
-      call MPI_Reduce(cdiff,ccdiff,1,mpireal,MPI_MAX,0, &
-        MPI_COMM_WORLD,ierr)
+      do j=1,nv
 
-      if(proc_id .eq. 0) then
-         if(mytype .eq. 8) then
-            prec = 1e-14
-         else
-            prec = 1e-5
-         endif
-         if(ccdiff .gt. prec * Nglob*0.25) then
-            print *,'Results are incorrect'
-         else
-            print *,'Results are correct'
-         endif
-         write (6,*) 'max diff =',ccdiff
-      endif
+         cdiff=0.0d0
+         do 20 z=istart(3),iend(3)
+            do 20 y=istart(2),iend(2)
+               sinyz=siny(y,j)*sinz(z,j)
+               do 20 x=istart(1),iend(1)
+                  ans=sinx(x,j)*sinyz
+                  if(cdiff .lt. abs(C(x,y,z,j)-ans)) then
+                     cdiff = abs(C(x,y,z,j)-ans)
+                  endif
+ 20      continue
+         call MPI_Reduce(cdiff,ccdiff,1,mpireal,MPI_MAX,0, &
+                   MPI_COMM_WORLD,ierr)
 
+        if(proc_id .eq. 0) then
+           write (6,*) 'Var. ',j,': max diff =',ccdiff
+           if(mytype .eq. 8) then
+              prec = 1e-14
+           else
+              prec = 1e-5
+           endif
+           if(ccdiff .gt. prec * Nglob*0.25) then
+              print *,'Results are incorrect'
+           else
+              print *,'Results are correct'
+           endif
+        endif
+
+      enddo
 
 ! Gather timing statistics
       call MPI_Reduce(rtime1,rtime2,1,mpi_real8,MPI_MAX,0, &

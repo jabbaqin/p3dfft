@@ -1,9 +1,10 @@
 /*
 ! This file is part of P3DFFT library
 !
-
-! Copyright (C) 2006-2013 Dmitry Pekurovsky
-! Copyright (C) 2006-2013 UC San Diego
+! Version 2.7
+!
+! Copyright (C) 2006-2014 Dmitry Pekurovsky
+! Copyright (C) 2006-2014 UC San Diego
 !
 ! P3DFFT is free software: you can redistribute it and/or modify
 ! it under the terms of the GNU General Public License as published by
@@ -21,35 +22,35 @@
 
 #include <stdlib.h>
 
+#define FORT_MOD_NAME(NAME) NAME
+
 #ifdef IBM
 
-#define FORT_MOD_NAME(NAME) __p3dfft_NMOD_##NAME
 #define FORTNAME(NAME) NAME
 
 elif defined INTEL
 
-#define FORT_MOD_NAME(NAME) p3dfft_mp_##NAME##_
 #define FORTNAME(NAME) NAME##_
 
 #elif defined PGI 
 
-#define FORT_MOD_NAME(NAME) p3dfft_##NAME##_
+/* #define FORT_MOD_NAME(NAME) p3dfft_##NAME##_ */
+
 #define FORTNAME(NAME) NAME##_
 
 #elif defined CRAY
 
-#define FORT_MOD_NAME(NAME) NAME##_
 #define FORTNAME(NAME) NAME
 
 #elif defined GNU
 #include "gnu.h"
+#define FORTNAME(NAME) NAME
 
 #else
-
-#define FORT_MOD_NAME(NAME) p3dfft_mp_##NAME##_
-#define FORTNAME(NAME) NAME##_
+#define FORTNAME(NAME) NAME
 
 #endif
+
 
 extern void FORT_MOD_NAME(p3dfft_setup)(int *dims,int *nx,int *ny,int *nz, int * comm, int *nxc, int *nyc, int *nzc, int *ow, int *memsize);
 extern void FORT_MOD_NAME(p3dfft_get_dims)(int *,int *,int *,int *);
@@ -66,47 +67,57 @@ extern void FORT_MOD_NAME(p3dfft_btran_c2r)(float *A,float *B, unsigned char *op
 
 extern void FORT_MOD_NAME(p3dfft_clean)();
 
-				       extern void p3dfft_setup(int *dims,int nx,int ny,int nz,int comm, int nxc,int nyc, int nzc, int ovewrite, int *memsize);
-extern void p3dfft_get_dims(int *,int *,int *,int );
+
+extern void Cp3dfft_setup(int *dims,int nx,int ny,int nz,int comm, int nxc,int nyc, int nzc, int ovewrite, int *memsize);
+extern void Cp3dfft_clean();
+
+extern void Cp3dfft_get_dims(int *,int *,int *,int );
 
 #ifndef SINGLE_PREC
-extern void p3dfft_ftran_r2c(double *A,double *B, unsigned char *op);
-extern void p3dfft_btran_c2r(double *A,double *B, unsigned char *op);
+extern void Cp3dfft_ftran_r2c(double *A,double *B, unsigned char *op);
+extern void Cp3dfft_btran_c2r(double *A,double *B, unsigned char *op);
 #else
-extern void p3dfft_ftran_r2c(float *A,float *B, unsigned char *op);
-extern void p3dfft_btran_c2r(float *A,float *B, unsigned char *op);
+extern void Cp3dfft_ftran_r2c(float *A,float *B, unsigned char *op);
+extern void Cp3dfft_btran_c2r(float *A,float *B, unsigned char *op);
 #endif
 
-extern void p3dfft_clean();
+extern void Cget_timers(double *timers);
+extern void Cset_timers();
 
-extern void get_timers(double *timers);
-extern void set_timers();
 
-inline void get_timers(double *timers) {
-  FORT_MOD_NAME(get_timers)(timers);
-}
-
-inline void set_timers() {
-  FORT_MOD_NAME(set_timers)();
-}
-
-inline void p3dfft_setup(int *dims,int nx,int ny,int nz, int comm, int nxc, int nyc, int nzc, int overwrite, int * memsize)
+inline void Cp3dfft_setup(int *dims,int nx,int ny,int nz, int comm, int nxc, int nyc, int nzc, int overwrite, int * memsize)
 {
   FORT_MOD_NAME(p3dfft_setup)(dims,&nx,&ny,&nz,&comm, &nxc, &nyc, &nzc, &overwrite,memsize);
 }
 
-inline void p3dfft_get_dims(int *start,int *end,int *size,int conf)
+inline void Cp3dfft_clean()
+{
+  FORT_MOD_NAME(p3dfft_clean)();
+}
+
+inline void Cp3dfft_get_dims(int *start,int *end,int *size,int conf)
 {
   FORT_MOD_NAME(p3dfft_get_dims)(start,end,size,&conf);
 }
 
+inline void Cget_timers(double *timers)
+{
+  FORT_MOD_NAME(get_timers)(timers);
+}
+
+inline void Cset_timers()
+{
+  FORT_MOD_NAME(set_timers)();
+}
+
+
 #ifndef SINGLE_PREC
-inline void p3dfft_ftran_r2c(double *A,double *B, unsigned char *op)
+inline void Cp3dfft_ftran_r2c(double *A,double *B, unsigned char *op)
 {
   FORT_MOD_NAME(p3dfft_ftran_r2c)(A,B,op);
 }
 #else
-inline void p3dfft_ftran_r2c(float *A,float *B, unsigned char *op)
+inline void Cp3dfft_ftran_r2c(float *A,float *B, unsigned char *op)
 {
   FORT_MOD_NAME(p3dfft_ftran_r2c)(A,B,op);
 }
@@ -114,18 +125,14 @@ inline void p3dfft_ftran_r2c(float *A,float *B, unsigned char *op)
 #endif
 
 #ifndef SINGLE_PREC
-inline void p3dfft_btran_c2r(double *A,double *B, unsigned char *op)
+inline void Cp3dfft_btran_c2r(double *A,double *B, unsigned char *op)
 {
   FORT_MOD_NAME(p3dfft_btran_c2r)(A,B,op);
 }
 #else
-inline void p3dfft_btran_c2r(float *A,float *B, unsigned char *op)
+inline void Cp3dfft_btran_c2r(float *A,float *B, unsigned char *op)
 {
   FORT_MOD_NAME(p3dfft_btran_c2r)(A,B,op);
 }
 #endif
 
-inline void p3dfft_clean()		
-{		
-  FORT_MOD_NAME(p3dfft_clean)();		
-}

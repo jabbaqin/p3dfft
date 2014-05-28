@@ -4,8 +4,8 @@
 !
 !    Software Framework for Scalable Fourier Transforms in Three Dimensions
 !
-!    Copyright (C) 2006-2013 Dmitry Pekurovsky
-!    Copyright (C) 2006-2013 University of California
+!    Copyright (C) 2006-2010 Dmitry Pekurovsky
+!    Copyright (C) 2006-2010 University of California
 !
 !    This program is free software: you can redistribute it and/or modify
 !    it under the terms of the GNU General Public License as published by
@@ -23,6 +23,42 @@
 !
 !----------------------------------------------------------------------------
 
+      subroutine ftran_r2c_many(IN,dim_in,OUT,dim_out,nv,op)
+      
+      use p3dfft
+
+      integer dim_in,dim_out
+      real(mytype), TARGET :: IN(dim_in,nv)
+      complex(mytype), TARGET :: OUT(dim_out,nv)
+!      real(mytype) IN(nx_fft,jistart:jiend,kjstart:kjend)
+!      complex(mytype) OUT(iistart:iiend,jjstart:jjend,nz_fft)
+!      logical flg_inplace
+      character(len=3) op
+      integer nv
+
+      call p3dfft_ftran_r2c_many(IN,dim_in,OUT,dim_out,nv,op)
+
+      return
+      end
+
+      subroutine btran_c2r_many(IN,dim_in,OUT,dim_out,nv,op)
+      
+      use p3dfft
+
+      integer dim_in,dim_out
+      real(mytype), TARGET :: OUT(dim_out,nv)
+      complex(mytype), TARGET :: IN(dim_in,nv)
+!      real(mytype) OUT(nx_fft,jistart:jiend,kjstart:kjend)
+!      complex(mytype) IN(iistart:iiend,jjstart:jjend,nz_fft)
+!      logical flg_inplace
+      character(len=3) op
+      integer nv
+
+      call p3dfft_btran_c2r_many(IN,dim_in,OUT,dim_out,nv,op)
+
+      return
+      end
+
       subroutine ftran_r2c(IN,OUT,op)
       
       use p3dfft
@@ -33,6 +69,7 @@
 !      complex(mytype) OUT(iistart:iiend,jjstart:jjend,nz_fft)
 !      logical flg_inplace
       character(len=3) op
+      integer nv
 
       call p3dfft_ftran_r2c(IN,OUT,op)
 
@@ -49,6 +86,7 @@
 !      complex(mytype) IN(iistart:iiend,jjstart:jjend,nz_fft)
 !      logical flg_inplace
       character(len=3) op
+      integer nv
 
       call p3dfft_btran_c2r(IN,OUT,op)
 

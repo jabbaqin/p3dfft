@@ -152,17 +152,17 @@ int main(int argc,char **argv)
       printf("Using processor grid %d x %d\n",dims[0],dims[1]);
 
    /* Initialize P3DFFT */
-   p3dfft_setup(dims,nx,ny,nz,MPI_COMM_WORLD,nx,ny,nz,0,memsize);
+   Cp3dfft_setup(dims,nx,ny,nz,MPI_COMM_WORLD,nx,ny,nz,0,memsize);
    /* Get dimensions for input array - real numbers, X-pencil shape.
       Note that we are following the Fortran ordering, i.e. 
       the dimension  with stride-1 is X. */
    conf = 1;
-   p3dfft_get_dims(istart,iend,isize,conf);
+   Cp3dfft_get_dims(istart,iend,isize,conf);
    /* Get dimensions for output array - complex numbers, Z-pencil shape.
       Stride-1 dimension could be X or Z, depending on how the library 
       was compiled (stride1 option) */
    conf = 2;
-   p3dfft_get_dims(fstart,fend,fsize,conf);
+   Cp3dfft_get_dims(fstart,fend,fsize,conf);
 
    /* Allocate and initialize */
 #ifndef SINGLE_PREC
@@ -209,7 +209,7 @@ int main(int argc,char **argv)
      MPI_Barrier(MPI_COMM_WORLD);
      /* Forward transform */
      rtime1 = rtime1 - MPI_Wtime();
-     p3dfft_ftran_r2c(A,B,op_f);
+     Cp3dfft_ftran_r2c(A,B,op_f);
      rtime1 = rtime1 + MPI_Wtime();
 
      if(proc_id == 0)
@@ -222,12 +222,12 @@ int main(int argc,char **argv)
      MPI_Barrier(MPI_COMM_WORLD);
      /* Backward transform */
      rtime1 = rtime1 - MPI_Wtime();
-     p3dfft_btran_c2r(B,C,op_b);
+     Cp3dfft_btran_c2r(B,C,op_b);
      rtime1 = rtime1 + MPI_Wtime();
 
    }
    /* Free work space */
-  p3dfft_clean();
+  Cp3dfft_clean();
  
   /* Check results */
   cdiff = 0.0; p2 = C;p1 = A;
@@ -313,7 +313,7 @@ void print_all(float *A,long int nar,int proc_id,long int Nglob)
   long int i;
 
   conf = 2;
-  p3dfft_get_dims(Fstart,Fend,Fsize,conf);
+  Cp3dfft_get_dims(Fstart,Fend,Fsize,conf);
   /*
   Fsize[0] *= 2;
   Fstart[0] = (Fstart[0]-1)*2;

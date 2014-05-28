@@ -65,6 +65,7 @@
          nz   = 33; Lz = 2.d0
 
       if (proc_id.eq.0) then 
+	print *,'P3DFFT test, Chebyshev'
          open (unit=3,file='stdin',status='old',  &
               access='sequential',form='formatted', iostat=fstatus)
          if (fstatus .eq. 0) then
@@ -166,8 +167,6 @@
       if (proc_id.eq.0) write(6,*)'time per loop', rtime2/dble(n)
 
       call MPI_FINALIZE (ierr)
-
-      stop
 
       end
 

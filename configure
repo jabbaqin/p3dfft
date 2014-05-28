@@ -725,7 +725,6 @@ enable_option_checking
 enable_ibm
 enable_intel
 enable_pgi
-enable_cray
 enable_gnu
 enable_single
 enable_oned
@@ -1383,7 +1382,6 @@ Optional Features:
   --enable-ibm            compile P3DFFT using IBM compiler
   --enable-intel          compile P3DFFT using Intel compiler
   --enable-pgi            compile P3DFFT using PGI compiler
-  --enable-cray            compile P3DFFT using Cray compiler
   --enable-gnu            compile P3DFFT using GNU compiler
   --enable-single         compile P3DFFT in single precision (default is
                           double precision)
@@ -2414,7 +2412,7 @@ _ACEOF
 
 	eval "ARRAY${N}='-DINTEL'"
 	N=`expr $N + 1`
-	FORTRAN_LIB="-lmpi_f90 -limf -lifcore"
+	FORTRAN_LIB="-lmpichf90 -limf -lifcore"
 
 #        FORTRAN_LIB="-lmpi_f90 -limf -lifcore"
 fi
@@ -2441,32 +2439,6 @@ _ACEOF
 	eval "ARRAY${N}='-DPGI'"
         N=`expr $N + 1`
         FORTRAN_LIB="-pgf90libs"
-
-fi
-
-# check whether to compile using Cray compiler
-{ $as_echo "$as_me:$LINENO: checking whether to use Cray compiler" >&5
-$as_echo_n "checking whether to use Cray compiler... " >&6; }
-# Check whether --enable-cray was given.
-if test "${enable_cray+set}" = set; then
-  enableval=$enable_cray; ok=$enableval
-else
-  ok=no
-fi
-
-{ $as_echo "$as_me:$LINENO: result: $ok" >&5
-$as_echo "$ok" >&6; }
-if test "$ok" = "yes"; then
-#	AC_SUBST(LDFLAGS,"$LDFLAGS -pgf90libs")
-
-cat >>confdefs.h <<\_ACEOF
-#define CRAY 1
-_ACEOF
-
-        eval FCFLAGS="\$FCFLAGS' -em -ef'"
-	eval "ARRAY${N}='-DCRAY'"
-        N=`expr $N + 1`
-        FORTRAN_LIB=""
 
 fi
 

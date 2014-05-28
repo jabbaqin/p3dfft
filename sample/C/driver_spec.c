@@ -157,12 +157,12 @@ int main(int argc,char **argv)
       printf("Using processor grid %d x %d\n",dims[0],dims[1]);
 
    /* Initialize P3DFFT */
-   p3dfft_setup(dims,nx,ny,nz,MPI_COMM_WORLD,nx,ny,nz,1,memsize);
+   Cp3dfft_setup(dims,nx,ny,nz,MPI_COMM_WORLD,nx,ny,nz,1,memsize);
    /* Get dimensions for input and output arrays */
    conf = 1;
-   p3dfft_get_dims(istart,iend,isize,conf);
+   Cp3dfft_get_dims(istart,iend,isize,conf);
    conf = 2;
-   p3dfft_get_dims(fstart,fend,fsize,conf);
+   Cp3dfft_get_dims(fstart,fend,fsize,conf);
 
 #ifndef SINGLE_PREC
    sinx = malloc(sizeof(double)*nx);
@@ -215,7 +215,7 @@ int main(int argc,char **argv)
    MPI_Barrier(MPI_COMM_WORLD);
    /* Compute forward Fourier transform on A, store results in B */
    rtime1 = - MPI_Wtime();
-   p3dfft_ftran_r2c(A,B,op_f);
+   Cp3dfft_ftran_r2c(A,B,op_f);
    rtime1 = rtime1 + MPI_Wtime();
 
    /* normalize */
@@ -248,7 +248,7 @@ int main(int argc,char **argv)
      printf("\n");
    }
 
-   p3dfft_clean();
+   Cp3dfft_clean();
    free(A);
    free(B);
    free(E);

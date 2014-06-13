@@ -152,7 +152,7 @@ int main(int argc,char **argv)
       printf("Using processor grid %d x %d\n",dims[0],dims[1]);
 
    /* Initialize P3DFFT */
-   Cp3dfft_setup(dims,nx,ny,nz,MPI_COMM_WORLD,nx,ny,nz,0,memsize);
+   Cp3dfft_setup(dims,nx,ny,nz,MPI_Comm_c2f(MPI_COMM_WORLD),nx,ny,nz,0,memsize);
    /* Get dimensions for input array - real numbers, X-pencil shape.
       Note that we are following the Fortran ordering, i.e. 
       the dimension  with stride-1 is X. */

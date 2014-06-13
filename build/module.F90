@@ -125,6 +125,7 @@
 		p3dfft_ftran_r2c, p3dfft_btran_c2r, p3dfft_cheby, &
 !		ftran_r2c,btran_c2r, &
 		p3dfft_ftran_r2c_many, p3dfft_btran_c2r_many, p3dfft_cheby_many, &
+		get_timers,set_timers,&
               p3dfft_clean, print_buf, print_buf_real, &
               proc_id2coords, proc_coords2id, &
               proc_dims, proc_parts, get_proc_parts, &

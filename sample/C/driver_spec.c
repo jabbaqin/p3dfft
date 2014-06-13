@@ -157,7 +157,7 @@ int main(int argc,char **argv)
       printf("Using processor grid %d x %d\n",dims[0],dims[1]);
 
    /* Initialize P3DFFT */
-   Cp3dfft_setup(dims,nx,ny,nz,MPI_COMM_WORLD,nx,ny,nz,1,memsize);
+   Cp3dfft_setup(dims,nx,ny,nz,MPI_Comm_c2f(MPI_COMM_WORLD),nx,ny,nz,1,memsize);
    /* Get dimensions for input and output arrays */
    conf = 1;
    Cp3dfft_get_dims(istart,iend,isize,conf);

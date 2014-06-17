@@ -228,7 +228,7 @@
 ! Backward transform: note - we pass the same array both as 
 ! original (complex) and transformed (real)
 
-         call btran_r2c_many (B,fsize(1)*fsize(2)*fsize(3),B, &
+         call btran_c2r_many (B,fsize(1)*fsize(2)*fsize(3),B, &
              isize(1)*isize(2)*isize(3),nv,'tff')
          rtime1 = rtime1 + MPI_wtime()
          

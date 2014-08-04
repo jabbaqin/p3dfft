@@ -11,6 +11,6 @@ SUBDIRS = \
 	sample
 
 all-local: 
-	echo $(SUCCESS)
+	@echo $(SUCCESS)
 clean-local:
 	-test -z "include/p3dfft.mod" || rm -f include/p3dfft.mod

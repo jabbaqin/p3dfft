@@ -59,7 +59,7 @@
 
       real(mytype), dimension(:,:,:),  allocatable :: BEG,C
       complex(mytype), dimension(:,:,:),  allocatable :: AEND
-      real(mytype) pi,twopi,sinyz,diff,cdiff,ccdiff,ans
+      real(mytype) twopi
       integer memsize(3)
 
       integer(i8) Ntot
@@ -157,22 +157,7 @@
 !   dimension could be either X or Z)
 ! 
       call p3dfft_get_dims(fstart,fend,fsize,2)
-!
-! Initialize the array to be transformed
-!
-      allocate (sinx(nx))
-      allocate (siny(ny))
-      allocate (sinz(nz))
 
-      do z=istart(3),iend(3)
-         sinz(z)=sin((z-1)*twopi/nz)
-      enddo
-      do y=istart(2),iend(2)
-         siny(y)=sin((y-1)*twopi/ny)
-      enddo
-      do x=istart(1),iend(1)
-         sinx(x)=sin((x-1)*twopi/nx)
-      enddo
 
 !      print *,'Allocating BEG (',isize,istart,iend
       allocate (BEG(istart(1):iend(1),istart(2):iend(2),istart(3):iend(3)), stat=ierr)
@@ -189,17 +174,10 @@
          print *,'Error ',ierr,' allocating array C'
       endif
 
-! Initialize with 3D sine wave
-
-      do z=istart(3),iend(3)
-         do y=istart(2),iend(2)
-            sinyz=siny(y)*sinz(z)
-            do x=istart(1),iend(1)
-               BEG(x,y,z)=sinx(x)*sinyz 
-            enddo
-         enddo
-      enddo
-
+!
+! Initialize the array to be transformed
+!
+	call init_ar_sine(BEG)
 !
 ! transform from physical space to wavenumber space
 ! (XgYiZj to XiYjZg)
@@ -248,34 +226,7 @@
       call p3dfft_clean
 
 ! Check results
-      cdiff=0.0d0
-      do 20 z=istart(3),iend(3)
-         do 20 y=istart(2),iend(2)
-            sinyz=siny(y)*sinz(z)
-            do 20 x=istart(1),iend(1)
-            ans=sinx(x)*sinyz
-            if(cdiff .lt. abs(C(x,y,z)-ans)) then
-               cdiff = abs(C(x,y,z)-ans)
-!               print *,'x,y,z,cdiff=',x,y,z,cdiff
-            endif
- 20   continue
-      call MPI_Reduce(cdiff,ccdiff,1,mpireal,MPI_MAX,0, &
-        MPI_COMM_WORLD,ierr)
-
-      if(proc_id .eq. 0) then
-         if(mytype .eq. 8) then
-            prec = 1e-14
-         else
-            prec = 1e-5
-         endif
-         if(ccdiff .gt. prec * Nglob*0.25) then
-            print *,'Results are incorrect'
-         else
-            print *,'Results are correct'
-         endif
-         write (6,*) 'max diff =',ccdiff
-      endif
-
+     call check_res(C)
 
 ! Gather timing statistics
       call MPI_Reduce(rtime1,rtime2,1,mpi_real8,MPI_MAX,0, &
@@ -317,6 +268,83 @@
       call MPI_FINALIZE (ierr)
 
       contains 
+
+!=========================================================
+	subroutine check_res(C)
+!=========================================================
+
+	real(mytype) C(istart(1):iend(1),istart(2):iend(2),istart(3):iend(3))
+	real(mytype) cdiff,ccdiff,sinyz,ans,prec
+	integer x,y,z
+
+
+      cdiff=0.0d0
+      do 20 z=istart(3),iend(3)
+         do 20 y=istart(2),iend(2)
+            sinyz=siny(y)*sinz(z)
+            do 20 x=istart(1),iend(1)
+            ans=sinx(x)*sinyz
+            if(cdiff .lt. abs(C(x,y,z)-ans)) then
+               cdiff = abs(C(x,y,z)-ans)
+!               print *,'x,y,z,cdiff=',x,y,z,cdiff
+            endif
+ 20   continue
+      call MPI_Reduce(cdiff,ccdiff,1,mpireal,MPI_MAX,0, &
+        MPI_COMM_WORLD,ierr)
+
+      if(proc_id .eq. 0) then
+         if(mytype .eq. 8) then
+            prec = 1e-14
+         else
+            prec = 1e-5
+         endif
+         if(ccdiff .gt. prec * Nglob*0.25) then
+            print *,'Results are incorrect'
+         else
+            print *,'Results are correct'
+         endif
+         write (6,*) 'max diff =',ccdiff
+      endif
+
+      return
+      end subroutine
+
+!=========================================================
+	subroutine init_ar_sine(A)
+!=========================================================
+
+	real(mytype) A(istart(1):iend(1),istart(2):iend(2),istart(3):iend(3))
+	integer x,y,z
+	real(mytype) sinyz
+
+      allocate (sinx(nx))
+      allocate (siny(ny))
+      allocate (sinz(nz))
+
+      do z=istart(3),iend(3)
+         sinz(z)=sin((z-1)*twopi/nz)
+      enddo
+      do y=istart(2),iend(2)
+         siny(y)=sin((y-1)*twopi/ny)
+      enddo
+      do x=istart(1),iend(1)
+         sinx(x)=sin((x-1)*twopi/nx)
+      enddo
+
+! Initialize with 3D sine wave
+
+      do z=istart(3),iend(3)
+         do y=istart(2),iend(2)
+            sinyz=siny(y)*sinz(z)
+            do x=istart(1),iend(1)
+               A(x,y,z)=sinx(x)*sinyz 
+            enddo
+         enddo
+      enddo
+
+      return
+      end subroutine
+
 !=========================================================
 
       subroutine mult_array(X,nar,f)

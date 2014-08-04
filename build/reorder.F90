@@ -4,8 +4,8 @@
 !
 !    Software Framework for Scalable Fourier Transforms in Three Dimensions
 !
-!    Copyright (C) 2006-2010 Dmitry Pekurovsky
-!    Copyright (C) 2006-2010 University of California
+!    Copyright (C) 2006-2014 Dmitry Pekurovsky
+!    Copyright (C) 2006-2014 University of California
 !    Copyright (C) 2010-2011 Jens Henrik Goebbert
 !
 !    This program is free software: you can redistribute it and/or modify
@@ -24,10 +24,16 @@
 !
 !----------------------------------------------------------------------------
 
+! This file contains routines for transposing data locally in memory
+! They are used then either iproc=1 or jproc=1 (or both)
+
+
 ! This routine is called only when jproc=1, and only when stride1 is used
 ! transform backward in Z and transpose array in memory 
 
+!=============================================================
       subroutine reorder_trans_b1_many(A,B,C,dim,nv,op)
+!=============================================================
 
       use fft_spec
 
@@ -44,7 +50,9 @@
       return
       end subroutine
 
+!=============================================================
       subroutine reorder_trans_b1(A,B,C,op)
+!=============================================================
 
       use fft_spec
 
@@ -183,7 +191,9 @@
 ! This routine is called only when iproc=1, and only when stride1 is used
 ! Transpose array in memory and transform forward in Y
 
+!=============================================================
       subroutine reorder_b2_many(A,B,nv)
+!=============================================================
 
       implicit none
 
@@ -228,7 +238,9 @@
 ! This routine is called only when iproc=1, and only when stride1 is used
 ! Transpose array in memory and transform forward in Y
 
+!=============================================================
       subroutine reorder_f1_many(A,B,tmp,nv)
+!=============================================================
 
       implicit none
 
@@ -262,7 +274,6 @@
       enddo
 
       enddo
-!      deallocate(tmp)
 
       return
       end subroutine
@@ -270,7 +281,9 @@
 ! This routine is called only when jproc=1, and only when stride1 is used
 ! Transpose array in memory and transform forward in Z
 
+!=============================================================
       subroutine reorder_trans_f2_many(A,B,C,dim,nv,op)
+!=============================================================
 
       use fft_spec
       implicit none
@@ -420,7 +433,9 @@
 ! This routine is called only when iproc=1, and only when stride1 is used
 ! Transpose array in memory and transform forward in Y
 
+!=============================================================
       subroutine reorder_b2(A,B)
+!=============================================================
 
       implicit none
 
@@ -464,7 +479,9 @@
 ! This routine is called only when iproc=1, and only when stride1 is used
 ! Transpose array in memory and transform forward in Y
 
+!=============================================================
       subroutine reorder_f1(A,B,tmp)
+!=============================================================
 
       implicit none
 
@@ -496,8 +513,6 @@
             enddo
          enddo
       enddo
-
-!      deallocate(tmp)
 
       return
       end subroutine

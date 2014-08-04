@@ -4,8 +4,8 @@
 !
 !    Software Framework for Scalable Fourier Transforms in Three Dimensions
 !
-!    Copyright (C) 2006-2010 Dmitry Pekurovsky
-!    Copyright (C) 2006-2010 University of California
+!    Copyright (C) 2006-2014 Dmitry Pekurovsky
+!    Copyright (C) 2006-2014 University of California
 !    Copyright (C) 2010-2011 Jens Henrik Goebbert
 !
 !    This program is free software: you can redistribute it and/or modify
@@ -123,7 +123,6 @@
  
     public :: p3dfft_get_dims, p3dfft_get_mpi_info, p3dfft_setup, &
 		p3dfft_ftran_r2c, p3dfft_btran_c2r, p3dfft_cheby, &
-!		ftran_r2c,btran_c2r, &
 		p3dfft_ftran_r2c_many, p3dfft_btran_c2r_many, p3dfft_cheby_many, &
 		get_timers,set_timers,&
               p3dfft_clean, print_buf, print_buf_real, &
@@ -155,16 +154,20 @@
 !#include "wrap.F90"
 !#include "ghost_cell.F90"
 
+
 !=====================================================
-! Return array dimensions for either real-space (conf=1) or wavenumber-space(conf=2)
-! 
+! this is a C wrapper routine
       subroutine p3dfft_get_dims_w(istart,iend,isize,conf) BIND(C,NAME='p3dfft_get_dims')
+!=====================================================
       integer istart(3),iend(3),isize(3),conf
 
       call p3dfft_get_dims(istart,iend,isize,conf) 
 
       end subroutine
 
+!=====================================================
+! Return array dimensions for either real-space (conf=1) or wavenumber-space(conf=2)
+! 
       subroutine p3dfft_get_dims(istart,iend,isize,conf) 
 !=====================================================
 
@@ -239,14 +242,18 @@
  
     end subroutine 	
 
+! this is a C wrapper routine
 !========================================================
       subroutine p3dfft_clean_w() BIND(C,NAME='p3dfft_clean')
+!========================================================
 
       call p3dfft_clean
 
       end subroutine 
 
+!========================================================
       subroutine p3dfft_clean() 
+!========================================================
 
 !!--------------------------------------------------------------
 ! Clean-up routines for FFTW
@@ -344,6 +351,7 @@
 
 !========================================================
       subroutine ar_copy_many(A,dim_a,B,dim_b,nar,nv)
+!========================================================
 
       integer(i8) nar,i
       integer dim_a,dim_b,nv,j
@@ -357,7 +365,9 @@
       end subroutine
 
 
+!========================================================
       subroutine ar_copy(A,B,nar)
+!========================================================
 
       integer(i8) nar,i
       complex(mytype) A(nar,1,1),B(nar,1,1)
@@ -369,7 +379,9 @@
       return
       end subroutine
 
+!========================================================
       subroutine seg_zero_z_many(A,xdim,ydim,z1,z2,zdim,dim,nv)
+!========================================================
 
       implicit none
       integer x,y,z,xdim,ydim,zdim,z1,z2,nv,j,dim
@@ -382,7 +394,9 @@
       return
       end subroutine
 
+!========================================================
       subroutine seg_zero_z(A,xdim,ydim,z1,z2,zdim)
+!========================================================
 
       implicit none
       integer x,y,z,xdim,ydim,zdim,z1,z2
@@ -399,7 +413,9 @@
       return
       end subroutine seg_zero_z
 
+!========================================================
     subroutine seg_copy_z_f_many(in,out,x1,x2,y1,y2,z1,z2,shift_z,xdim,ydim,zdim,dim,nv)
+!========================================================
 
     implicit none
     integer x1,x2,y1,y2,z1,z2,xdim,ydim,zdim,shift_z,x,y,z,nv,j,dim
@@ -412,7 +428,9 @@
     return
     end subroutine
 
+!========================================================
     subroutine seg_copy_z_b_many(in,out,x1,x2,y1,y2,z1,z2,shift_z,xdim,ydim,zdim,dim,nv)
+!========================================================
 
     implicit none
     integer x1,x2,y1,y2,z1,z2,xdim,ydim,zdim,shift_z,x,y,z,nv,j,dim
@@ -425,7 +443,9 @@
     return
     end subroutine
 
+!========================================================
     subroutine seg_copy_z(in,out,x1,x2,y1,y2,z1,z2,shift_z,xdim,ydim,zdim)
+!========================================================
 
     implicit none
     integer x1,x2,y1,y2,z1,z2,xdim,ydim,zdim,shift_z,x,y,z
@@ -445,8 +465,8 @@
 
 
 !========================================================
-
       subroutine get_timers_w(timer) BIND(C,name='get_timers')
+!========================================================
 
       real(r8) timer(12)
 
@@ -484,6 +504,7 @@
 
 !========================================================
       subroutine print_buf(A,lx,ly,lz)
+!========================================================
 
       complex(mytype) A(lx,ly,lz)
       integer lx,ly,lz,i,j,k
@@ -501,6 +522,7 @@
       end subroutine
 !========================================================
       subroutine print_buf_real(A,lx,ly,lz)
+!========================================================
 
       real(mytype) A(lx,ly,lz)
       integer lx,ly,lz,i,j,k

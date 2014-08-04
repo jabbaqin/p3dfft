@@ -4,8 +4,8 @@
 !
 !    Software Framework for Scalable Fourier Transforms in Three Dimensions
 !
-!    Copyright (C) 2006-2010 Dmitry Pekurovsky
-!    Copyright (C) 2006-2010 University of California
+!    Copyright (C) 2006-2014 Dmitry Pekurovsky
+!    Copyright (C) 2006-2014 University of California
 !    Copyright (C) 2010-2011 Jens Henrik Goebbert
 !
 !    This program is free software: you can redistribute it and/or modify
@@ -24,36 +24,33 @@
 !
 !----------------------------------------------------------------------------
 
+! This is a C wrapper routine
 !========================================================
       subroutine p3dfft_ftran_r2c_many_w (XgYZ,dim_in,XYZg,dim_out,nv,op) BIND(C,NAME='p3dfft_ftran_r2c_many')
 !========================================================
-
+      use, intrinsic :: iso_c_binding
       real(mytype), TARGET :: XgYZ(nx_fft,jistart:jiend,kjstart:kjend)
 #ifdef STRIDE1
       complex(mytype), TARGET :: XYZg(nzc,iistart:iiend,jjstart:jjend)
 #else
       complex(mytype), TARGET :: XYZg(iistart:iiend,jjstart:jjend,nzc)
 #endif
-      character(len=3) op
       integer dim_in,dim_out,nv
+      character, dimension(*), target :: op
+      character(4), pointer :: lcl_op
+      call c_f_pointer(c_loc(op), lcl_op)
 
-      call p3dfft_ftran_r2c_many (XgYZ,dim_in,XYZg,dim_out,nv,op) 
+      call p3dfft_ftran_r2c_many (XgYZ,dim_in,XYZg,dim_out,nv,lcl_op) 
 
       end subroutine
 
+! Forward R2C transform of multiple variables (nv)
 !========================================================
       subroutine p3dfft_ftran_r2c_many (XgYZ,dim_in,XYZg,dim_out,nv,op) 
 !========================================================
 
       use fft_spec
       implicit none
-
-!      real(mytype), TARGET :: XgYZ(nx_fft,jisize,kjsize,nv)
-!#ifdef STRIDE1
-!      complex(mytype), TARGET :: XYZg(nzc,jjsize,iisize,nv)
-!#else
-!      complex(mytype), TARGET :: XYZg(iisize,jjsize,nzc,nv)
-!#endif
 
       integer dim_in,dim_out
 
@@ -63,7 +60,6 @@
       integer x,y,z,i,nx,ny,nz,ierr,dnz,nv,j,err,n1,n2
       integer(i8) Nl
       character(len=3) op
-      
       if(.not. mpi_set) then
          print *,'P3DFFT error: call setup before other routines'
          return
@@ -118,7 +114,6 @@
 
 ! FFT transform (R2C) in X for all z and y
 
-
       if(jisize * kjsize .gt. 0) then
          call init_f_r2c(XgYZ,nx,buf,nxhp,nx,jisize*kjsize)
 
@@ -127,7 +122,6 @@
          timers(5) = timers(5) + MPI_Wtime()
 
       endif
-
 
 ! Exchange data in rows 
 
@@ -256,6 +250,7 @@
       return
       end subroutine
 
+! This is a C wrapper routine
 !========================================================
       subroutine p3dfft_ftran_cheby_many_w (XgYZ,dim_in,XYZg,dim_out,nv,Lz) BIND(C,NAME='p3dfft_cheby_many')
 !========================================================
@@ -273,8 +268,10 @@
 
       end subroutine
 
-!---------------------------------------------------------------
+! Chebyshev transform (2D R2C forward FFT + Chebyshev) for multiple variables 
+!========================================================
 	subroutine p3dfft_cheby_many(in,dim_in,out,dim_out,nv,Lz) 
+!========================================================
 
 	integer dim_in,dim_out,nv,j
 	real(mytype) Lz
@@ -291,7 +288,10 @@
 	end subroutine
 
 
+! This is a C wrapper routine
+!========================================================
 	subroutine p3dfft_cheby_w(in,out,Lz) BIND(C,NAME='p3dfft_cheby')
+!========================================================
 
       	real(mytype), dimension(nx_fft,     &
                                 jisize,     &
@@ -312,8 +312,10 @@
 
 	end subroutine
 
+! Chebyshev transform (2D R2C forward FFT + Chebyshev) for a single variable 
 !==============================================================
 	subroutine p3dfft_cheby(in,out,Lz) 
+!========================================================
 
 !     !	function args
       	real(mytype), dimension(nx_fft,     &
@@ -395,126 +397,28 @@
 	return
 	end subroutine p3dfft_cheby
 
-! --------------------------------------
-!
-!  p3dfft_ftran_r2c_1d(..)
-!
-! --------------------------------------
-subroutine p3dfft_ftran_r2c_1d (rXgYZ, cXgYZ)
-  use fft_spec
-  implicit none
 
-  real (mytype), target :: rXgYZ (NX_fft, jistart:jiend, kjstart:kjend)
-  real (mytype), target :: cXgYZ (NX_fft+2, jistart:jiend, kjstart:kjend)
-
-!      complex(mytype), allocatable :: XYgZ(:,:,:)
-  integer x, y, z, i, err, nx, ny, nz
-
-  if ( .not. mpi_set) then
-    print *, 'P3DFFT error: call setup before other routines'
-    return
-  end if
-
-  nx = NX_fft
-  ny = NY_fft
-  nz = NZ_fft
-
-!
-! FFT transform (R2C) in X for all z and y
-!
-  if (jisize*kjsize > 0) then
-    call init_f_r2c (rXgYZ, nx, cXgYZ, nxhp, nx, jisize*kjsize)
-    call exec_f_r2c (rXgYZ, nx, cXgYZ, nxhp, nx, jisize*kjsize)
-  end if
-
-end subroutine p3dfft_ftran_r2c_1d
-
-!	 call f_r2c(XgYZ,nx,buf,nxhp,nx,jisize*kjsize,nv)
-
-subroutine f_r2c_many(source,str1,dest,str2,n,m,dim,nv)
-
-  integer str1,str2,n,m,nv,j,dim
-  real(mytype) source(dim,nv)
-  complex(mytype) dest(n/2+1,m,nv)
-
-  do j=1,nv
-    call exec_f_r2c(source(1,j),str1,dest(1,1,j),str2,n,m)
-  enddo
-
-  return
-  end subroutine
-
-         subroutine f_c1_many(A,str1,str2,n,m,dim,nv)
-
-	   integer n,m,nv,j,str1,str2,dim
-	   complex(mytype) A(dim,nv)
-
-	 do j=1,nv
-           call exec_f_c1(A(1,j),str1,str2,A(1,j),str1,str2,n,m)
-         enddo
-
-	 return
-	 end subroutine
-
-         subroutine ztran_f_same_many(A,str1,str2,n,m,dim,nv,op)
-	
-	   integer str1,str2,n,m,nv,j,ierr,dim
-	   complex(mytype) A(dim,nv)
-	   character(len=3) op
-
-	    if(op(3:3) == 't' .or. op(3:3) == 'f') then
-               call init_f_c(A,str1,str2,A,str1,str2,n,m)
-         
-              timers(8) = timers(8) - MPI_Wtime()
-	      do j=1,nv
-                 call exec_f_c2_same(A(1,j),str1,str2,A(1,j),str1,str2,n,m)
-              enddo
-              timers(8) = timers(8) + MPI_Wtime()
-
-	    else if(op(3:3) == 'c') then
-               call init_ctrans_r2(A,str1,str2,A,str1,str2,n,m)
-         
-              timers(8) = timers(8) - MPI_Wtime()
-	      do j=1,nv
-                 call exec_ctrans_r2_same(A(1,j),2*str1,str2,A(1,j),2*str1,str2,n,2*m)
-	      enddo
-              timers(8) = timers(8) + MPI_Wtime()
-
-	    else if(op(3:3) == 's') then
-               call init_strans_r2(A,str1,str2,A,str1,str2,n,m)
-         
-              timers(8) = timers(8) - MPI_Wtime()
-	      do j=1,nv
-                 call exec_strans_r2_same(A(1,j),2*str1,str2,A(1,j),2*str1,str2,n,2*m)
-              enddo
-              timers(8) = timers(8) + MPI_Wtime()
-	    else if(op(3:3) .ne. 'n' .and. op(3:3) .ne. '0') then
-		print *,'Unknown transform type: ',op(3:3)
-		call MPI_Abort(MPI_COMM_WORLD,ierr)
-            endif
-
-	    return
-	    end subroutine
-
-
-
-
+! This is a C wrapper routine
 !========================================================
       subroutine p3dfft_ftran_r2c_w (XgYZ,XYZg,op) BIND(C,NAME='p3dfft_ftran_r2c')
 !========================================================
-
+      use, intrinsic :: iso_c_binding
       real(mytype), TARGET :: XgYZ(nx_fft,jistart:jiend,kjstart:kjend)
 #ifdef STRIDE1
       complex(mytype), TARGET :: XYZg(nzc,iistart:iiend,jjstart:jjend)
 #else
       complex(mytype), TARGET :: XYZg(iistart:iiend,jjstart:jjend,nzc)
 #endif
-      character(len=3) op
+      integer dim_in,dim_out,nv
+      character, dimension(*), target :: op
+      character(4), pointer :: lcl_op
+      call c_f_pointer(c_loc(op), lcl_op)
 
-      call p3dfft_ftran_r2c (XgYZ,XYZg,op) 
+      call p3dfft_ftran_r2c (XgYZ,XYZg,lcl_op) 
 
       end subroutine
 
+! Forward R2C transform of 1 variable
 !========================================================
       subroutine p3dfft_ftran_r2c (XgYZ,XYZg,op) 
 !========================================================
@@ -790,3 +694,106 @@ subroutine f_r2c_many(source,str1,dest,str2,n,m,dim,nv)
 
       return
       end subroutine
+
+! --------------------------------------
+!
+!  p3dfft_ftran_r2c_1d(..)
+!
+! --------------------------------------
+subroutine p3dfft_ftran_r2c_1d (rXgYZ, cXgYZ)
+  use fft_spec
+  implicit none
+
+  real (mytype), target :: rXgYZ (NX_fft, jistart:jiend, kjstart:kjend)
+  real (mytype), target :: cXgYZ (NX_fft+2, jistart:jiend, kjstart:kjend)
+
+!      complex(mytype), allocatable :: XYgZ(:,:,:)
+  integer x, y, z, i, err, nx, ny, nz
+
+  if ( .not. mpi_set) then
+    print *, 'P3DFFT error: call setup before other routines'
+    return
+  end if
+
+  nx = NX_fft
+  ny = NY_fft
+  nz = NZ_fft
+
+!
+! FFT transform (R2C) in X for all z and y
+!
+  if (jisize*kjsize > 0) then
+    call init_f_r2c (rXgYZ, nx, cXgYZ, nxhp, nx, jisize*kjsize)
+    call exec_f_r2c (rXgYZ, nx, cXgYZ, nxhp, nx, jisize*kjsize)
+  end if
+
+end subroutine p3dfft_ftran_r2c_1d
+
+!	 call f_r2c(XgYZ,nx,buf,nxhp,nx,jisize*kjsize,nv)
+
+subroutine f_r2c_many(source,str1,dest,str2,n,m,dim,nv)
+
+  integer str1,str2,n,m,nv,j,dim
+  real(mytype) source(dim,nv)
+  complex(mytype) dest(n/2+1,m,nv)
+
+  do j=1,nv
+    call exec_f_r2c(source(1,j),str1,dest(1,1,j),str2,n,m)
+  enddo
+
+  return
+  end subroutine
+
+         subroutine f_c1_many(A,str1,str2,n,m,dim,nv)
+
+	   integer n,m,nv,j,str1,str2,dim
+	   complex(mytype) A(dim,nv)
+
+	 do j=1,nv
+           call exec_f_c1(A(1,j),str1,str2,A(1,j),str1,str2,n,m)
+         enddo
+
+	 return
+	 end subroutine
+
+         subroutine ztran_f_same_many(A,str1,str2,n,m,dim,nv,op)
+	
+	   integer str1,str2,n,m,nv,j,ierr,dim
+	   complex(mytype) A(dim,nv)
+	   character(len=3) op
+
+	    if(op(3:3) == 't' .or. op(3:3) == 'f') then
+               call init_f_c(A,str1,str2,A,str1,str2,n,m)
+         
+              timers(8) = timers(8) - MPI_Wtime()
+	      do j=1,nv
+                 call exec_f_c2_same(A(1,j),str1,str2,A(1,j),str1,str2,n,m)
+              enddo
+              timers(8) = timers(8) + MPI_Wtime()
+
+	    else if(op(3:3) == 'c') then
+               call init_ctrans_r2(A,str1,str2,A,str1,str2,n,m)
+         
+              timers(8) = timers(8) - MPI_Wtime()
+	      do j=1,nv
+                 call exec_ctrans_r2_same(A(1,j),2*str1,str2,A(1,j),2*str1,str2,n,2*m)
+	      enddo
+              timers(8) = timers(8) + MPI_Wtime()
+
+	    else if(op(3:3) == 's') then
+               call init_strans_r2(A,str1,str2,A,str1,str2,n,m)
+         
+              timers(8) = timers(8) - MPI_Wtime()
+	      do j=1,nv
+                 call exec_strans_r2_same(A(1,j),2*str1,str2,A(1,j),2*str1,str2,n,2*m)
+              enddo
+              timers(8) = timers(8) + MPI_Wtime()
+	    else if(op(3:3) .ne. 'n' .and. op(3:3) .ne. '0') then
+		print *,'Unknown transform type: ',op(3:3)
+		call MPI_Abort(MPI_COMM_WORLD,ierr)
+            endif
+
+	    return
+	    end subroutine
+
+

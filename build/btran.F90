@@ -4,8 +4,8 @@
 !
 !    Software Framework for Scalable Fourier Transforms in Three Dimensions
 !
-!    Copyright (C) 2006-2010 Dmitry Pekurovsky
-!    Copyright (C) 2006-2010 University of California
+!    Copyright (C) 2006-2014 Dmitry Pekurovsky
+!    Copyright (C) 2006-2014 University of California
 !    Copyright (C) 2010-2011 Jens Henrik Goebbert
 !
 !    This program is free software: you can redistribute it and/or modify
@@ -22,23 +22,28 @@
 !    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 !
 !
+
+! this is a C wrapper routine
 !========================================================
       subroutine p3dfft_btran_c2r_many_w (XYZg,dim_in,XgYZ,dim_out,nv,op) BIND(C,NAME='p3dfft_btran_c2r_many')
 !========================================================
-
+      use, intrinsic :: iso_c_binding
       real(mytype), TARGET :: XgYZ(nx_fft,jistart:jiend,kjstart:kjend)
 #ifdef STRIDE1
       complex(mytype), TARGET :: XYZg(nzc,iistart:iiend,jjstart:jjend)
 #else
       complex(mytype), TARGET :: XYZg(iistart:iiend,jjstart:jjend,nzc)
 #endif
-      character(len=3) op
       integer dim_in,dim_out,nv
+      character, dimension(*), target :: op
+      character(4), pointer :: lcl_op
+      call c_f_pointer(c_loc(op), lcl_op)
 
-      call p3dfft_btran_c2r_many (XYZg,dim_in,XgYZ,dim_out,nv,op) 
+      call p3dfft_btran_c2r_many (XYZg,dim_in,XgYZ,dim_out,nv,lcl_op) 
 
       end subroutine
 
+! Inverse C2R 3D FFT transform of multiple variables (nv)
 !----------------------------------------------------------------------------
       subroutine p3dfft_btran_c2r_many (XYZg,dim_in,XgYZ,dim_out,nv,op)
 !========================================================
@@ -72,6 +77,7 @@
       nx = nx_fft
       ny = ny_fft
       nz = nz_fft
+
 
 ! For FFT libraries that require explicit allocation of work space,
 ! such as ESSL, initialize here
@@ -223,10 +229,18 @@
 
 !	deallocate(buf)
 
+!      do j=1,nv
+!        print *,'Exiting btran: j=',j
+!        call print_buf_real(XgYZ(1,j),nx,jisize,kjsize)
+!      enddo	
+
+
       return
       end subroutine
 
+!========================================================
 subroutine b_c2r_many(A,str1,B,str2,n,m,dim,nv)
+!========================================================
 
 	   integer str1,str2,n,m,nv,j,dim
 	   complex(mytype) A(n/2+1,m,nv)
@@ -239,7 +253,9 @@ subroutine b_c2r_many(A,str1,B,str2,n,m,dim,nv)
 	   return
 	   end subroutine
 
+!========================================================
 subroutine ztran_b_same_many(A,str1,str2,n,m,dim,nv,op)
+!========================================================
 
 	   integer str1,str2,n,m,nv,j,ierr,dim
 	   complex(mytype) A(dim,nv)
@@ -291,22 +307,26 @@ subroutine ztran_b_same_many(A,str1,str2,n,m,dim,nv,op)
 	   return
 	   end subroutine
 
+! This is a C wrapper routine
 !========================================================
       subroutine p3dfft_btran_c2r_w (XYZg,XgYZ,op) BIND(C,NAME='p3dfft_btran_c2r')
 !========================================================
-
+      use, intrinsic :: iso_c_binding
       real(mytype), TARGET :: XgYZ(nx_fft,jistart:jiend,kjstart:kjend)
 #ifdef STRIDE1
       complex(mytype), TARGET :: XYZg(nzc,iistart:iiend,jjstart:jjend)
 #else
       complex(mytype), TARGET :: XYZg(iistart:iiend,jjstart:jjend,nzc)
 #endif
-      character(len=3) op
+      character, dimension(*), target :: op
+      character(4), pointer :: lcl_op
+      call c_f_pointer(c_loc(op), lcl_op)
 
-      call p3dfft_btran_c2r (XYZg,XgYZ,op) 
+      call p3dfft_btran_c2r (XYZg,XgYZ,lcl_op) 
 
       end subroutine
 
+! Inverse C2R 3D FFT transform of a single variable
 !----------------------------------------------------------------------------
       subroutine p3dfft_btran_c2r (XYZg,XgYZ,op)
 !========================================================

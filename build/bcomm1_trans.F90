@@ -60,7 +60,7 @@
 
      if(jjsize .gt. 0) then
         do j=1,nv
-          call pack_send_b1tr(source(1,j),buf1,buf3,j,nv,op)     
+          call pack_bcomm1_trans(buf1,source(1,j),buf3,j,nv,op)     
 	enddo
      endif
 
@@ -82,6 +82,22 @@
       tc = tc - MPI_Wtime()
 
 ! Unpack receive buffers into dest
+
+      call unpack_bcomm1_trans_many(dest,buf2,nv)
+
+
+      deallocate(buf3)
+
+      tc = tc + MPI_Wtime()
+      
+      return
+      end subroutine
+
+      subroutine unpack_bcomm1_trans_many(dest,buf2,nv)
+
+      complex(mytype) dest(ny_fft,iisize,kjsize,nv)
+      complex(mytype) buf2(ny_fft*iisize*kjsize*nv)
+      integer i,j,nv,position,pos0,pos1,x,y,z,dny      
 
       dny = ny_fft - nyc
       do i=0,jproc-1
@@ -140,17 +156,11 @@
         enddo
       endif
 
-      deallocate(buf3)
-
-      tc = tc + MPI_Wtime()
-      
       return
       end subroutine
 
 
-
-
-      subroutine pack_send_b1tr(source,sendbuf,buf3,j,nv,op)
+      subroutine pack_bcomm1_trans(sendbuf,source,buf3,j,nv,op)
 
       implicit none
 
@@ -375,314 +385,42 @@
 
       allocate(buf3(nz_fft,jjsize))
 
-#ifdef USE_EVEN
-! Use MPI_Alltoall
+      call pack_bcomm1_trans(buf1,source,buf3,1,1,op)     
 
-     if(jjsize .gt. 0) then
-
-      dnz = nz - nzc
-      if(op(1:1) == '0' .or. op(1:1) == 'n') then
-         do x=1,iisize
-            do i=0,jproc-1
-            
-               pos0 = i * KfCntMax / (mytype*2) + (x-1)*jjsize 
-	       if(kjen(i) .lt. nzhc .or. kjst(i) .gt. nzhc+1) then
-! Just copy the data
-	           do z=kjst(i),kjen(i),NBz
-        	      z2 = min(z+NBz-1,kjen(i))
-
-              		do y=1,jjsize,NBy2
-                	   y2 = min(y+NBy2-1,jjsize)
-                    
-                 	   pos1 = pos0 +y
-                     
-	                   do iz=z,z2
-           	              position = pos1 
-                 	      do iy=y,y2
-! Here we are sure that dest and buf are different
-                      	         buf1(position) = source(iz,iy,x)
-                       	         position = position + 1
-                    	      enddo
-                    	   pos1 = pos1 + iisize * jjsize
-                        enddo
-                     enddo
-                     pos0 = pos0 + iisize*jjsize*NBz
-	          enddo
-	    else then
-! Copy some data, then insert zeros to restore full dimension, then again 
-! copy some data if needed	
-	           do z=kjst(i),nzhc,NBz
-        	      z2 = min(z+NBz-1,nzhc)
-
-              		do y=1,jjsize,NBy2
-                	   y2 = min(y+NBy2-1,jjsize)
-                    
-                 	   pos1 = pos0 +y
-                     
-	                   do iz=z,z2
-           	              position = pos1 
-                 	      do iy=y,y2
-! Here we are sure that dest and buf are different
-                      	         buf1(position) = source(iz,iy,x)
-                       	         position = position + 1
-                    	      enddo
-                    	   pos1 = pos1 + iisize * jjsize
-                        enddo
-                     enddo
-                     pos0 = pos0 + iisize*jjsize*NBz
-	          enddo
-
-                  pos0 = i * KfCntMax / (mytype*2) + (x-1)*jjsize  &
-		     +(nzhc-kjst(i)+1)*iisize*jjsize
-		  do z=1,dnz
-		    position = pos0
-		    do y=1,jjsize
-			buf1(position) = 0.
-		        position = position +1
-		    enddo
-		    pos0 = pos0 + iisize*jjsize
-		  enddo
-
-	           do z=nzhc+1,kjen(i),NBz
-        	      z2 = min(z+NBz-1,kjen(i))
-
-              		do y=1,jjsize,NBy2
-                	   y2 = min(y+NBy2-1,jjsize)
-                    
-                 	   pos1 = pos0 +y
-                     
-	                   do iz=z,z2
-           	              position = pos1 
-                 	      do iy=y,y2
-! Here we are sure that dest and buf are different
-                      	         buf1(position) = source(iz,iy,x)
-                       	         position = position + 1
-                    	      enddo
-                    	   pos1 = pos1 + iisize * jjsize
-                        enddo
-                     enddo
-                     pos0 = pos0 + iisize*jjsize*NBz
-	          enddo
-	     endif
-	  enddo
-       enddo
-
-      else
-         do x=1,iisize
-
-	    if(nz .ne. nzc) then
-
-	       do y=1,jjsize
-                  do z=1,nzhc
-		     buf3(z,y) = source(z,y,x)
-	          enddo
-	          do z=nzhc+1,nzhc+dnz
-		     buf3(z,y) = 0.
-	          enddo
-	          do z=nzhc+dnz+1,nz_fft
-		     buf3(z,y) = source(z-dnz,y,x)
- 	          enddo
-	       enddo
-
-   	       if(op(1:1) == 't' .or. op(1:1) == 'f') then
-                call exec_b_c2_same(buf3, 1,nz_fft, &
-				  buf3, 1,nz_fft,nz_fft,jjsize)
- 	       else if(op(1:1) == 'c') then	
-                   call exec_ctrans_r2_complex_same(buf3, 2,2*nz_fft, & 
-				  buf3, 2,2*nz_fft,nz_fft,jjsize)
- 	       else if(op(1:1) == 's') then	
-                   call exec_strans_r2_complex_same(buf3, 2,2*nz_fft, & 
-				  buf3, 2,2*nz_fft,nz_fft,jjsize)
-	       else
-		   print *,taskid,'Unknown transform type: ',op(1:1)
-		   call MPI_abort(MPI_COMM_WORLD,ierr)
-	       endif
-
-	    else
-
-     	       if(op(1:1) == 't' .or. op(1:1) == 'f') then
-                  call exec_b_c2_dif(source(1,1,x), 1,nz_fft, &
-				  buf3, 1,nz_fft,nz_fft,jjsize)
- 	       else if(op(1:1) == 'c') then	
-                   call exec_ctrans_r2_complex_dif(source(1,1,x), 2,2*nz_fft, & 
-				  buf3, 2,2*nz_fft,nz_fft,jjsize)
- 	       else if(op(1:1) == 's') then	
-                   call exec_strans_r2_complex_dif(source(1,1,x), 2,2*nz_fft, & 
-				  buf3, 2,2*nz_fft,nz_fft,jjsize)
-	       else
-		   print *,taskid,'Unknown transform type: ',op(1:1)
-		   call MPI_abort(MPI_COMM_WORLD,ierr)
-	       endif
-
-	    endif
-         
-            do i=0,jproc-1
-            
-               pos0 = i * KfCntMax / (mytype*2) + (x-1)*jjsize 
-
-               do z=kjst(i),kjen(i),NBz
-                  z2 = min(z+NBz-1,kjen(i))
-
-                  do y=1,jjsize,NBy2
-                     y2 = min(y+NBy2-1,jjsize)
-                     
-                     pos1 = pos0 +y
-                     
-                     do iz=z,z2
-                        position = pos1 
-                        do iy=y,y2
-! Here we are sure that dest and buf are different
-                           buf1(position) = buf3(iz,iy)
-                           position = position + 1
-                        enddo
-                        pos1 = pos1 + iisize * jjsize
-                     enddo
-                  enddo
-               pos0 = pos0 + iisize*jjsize*NBz
-               enddo
-
-            enddo
-         enddo
-
-	endif
-     endif
 
       tc = tc + MPI_Wtime()
       t = t - MPI_Wtime() 
+#ifdef USE_EVEN
       call mpi_alltoall(buf1,KfCntMax, mpi_byte, buf2,KfCntMax,mpi_byte,mpi_comm_col,ierr)
-      t = t + MPI_Wtime() 
-      tc = tc - MPI_Wtime()
-         
 #else
 ! Use MPI_Alltoallv
 
-     if(jjsize .gt. 0) then
-
-      dnz = nz_fft - nzc
-      if(op(1:1) == '0' .or. op(1:1) == 'n') then
-
-	 do x=1,iisize
-           pos0 = (x-1)*jjsize 
-
-           do z=1,nzhc,NBz
-              z2 = min(z+NBz-1,nzhc)
-
-              do y=1,jjsize,NBy2
-                 y2 = min(y+NBy2-1,jjsize)
-                    
-                 pos1 = pos0 +y
-                     
-                 do iz=z,z2
-                    position = pos1 
-                    do iy=y,y2
-! Here we are sure that dest and buf are different
-                       buf1(position) = source(iz,iy,x)
-                       position = position + 1
-                    enddo
-                    pos1 = pos1 + iisize * jjsize
-                 enddo
-              enddo
-              pos0 = pos0 + iisize*jjsize*NBz
-	   enddo
-
-           pos1 = (x-1)*jjsize + iisize*jjsize*nzhc +1
-           do z=nzhc+1,nz_fft-nzhc
-	      position = pos1
-   	      do y=1,jjsize
-		 buf1(position) = 0.
-                 position = position + 1
-              enddo
-              pos1 = pos1 + iisize * jjsize
-	   enddo
-
-	   pos0 = pos1 -1
-           do z=nz_fft-nzhc+1,nz_fft,NBz
-              z2 = min(z+NBz-1,nz_fft)
-
-              do y=1,jjsize,NBy2
-                 y2 = min(y+NBy2-1,jjsize)
-                    
-                 pos1 = pos0 +y
-                     
-                 do iz=z,z2
-                    position = pos1 
-                    do iy=y,y2
-! Here we are sure that dest and buf are different
-                       buf1(position) = source(iz,iy,x)
-                       position = position + 1
-                    enddo
-                    pos1 = pos1 + iisize * jjsize
-                 enddo
-              enddo
-              pos0 = pos0 + iisize*jjsize*NBz
-	   enddo
-
-        enddo
-
-      else
-         do x=1,iisize
-           pos0 = (x-1)*jjsize 
-
-	    do y=1,jjsize
-               do z=1,nzhc
-		  buf3(z,y) = source(z,y,x)
-	       enddo
-	       do z=nzhc+1,nz_fft-nzhc
-		  buf3(z,y) = 0.
-	       enddo
-	       do z=nz_fft-nzhc+1,nz_fft
-		  buf3(z,y) = source(z-dnz,y,x)
- 	       enddo
-	    enddo
-
-  	    if(op(1:1) == 't' .or. op(1:1) == 'f') then
-              call exec_b_c2_same(buf3, 1,nz_fft, &
-		  buf3, 1,nz_fft,nz_fft,jjsize)
- 	    else if(op(1:1) == 'c') then	
-              call exec_ctrans_r2_complex_same(buf3, 2,2*nz_fft, & 
-				  buf3, 2,2*nz_fft,nz_fft,jjsize)
-    	    else if(op(1:1) == 's') then	
-              call exec_strans_r2_complex_same(buf3, 2,2*nz_fft, & 
-				  buf3, 2,2*nz_fft,nz_fft,jjsize)
- 	    else
-	      print *,taskid,'Unknown transform type: ',op(1:1)
-  	      call MPI_abort(MPI_COMM_WORLD,ierr)
-	    endif
-            
-            do z=1,nz_fft,NBz
-              z2 = min(z+NBz-1,nz_fft)
-
-              do y=1,jjsize,NBy2
-                 y2 = min(y+NBy2-1,jjsize)
-                    
-                 pos1 = pos0 +y
-                     
-                 do iz=z,z2
-                    position = pos1 
-                    do iy=y,y2
-! Here we are sure that dest and buf are different
-                       buf1(position) = buf3(iz,iy)
-                       position = position + 1
-                    enddo
-                    pos1 = pos1 + iisize * jjsize
-                 enddo
-              enddo
-              pos0 = pos0 + iisize*jjsize*NBz
-	    enddo
-
-        enddo
-	endif
-     endif
-         
-      tc = tc + MPI_Wtime()
-      t = t - MPI_Wtime() 
-      call mpi_alltoallv(buf1,JrSndCnts, JrSndStrt,mpi_byte, buf2,JrRcvCnts, JrRcvStrt,mpi_byte,mpi_comm_col,ierr)
       t = t + MPI_Wtime() 
       tc = tc - MPI_Wtime()
-
+         
+      call mpi_alltoallv(buf1,JrSndCnts, JrSndStrt,mpi_byte, buf2,JrRcvCnts, JrRcvStrt,mpi_byte,mpi_comm_col,ierr)
 #endif
 
+      t = t + MPI_Wtime() 
+      tc = tc - MPI_Wtime()
+      
+      call unpack_bcomm1_trans(dest,buf2)
+
+
 ! Unpack receive buffers into dest
+
+      deallocate(buf3)
+
+      tc = tc + MPI_Wtime()
+      
+      return
+      end subroutine
+
+      subroutine unpack_bcomm1_trans(dest,buf2)
+
+      complex(mytype) dest(ny_fft,iisize,kjsize)
+      complex(mytype) buf2(ny_fft*iisize*kjsize)
+      integer i,dny,position,pos0,pos1,x,y,z
 
       dny = ny_fft - nyc
       do i=0,jproc-1
@@ -736,9 +474,5 @@
          enddo
       endif
 
-      deallocate(buf3)
-
-      tc = tc + MPI_Wtime()
-      
-      return
+      return 
       end subroutine

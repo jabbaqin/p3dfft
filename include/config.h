@@ -5,7 +5,7 @@
 /* #undef CC */
 
 /* arguments passed to configure script */
-#define CONFIGURE_ARGS " '--enable-cray' '--enable-fftw' '--with-fftw=/opt/fftw/3.2.2.1/lib/..' 'FC=ftn' 'CC=cc' 'FCFLAGS=-ef -em -g' 'CFLAGS=-g'"
+#define CONFIGURE_ARGS " '--enable-intel' '--enable-fftw' '--with-fftw=/opt/fftw/3.3.3/intel/mvapich2/ib' 'FC=mpif90' 'CC=mpicc'"
 
 /* Define if you want to enable C convention for processor dimensions */
 /* #undef DIMS_C */
@@ -57,7 +57,7 @@
 /* #undef IBM */
 
 /* Define if you want to compile P3DFFT using Intel compiler */
-/* #undef INTEL */
+#define INTEL 1
 
 /* Define if you want to enable the measure algorithm */
 #define MEASURE 1

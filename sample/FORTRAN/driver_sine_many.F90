@@ -26,14 +26,14 @@
 ! This sample program illustrates the 
 ! use of P3DFFT library for highly scalable parallel 3D FFT. 
 !
+! This is a test program for MULTIVARIABLE routines of P3DFFT, 
+! such as ftran_r2c_many, btran_c2r_many etc
+
 ! This program initializes a 3D array with a 3D sine wave, then 
 ! performs forward transform, backward transform, and checks that 
 ! the results are correct, namely the same as in the start except 
 ! for a normalization factor. It can be used both as a correctness
 ! test and for timing the library functions. 
-!
-! This is a test program for MULTIVARIABLE routines of P3DFFT, 
-! such as ftran_r2c_many, btran_c2r_many etc
 !
 ! The program expects 'stdin' file in the working directory, with 
 ! a single line of numbers : Nx,Ny,Nz,Ndim,Nv,Nrep. Here Nx,Ny,Nz
@@ -63,12 +63,12 @@
 
       real(mytype), dimension(:,:,:,:),  allocatable :: BEG,C
       complex(mytype), dimension(:,:,:,:),  allocatable :: AEND
-      real(mytype) pi,twopi,sinyz,diff,cdiff,ccdiff,ans
+      real(mytype) twopi
 
       integer(i8) Ntot
       real(mytype) factor
       real(mytype),dimension(:,:),allocatable:: sinx,siny,sinz
-      real(i8) rtime1,rtime2,Nglob,prec
+      real(i8) rtime1,rtime2,Nglob
       real(i8) gt(12,3),gtcomm(3),tc
       integer ierr,nu,ndim,dims(2),nproc,proc_id,j,nv
       integer istart(3),iend(3),isize(3)
@@ -167,13 +167,6 @@
 !   dimension could be either X or Z)
 ! 
       call p3dfft_get_dims(fstart,fend,fsize,2)
-!
-! Initialize the array to be transformed
-!
-      allocate (sinx(nx,nv))
-      allocate (siny(ny,nv))
-      allocate (sinz(nz,nv))
-
 
 !      print *,'Allocating BEG (',isize,istart,iend
       allocate (BEG(istart(1):iend(1),istart(2):iend(2),istart(3):iend(3),nv), stat=ierr)
@@ -190,29 +183,7 @@
          print *,'Error ',ierr,' allocating array C'
       endif
 
-! Initialize with 3D sine wave, with wavelength dependent on var. number j
-
-      do j=1,nv
-
-         do z=istart(3),iend(3)
-            sinz(z,j)=sin(j*(z-1)*twopi/nz)
-         enddo
-         do y=istart(2),iend(2)
-            siny(y,j)=sin(j*(y-1)*twopi/ny)
-         enddo
-         do x=istart(1),iend(1)
-            sinx(x,j)=sin(j*(x-1)*twopi/nx)
-         enddo
-         
-         do z=istart(3),iend(3)
-            do y=istart(2),iend(2)
-               sinyz=siny(y,j)*sinz(z,j)
-               do x=istart(1),iend(1)
-                  BEG(x,y,z,j)=sinx(x,j)*sinyz 
-               enddo
-            enddo
-         enddo
-      enddo
+      call init_ar_sine_many(BEG,nv)
 
 !
 ! transform from physical space to wavenumber space
@@ -221,7 +192,7 @@
 ! (XiYjZg to XgYiZj)
 !
 
-! Do a few transforms to "warm up" the network
+! Do a few transforms to "warm up" the network (for more accurate timing reporting)
          call p3dfft_ftran_r2c_many (BEG,isize(1)*isize(2)*isize(3),AEND, &
               fsize(1)*fsize(2)*fsize(3),nv,'fft')
          call p3dfft_ftran_r2c_many (BEG,isize(1)*isize(2)*isize(3),AEND, &
@@ -274,36 +245,7 @@
       call p3dfft_clean
 
 ! Check results
-      do j=1,nv
-
-         cdiff=0.0d0
-         do 20 z=istart(3),iend(3)
-            do 20 y=istart(2),iend(2)
-               sinyz=siny(y,j)*sinz(z,j)
-               do 20 x=istart(1),iend(1)
-                  ans=sinx(x,j)*sinyz
-                  if(cdiff .lt. abs(C(x,y,z,j)-ans)) then
-                     cdiff = abs(C(x,y,z,j)-ans)
-                  endif
- 20      continue
-         call MPI_Reduce(cdiff,ccdiff,1,mpireal,MPI_MAX,0, &
-                   MPI_COMM_WORLD,ierr)
-
-        if(proc_id .eq. 0) then
-           write (6,*) 'Var. ',j,': max diff =',ccdiff
-           if(mytype .eq. 8) then
-              prec = 1e-14
-           else
-              prec = 1e-5
-           endif
-           if(ccdiff .gt. prec * Nglob*0.25) then
-              print *,'Results are incorrect'
-           else
-              print *,'Results are correct'
-           endif
-        endif
-
-      enddo
+      call check_res(C,nv)
 
 ! Gather timing statistics
       call MPI_Reduce(rtime1,rtime2,1,mpi_real8,MPI_MAX,0, &
@@ -345,9 +287,93 @@
       call MPI_FINALIZE (ierr)
 
       contains 
+
+!=========================================================
+      subroutine check_res(C,nv)      
 !=========================================================
 
+	real(mytype) C(istart(1):iend(1),istart(2):iend(2),istart(3):iend(3),nv)
+	real(mytype) sinyz,cdiff,ccdiff,ans,prec
+	integer j,x,y,z,nv
+
+      do j=1,nv
+
+         cdiff=0.0d0
+         do 20 z=istart(3),iend(3)
+            do 20 y=istart(2),iend(2)
+               sinyz=siny(y,j)*sinz(z,j)
+               do 20 x=istart(1),iend(1)
+                  ans=sinx(x,j)*sinyz
+                  if(cdiff .lt. abs(C(x,y,z,j)-ans)) then
+                     cdiff = abs(C(x,y,z,j)-ans)
+                  endif
+ 20      continue
+         call MPI_Reduce(cdiff,ccdiff,1,mpireal,MPI_MAX,0, &
+                   MPI_COMM_WORLD,ierr)
+
+        if(proc_id .eq. 0) then
+           write (6,*) 'Var. ',j,': max diff =',ccdiff
+           if(mytype .eq. 8) then
+              prec = 1e-14
+           else
+              prec = 1e-5
+           endif
+           if(ccdiff .gt. prec * Nglob*0.25) then
+              print *,'Results are incorrect'
+           else
+              print *,'Results are correct'
+           endif
+        endif
+
+      enddo
+
+      return
+      end subroutine
+
+!=========================================================
+	subroutine init_ar_sine_many(A,nv)
+!=========================================================
+
+	real(mytype) A(istart(1):iend(1),istart(2):iend(2),istart(3):iend(3),nv)
+	real(mytype) sinyz
+	integer j,x,y,z,nv
+!
+! Initialize the array to be transformed
+!
+      allocate (sinx(nx,nv))
+      allocate (siny(ny,nv))
+      allocate (sinz(nz,nv))
+
+! Initialize with 3D sine wave, with wavelength dependent on var. number j
+
+      do j=1,nv
+
+         do z=istart(3),iend(3)
+            sinz(z,j)=sin(j*(z-1)*twopi/nz)
+         enddo
+         do y=istart(2),iend(2)
+            siny(y,j)=sin(j*(y-1)*twopi/ny)
+         enddo
+         do x=istart(1),iend(1)
+            sinx(x,j)=sin(j*(x-1)*twopi/nx)
+         enddo
+         
+         do z=istart(3),iend(3)
+            do y=istart(2),iend(2)
+               sinyz=siny(y,j)*sinz(z,j)
+               do x=istart(1),iend(1)
+                  BEG(x,y,z,j)=sinx(x,j)*sinyz 
+               enddo
+            enddo
+         enddo
+      enddo
+
+      return
+      end subroutine
+
+!=========================================================
       subroutine mult_array(X,nar,f)
+!=========================================================
 
       use p3dfft
 

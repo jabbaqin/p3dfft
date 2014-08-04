@@ -152,10 +152,6 @@
       call p3dfft_get_dims(istart,iend,isize,1)
       call p3dfft_get_dims(fstart,fend,fsize,2)
 
-!
-! initialize
-!
-
 !      print *,'Allocating BEG (',isize,istart,iend
       allocate (BEG(istart(1):iend(1),istart(2):iend(2),istart(3):iend(3)), stat=ierr)
       if(ierr .ne. 0) then
@@ -174,6 +170,10 @@
       if(ierr .ne. 0) then
          print *,'Error ',ierr,' allocating array FIN'
       endif
+
+!
+! initialize
+!
 
 ! start with x-z slabs in physical space
 !

@@ -4,8 +4,8 @@
 !
 !    Software Framework for Scalable Fourier Transforms in Three Dimensions
 !
-!    Copyright (C) 2006-2010 Dmitry Pekurovsky
-!    Copyright (C) 2006-2010 University of California
+!    Copyright (C) 2006-2014 Dmitry Pekurovsky
+!    Copyright (C) 2006-2014 University of California
 !    Copyright (C) 2010-2011 Jens Henrik Goebbert
 !
 !    This program is free software: you can redistribute it and/or modify
@@ -71,6 +71,19 @@
       t = t + MPI_Wtime() 
 
 ! Unpack receive buffers into dest
+      
+      call unpack_bcomm1_many(dest,buf2,nv)
+      
+      return
+      end subroutine
+
+!========================================================
+      subroutine unpack_bcomm1_many(dest,buf2,nv)
+!========================================================
+
+      complex(mytype) dest(iisize,ny_fft,kjsize,nv)
+      complex(mytype) buf2(iisize*ny_fft*kjsize*nv)
+      integer i,j,position,pos0,pos1,x,y,z,dny,nv
 
       position=1
       dny = ny_fft - nyc
@@ -136,12 +149,13 @@
          position = (i+1)*KfCntMax*nv/(mytype*2)+1
 #endif
       enddo
-      
-      
-      return
-      end subroutine
 
+      end subroutine      
+
+
+!========================================================
       subroutine pack_bcomm1(A,j,nv)
+!========================================================
 
       integer j,nv
       complex(mytype) A(iisize,jjsize,nz_fft)
@@ -173,6 +187,7 @@
       return
       end subroutine
 
+!========================================================
       subroutine bcomm1 (source,dest,t,tc)
 !========================================================
       implicit none
@@ -224,6 +239,17 @@
       t = t + MPI_Wtime() 
 
 ! Unpack receive buffers into dest
+
+      call unpack_bcomm1(dest,buf2)
+
+      return
+      end subroutine
+
+      subroutine unpack_bcomm1(dest,buf2)
+
+      complex(mytype) dest(iisize,ny_fft,kjsize)
+      complex(mytype) buf2(iisize*ny_fft*kjsize)
+      integer i,position,pos0,x,y,z,dny
 
       position=1
       dny = ny_fft - nyc

@@ -32,7 +32,11 @@ if test "$ok" = "yes"; then
         AC_DEFINE(INTEL, 1, [Define if you want to compile P3DFFT using Intel compiler])
 	eval "ARRAY${N}='-DINTEL'"
 	N=`expr $N + 1`
+	if (( `echo $HOST | grep -c "blacklight"` > 0 )); then
+	AC_SUBST(FORTRAN_LIB,"-lmpi -limf -lifcore")
+	else
 	AC_SUBST(FORTRAN_LIB,"-lmpichf90 -limf -lifcore")
+	fi
 #        FORTRAN_LIB="-lmpi_f90 -limf -lifcore"
 fi
 
@@ -48,6 +52,18 @@ if test "$ok" = "yes"; then
         AC_SUBST(FORTRAN_LIB,"-pgf90libs")
 fi
 
+# check whether to compile using Cray
+AC_MSG_CHECKING([whether to use Cray compiler])
+AC_ARG_ENABLE(cray, [AC_HELP_STRING([--enable-cray], [compile P3DFFT using CRAY compiler])], ok=$enableval, ok=no)
+AC_MSG_RESULT([$ok])
+if test "$ok" = "yes"; then
+        AC_DEFINE(CRAY, 1, [Define if you want to compile P3DFFT using CRAY compiler])
+    eval FCFLAGS="\$FCFLAGS' -em -ef'"
+    eval "ARRAY${N}='-DCRAY'"
+        N=`expr $N + 1`
+        FORTRAN_LIB=""
+fi
+
 # check whether to compile using GNU
 AC_MSG_CHECKING([whether to use GNU compiler])
 AC_ARG_ENABLE(gnu, [AC_HELP_STRING([--enable-gnu], [compile P3DFFT using GNU compiler])], ok=$enableval, ok=no)
@@ -56,7 +72,11 @@ if test "$ok" = "yes"; then
         AC_DEFINE(GNU, 1, [Define if you want to compile P3DFFT using GNU compiler])
 	eval "ARRAY${N}='-DGNU'"
         N=`expr $N + 1`
+	if (( `echo $HOST | grep -c "blacklight"` > 0 )); then
+	AC_SUBST(FORTRAN_LIB,"-lgfortran -lmpi")
+	else
         AC_SUBST(FORTRAN_LIB,"-lgfortran -lmpichf90")
+	fi
 fi
 
 # check whether to enable single precision
@@ -236,6 +256,9 @@ if test "$withfftw" != "yes" && test "$withfftw" != ""; then
 	if test -e [$withfftw/lib/libfftw3.a ]; then
 		AC_SUBST(FFTW_INC, "-I$withfftw/include")
 		AC_SUBST(FFTW_LIB, "$withfftw/lib/libfftw3.a")
+        elif test -e [$withfftw/lib64/libfftw3.a ]; then
+                AC_SUBST(FFTW_INC, "-I$withfftw/include")
+                AC_SUBST(FFTW_LIB, "$withfftw/lib64/libfftw3.a")
 	else
 		AC_MSG_ERROR([libfftw3.a was not found in given location!])
 	fi

@@ -60,7 +60,7 @@
       real(mytype), dimension(:,:,:),  allocatable :: Beg
       real(mytype),dimension(:),allocatable:: sinx,siny,sinz
       real(mytype),dimension(:),allocatable:: cosx,cosy,cosz
-      real(mytype) pi,twopi,sinyz,diff,cdiff,ccdiff,ans,tmp
+      real(mytype) twopi
 
       integer(i8) Ntot
       real(mytype) factor
@@ -227,9 +227,61 @@
       call p3dfft_clean
 
 ! Check results: we expect four non-zero values
+     call check_res(FIN)
+      
+      deallocate(sinx,siny,sinz,cosx,cosy,cosz)
+      deallocate(BEG,FIN)
 
-      cdiff = 0.0
-      tmp = 0.0
+! Gather timing statistics
+      call MPI_Reduce(rtime1,rtime2,1,mpi_real8,MPI_MAX,0, &
+        MPI_COMM_WORLD,ierr)
+
+      if (proc_id.eq.0) write(6,*)'proc_id, cpu time per loop', &
+         proc_id,rtime2/dble(n)
+
+      timers = timers / dble(n)
+
+      call MPI_Reduce(timers,gt(1,1),12,mpi_real8,MPI_SUM,0, &
+        MPI_COMM_WORLD,ierr)
+
+      call MPI_Reduce(timers,gt(1,2),12,mpi_real8,MPI_MAX,0, &
+        MPI_COMM_WORLD,ierr)
+
+      call MPI_Reduce(timers,gt(1,3),12,mpi_real8,MPI_MIN,0, &
+        MPI_COMM_WORLD,ierr)
+
+      tc = (timers(1)+timers(2)+timers(3)+timers(4))
+      call MPI_Reduce(tc,gtcomm(1),1,mpi_real8,MPI_SUM,0, &
+        MPI_COMM_WORLD,ierr)
+      call MPI_Reduce(tc,gtcomm(2),1,mpi_real8,MPI_MAX,0, &
+        MPI_COMM_WORLD,ierr)
+      call MPI_Reduce(tc,gtcomm(3),1,mpi_real8,MPI_MIN,0, &
+        MPI_COMM_WORLD,ierr)
+
+      gt(1:12,1) = gt(1:12,1) / dble(nproc)
+      gtcomm(1) = gtcomm(1) / dble(nproc)
+
+      if(proc_id .eq. 0) then
+         do i=1,12
+            print *,'timer',i,' (avg/max/min): ',gt(i,:)
+         enddo
+         print *,'Total comm (avg/max/min): ',gtcomm
+      endif
+
+
+      call MPI_FINALIZE (ierr)
+
+      contains 
+
+!=========================================================
+      subroutine check_res(FIN)
+!=========================================================
+
+      real(mytype) FIN(fstart(1):fend(1),fstart(2):fend(2),fstart(3):fend(3))
+      real(mytype) cdiff,ccdiff,prec,tmp
+
+      cdiff = 0.0d0
+      tmp = 0.0d0
       do z=fstart(3),fend(3)
          do y=fstart(2),fend(2)
             do x=fstart(1),fend(1)
@@ -286,54 +338,15 @@
          endif
          print *,'Max diff =',ccdiff
       endif
-      
-      deallocate(sinx,siny,sinz,cosx,cosy,cosz)
-      deallocate(BEG,FIN)
 
-! Gather timing statistics
-      call MPI_Reduce(rtime1,rtime2,1,mpi_real8,MPI_MAX,0, &
-        MPI_COMM_WORLD,ierr)
+      return
+      end subroutine
 
-      if (proc_id.eq.0) write(6,*)'proc_id, cpu time per loop', &
-         proc_id,rtime2/dble(n)
-
-      timers = timers / dble(n)
-
-      call MPI_Reduce(timers,gt(1,1),12,mpi_real8,MPI_SUM,0, &
-        MPI_COMM_WORLD,ierr)
-
-      call MPI_Reduce(timers,gt(1,2),12,mpi_real8,MPI_MAX,0, &
-        MPI_COMM_WORLD,ierr)
-
-      call MPI_Reduce(timers,gt(1,3),12,mpi_real8,MPI_MIN,0, &
-        MPI_COMM_WORLD,ierr)
-
-      tc = (timers(1)+timers(2)+timers(3)+timers(4))
-      call MPI_Reduce(tc,gtcomm(1),1,mpi_real8,MPI_SUM,0, &
-        MPI_COMM_WORLD,ierr)
-      call MPI_Reduce(tc,gtcomm(2),1,mpi_real8,MPI_MAX,0, &
-        MPI_COMM_WORLD,ierr)
-      call MPI_Reduce(tc,gtcomm(3),1,mpi_real8,MPI_MIN,0, &
-        MPI_COMM_WORLD,ierr)
-
-      gt(1:12,1) = gt(1:12,1) / dble(nproc)
-      gtcomm(1) = gtcomm(1) / dble(nproc)
-
-      if(proc_id .eq. 0) then
-         do i=1,12
-            print *,'timer',i,' (avg/max/min): ',gt(i,:)
-         enddo
-         print *,'Total comm (avg/max/min): ',gtcomm
-      endif
-
-
-      call MPI_FINALIZE (ierr)
-
-      contains 
 !=========================================================
 ! Initialize complex array passed as real
 
         subroutine init_wave1(A)
+!=========================================================
 
            implicit none
 

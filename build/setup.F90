@@ -4,8 +4,8 @@
 !
 !    Software Framework for Scalable Fourier Transforms in Three Dimensions
 !
-!    Copyright (C) 2006-2010 Dmitry Pekurovsky
-!    Copyright (C) 2006-2010 University of California
+!    Copyright (C) 2006-2014 Dmitry Pekurovsky
+!    Copyright (C) 2006-2014 University of California
 !    Copyright (C) 2010-2011 Jens Henrik Goebbert
 !
 !    This program is free software: you can redistribute it and/or modify
@@ -309,7 +309,6 @@
 
       endif
 
-!      print *,taskid,': padd=',padd
 ! Initialize FFTW and allocate buffers for communication
       nm = nxhp * jisize * (kjsize+padd) 
       nv_preset = 1
@@ -411,11 +410,6 @@
          KfRcvStrt(i) = (kjst(i) -1) * iisize * jjsize*mytype*2
          KfRcvCnts(i) = iisize*jjsize*kjsz(i)*mytype*2
       end do
-
-    if(taskid .eq. 0) then
-       print *,'KfRcv Cnts and Strt:', kfrcvcnts,kfrcvstrt
-    endif
-
 
 !   start pointers and types of send  for the 1st inverse transpose
       do i=0,jproc-1

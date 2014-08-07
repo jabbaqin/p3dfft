@@ -99,7 +99,11 @@
       	enddo
       	allocate(coordZ(nz))
       	do k=1,nz
+#ifndef SINGLE_PREC
       		coordZ(k) = dcos( pi*(k-1)/dble(nz-1) ) *2.d0/Lz
+#else
+      		coordZ(k) = cos( pi*(k-1)/dble(nz-1) ) *2.d0/Lz
+#endif
       	enddo
       	if(mod(nz,2) .eq. 0) then
       		if(proc_id .eq. 0) write(*,*) 'ERROR: Chebyshev expects nz to be odd!'
@@ -168,6 +172,8 @@
 
       call MPI_FINALIZE (ierr)
 
+      stop
+
       end
 
 !=========================================================
@@ -210,7 +216,11 @@
       	integer            :: i,j,k,ierr
 
       	do k=istart(3),iend(3)
+#ifndef SINGLE_PREC
            rmem(:,:,k) = dsin(coordZ(k))
+#else
+           rmem(:,:,k) = sin(coordZ(k))
+#endif
         enddo
 
          call MPI_Barrier(MPI_COMM_WORLD,ierr)
@@ -249,7 +259,11 @@
         do k=istart(3),iend(3)
       	  do j=istart(2),iend(2)
              do i=istart(1),iend(1)
+#ifndef SINGLE_PREC
      		  delta = rmem(i,j,k) -dcos(coordZ(k))
+#else
+     		  delta = rmem(i,j,k) -cos(coordZ(k))
+#endif
      		  if(abs(delta) .gt. maxdelta1) maxdelta1 = abs(delta)
      		enddo
      	  enddo

@@ -8,6 +8,6 @@
 
 /* check for GCC 4.4.4 (40404) */
 #elif GCC_VERSION >= 40404
-#define FORT_MOD_NAME(NAME) __p3dfft_MOD_##NAME
+#define FORT_MOD_NAME(NAME) NAME
 #define FORTNAME(NAME) NAME##_
 #endif

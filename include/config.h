@@ -5,7 +5,7 @@
 /* #undef CC */
 
 /* arguments passed to configure script */
-#define CONFIGURE_ARGS " '--enable-gnu' '--enable-fftw' '--with-fftw=/opt/fftw/3.3.3/gnu/mvapich2/ib' 'FC=mpif90' 'CC=mpicc'"
+#define CONFIGURE_ARGS " '--enable-intel' '--enable-fftw' '--with-fftw=/opt/fftw/3.3.3/intel/mvapich2/ib' 'FC=mpif90' 'CC=mpicc'"
 
 /* Define if you want to compile P3DFFT using CRAY compiler */
 /* #undef CRAY */
@@ -23,7 +23,7 @@
 #define FFTW 1
 
 /* Define if you want to compile P3DFFT using GNU compiler */
-#define GNU 1
+/* #undef GNU */
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H 1
@@ -60,7 +60,7 @@
 /* #undef IBM */
 
 /* Define if you want to compile P3DFFT using Intel compiler */
-/* #undef INTEL */
+#define INTEL 1
 
 /* Define if you want to enable the measure algorithm */
 #define MEASURE 1

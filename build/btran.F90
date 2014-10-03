@@ -79,7 +79,7 @@
 ! such as ESSL, initialize here
 
 
-!$OMP PARALLEL DO ordered private(buf,j,z) shared(XgYZ,buf_size,nx,jisize,kjsize,nxhp,timers,iproc,taskid,jproc,iisize,jjsize,ny,nz,op,XYZg,nzc,nzhc,Nl,nv,OW)
+!$OMP PARALLEL DO private(buf,j,z) shared(XgYZ,buf_size,nx,jisize,kjsize,nxhp,timers,iproc,taskid,jproc,iisize,jjsize,ny,nz,op,XYZg,nzc,nzhc,Nl,nv,OW)
       do j=1,nv
 
 ! Allocate work array

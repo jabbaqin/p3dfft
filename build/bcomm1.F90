@@ -214,6 +214,7 @@
   
          t = t - MPI_Wtime() 
 !$OMP ordered
+      if(ithr .eq. threadid) then   
          call mpi_alltoall(buf1,KfCntMax,mpi_byte, &
               buf2,KfCntMax,mpi_byte,mpi_comm_col,ierr)
 !$OMP end ordered
@@ -222,6 +223,7 @@
       else
          t = t - MPI_Wtime() 
 !$OMP ordered
+      if(ithr .eq. threadid) then   
          call mpi_alltoall(source,KfCntMax,mpi_byte, &
               buf2,KfCntMax,mpi_byte,mpi_comm_col,ierr)
 !$OMP end ordered

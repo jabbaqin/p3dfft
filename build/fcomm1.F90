@@ -161,7 +161,7 @@
 #endif
 
       real(r8) t,tc
-      integer x,y,i,ierr,z,xs,j,n,ix,iy,y2,x2,l
+      integer x,y,i,ierr,z,xs,j,n,ix,iy,y2,x2,l,ithr
       integer(i8) position,pos1,pos0,pos2
       complex(mytype), allocatable :: buf1(:),buf2(:)
       integer threadid,omp_get_thread_num
@@ -202,7 +202,10 @@
 !$OMP FLUSH
 #endif
 
-!$OMP ordered
+! !$OMP ordered
+   do ithr=0,nthreads-1
+!$OMP BARRIER
+      if(ithr .eq. threadid) then   
 
 #ifdef USE_EVEN
 
@@ -222,7 +225,10 @@
       call mpi_alltoallv(buf1,IfSndCnts, IfSndStrt,mpi_byte, buf2,IfRcvCnts, IfRcvStrt,mpi_byte,mpi_comm_row,ierr)
 #endif
 
-!$OMP end ordered
+	endif	
+     enddo	
+
+! !$OMP end ordered
 
 #ifdef DEBUG
       print *,taskid,threadid,": Passed alltoall in fcomm1"

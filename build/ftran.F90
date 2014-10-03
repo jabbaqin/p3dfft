@@ -92,7 +92,7 @@
 #endif
 
 
-!$OMP PARALLEL DO ordered private(buf,j,z,dnz) shared(XgYZ,buf_size,nx,jisize,kjsize,nxhp,timers,iproc,taskid,jproc,iisize,jjsize,ny,nz,op,XYZg,nzc,nzhc,Nl,nv)
+!$OMP PARALLEL DO  private(buf,j,z,dnz) shared(XgYZ,buf_size,nx,jisize,kjsize,nxhp,timers,iproc,taskid,jproc,iisize,jjsize,ny,nz,op,XYZg,nzc,nzhc,Nl,nv)
       do j=1,nv
 
         allocate (buf(buf_size), stat=err)

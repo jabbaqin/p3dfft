@@ -164,9 +164,10 @@
       complex(mytype) source(iisize,ny_fft,kjsize)
 #endif
       real(r8) t,tc
-      integer x,y,z,i,ierr,ix,iy,x2,y2,l
+      integer x,y,z,i,ierr,ix,iy,x2,y2,l,ithr
       integer(i8) position,pos1,pos0,pos2
       complex(mytype), allocatable :: buf1(:),buf2(:)
+      integer threadid,omp_get_thread_num
 
       tc = tc - MPI_Wtime()
 
@@ -224,7 +225,12 @@
 
 ! !$OMP BARRIER
 
-!$OMP ordered
+      threadid = OMP_GET_THREAD_NUM()
+
+! !$OMP ordered
+   do ithr=0,nthreads-1
+!$OMP BARRIER
+      if(ithr .eq. threadid) then   
 
 #ifdef USE_EVEN
       call mpi_alltoall (buf1,IfCntMax,mpi_byte, buf2,IfCntMax,mpi_byte,mpi_comm_row,ierr)
@@ -232,7 +238,9 @@
       call mpi_alltoallv (buf1,KrSndCnts, KrSndStrt, mpi_byte, buf2,KrRcvCnts,KrRcvStrt,mpi_byte,mpi_comm_row,ierr)
 #endif
 
-!$OMP end ordered
+     endif
+    enddo
+! !$OMP end ordered
 
       deallocate(buf1)
 

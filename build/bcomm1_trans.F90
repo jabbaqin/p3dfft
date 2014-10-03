@@ -34,11 +34,12 @@
       use fft_spec
       implicit none
 
-      integer j,nv,nz,dim,ierr
+      integer j,nv,nz,dim,ierr,ithr
 ! Assume STRIDE1
       complex(mytype) source(nzc,jjsize,iisize)
       complex(mytype) dest(ny_fft,iisize,kjsize)
       complex(mytype), allocatable :: buf1(:), buf2(:)
+      integer threadid,omp_get_thread_num
 
       real(r8) t,tc
       character(len=3) op
@@ -59,7 +60,12 @@
 !      tc = tc + MPI_Wtime()
 !      t = t - MPI_Wtime() 
 
-!$OMP ORDERED
+      threadid = OMP_GET_THREAD_NUM()
+
+! !$OMP ORDERED
+   do ithr=0,nthreads-1
+!$OMP BARRIER
+      if(ithr .eq. threadid) then   
 
 #ifdef USE_EVEN
       call mpi_alltoall(buf1,KfCntMax, mpi_byte, buf2,KfCntMax,mpi_byte,mpi_comm_col,ierr)
@@ -67,7 +73,9 @@
 
       call mpi_alltoallv(buf1,JrSndCnts, JrSndStrt,mpi_byte, buf2,JrRcvCnts, JrRcvStrt,mpi_byte,mpi_comm_col,ierr)
 #endif
-!$OMP END ORDERED
+     endif
+   enddo
+! !$OMP END ORDERED
 
 !      t = t + MPI_Wtime() 
 !      tc = tc - MPI_Wtime()

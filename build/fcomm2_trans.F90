@@ -44,7 +44,7 @@
       real(r8) t,tc
       integer x,z,y,i,ierr,xs,ys,y2,z2,iy,iz,ix,x2,n,sz,l,dny,dnz
       integer(i8) position,pos1,pos0,pos2
-      integer threadid,omp_get_thread_num
+      integer threadid,omp_get_thread_num,ithr
       character(len=3) op
       integer sndcnts(0:jproc-1)
       integer rcvcnts(0:jproc-1)
@@ -86,7 +86,11 @@
 !      t = t - MPI_Wtime()
 
 
-!$OMP ORDERED
+!  can't use !$OMP ORDERED for the second time in the loop, so write our own
+
+   do ithr=0,nthreads-1
+!$OMP BARRIER
+      if(ithr .eq. threadid) then   
 
 #ifdef USE_EVEN
       call mpi_alltoall(buf1,KfCntMax, mpi_byte, buf2,KfCntMax, mpi_byte,mpi_comm_col,ierr)
@@ -100,7 +104,10 @@
       call mpi_alltoallv(buf1,KfSndCnts, KfSndStrt,mpi_byte,buf2,KfRcvCnts, KfRcvStrt,mpi_byte,mpi_comm_col,ierr)
 #endif
 
-!$OMP END ORDERED
+	endif
+    enddo	
+
+!  !$OMP END ORDERED
 
 #ifdef DEBUG
       print *,taskid,threadid,": Passed alltoall in fcomm2_trans"

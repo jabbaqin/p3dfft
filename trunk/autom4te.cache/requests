@@ -340,8 +340,8 @@
                         'AM_SET_LEADING_DOT' => 1,
                         'AM_SET_DEPDIR' => 1,
                         '_AM_DEPENDENCIES' => 1,
-                        'AM_PROG_INSTALL_SH' => 1,
                         'm4_include' => 1,
+                        'AM_PROG_INSTALL_SH' => 1,
                         '_AC_AM_CONFIG_HEADER_HOOK' => 1,
                         'AU_DEFUN' => 1,
                         'AM_MAKE_INCLUDE' => 1
